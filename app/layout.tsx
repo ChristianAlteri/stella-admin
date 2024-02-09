@@ -1,13 +1,14 @@
 import './globals.css'
-import { Roboto } from 'next/font/google'
+import { Roboto_Flex } from 'next/font/google'
 import { ClerkProvider } from '@clerk/nextjs'
 import { ModalProvider } from '@/providers/modal-provider'
 import { ToastProvider } from '@/providers/toast-provider'
 
 
 
-const font = Roboto({
-  weight: '400',
+const font = Roboto_Flex({
+  weight: '600',
+
   subsets: ['latin'],
 })
 
