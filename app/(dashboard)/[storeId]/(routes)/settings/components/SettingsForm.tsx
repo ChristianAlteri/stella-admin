@@ -8,7 +8,7 @@ import { toast } from "react-hot-toast";
 import { Trash } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-// import { useOrigin } from "@/hooks/use-origin";
+import { useOrigin } from "@/hooks/use-origin";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -22,12 +22,12 @@ import {
 } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { Heading } from "@/components/ui/heading";
-// import { ApiAlert } from "@/components/ui/api-alert";
+import { ApiAlert } from "@/components/ui/api-alert";
 import { Store } from "@prisma/client";
 import { Trash2 } from "lucide-react";
 import { TbFaceId, TbFaceIdError } from "react-icons/tb";
 import { AlertModal } from "@/components/modals/alert-modal";
-import { ApiAlert } from "@/components/ui/api-alert";
+
 
 interface SettingsFormProps {
   initialData: Store;
@@ -42,7 +42,7 @@ type SettingsFormValues = z.infer<typeof formSchema>;
 const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
   const params = useParams();
   const router = useRouter();
-  //   const origin = useOrigin();
+    const origin = useOrigin();
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
