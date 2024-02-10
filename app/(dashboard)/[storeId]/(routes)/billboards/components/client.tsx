@@ -5,15 +5,15 @@ import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
 
 import { Plus, PlusCircle, PlusSquare } from "lucide-react";
-import { columns, BillboardColumn } from "./columns";
+// import { columns, BillboardColumn } from "./columns";
 import { useParams, useRouter } from "next/navigation";
 
 interface BillboardClientProps {
-    data: BillboardColumn[];
+    // data: BillboardColumn[];
   }
   
   export const BillboardClient: React.FC<BillboardClientProps> = ({
-    data
+    // data
   }) => {
     const params = useParams();
     const router = useRouter();
