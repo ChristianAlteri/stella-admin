@@ -26,7 +26,7 @@ interface BillboardClientProps {
         />
         <Button onClick={() => router.push(`/${params.storeId}/billboards/new`)} size="sm">
           <PlusCircle className="mr-2 h-4 w-4" />
-          Upload
+          Create New
         </Button>
       </div>
       <Separator />
