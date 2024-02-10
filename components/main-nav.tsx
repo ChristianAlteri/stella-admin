@@ -30,9 +30,9 @@ export function MainNav({
       active: pathname === `/${params.storeId}/categories`,
     },
     {
-      href: `/${params.storeId}/brands`,
-      label: 'Brands',
-      active: pathname === `/${params.storeId}/brands`,
+      href: `/${params.storeId}/designers`,
+      label: 'Designers',
+      active: pathname === `/${params.storeId}/designers`,
     },
     {
       href: `/${params.storeId}/sizes`,
@@ -72,7 +72,7 @@ export function MainNav({
           href={route.href}
           className={cn(
             'text-sm font-medium transition-colors hover:text-primary hover:underline',
-            route.active ? 'text-black dark:text-white hover:underline' : 'text-muted-foreground'
+            route.active ? 'text-black  rounded-md p-2 bg-stone-100 dark:text-white hover:underline' : 'text-muted-foreground'
           )}
         >
           {route.label}

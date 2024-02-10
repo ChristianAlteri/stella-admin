@@ -17,7 +17,7 @@ model Store {
   userId     String
   billboards Billboard[] @relation("StoreToBillboard")
   categories Category[]  @relation("StoreToCategory")
-  brands     Brand[]     @relation("StoreToBrand")
+  designers  Designer[]  @relation("StoreToDesigner")
   products   Product[]   @relation("StoreToProduct")
   sizes      Size[]      @relation("StoreToSize")
   colors     Color[]     @relation("StoreToColor")
@@ -55,7 +55,7 @@ model Billboard {
   label      String
   imageUrl   String
   categories Category[]
-  brands     Brand[]
+  designers  Designer[]
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 
@@ -78,14 +78,14 @@ model Category {
   @@index([billboardId])
 }
 
-model Brand {
+model Designer {
   id          String    @id @default(uuid())
   storeId     String // Foreign Key to Store
-  store       Store     @relation("StoreToBrand", fields: [storeId], references: [id])
+  store       Store     @relation("StoreToDesigner", fields: [storeId], references: [id])
   billboardId String // Foreign Key to Billboard
   billboard   Billboard @relation(fields: [billboardId], references: [id])
   name        String
-  products    Product[] @relation("BrandToProduct")
+  products    Product[] @relation("DesignerToProduct")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -99,8 +99,8 @@ model Product {
   store        Store       @relation("StoreToProduct", fields: [storeId], references: [id])
   categoryId   String // Foreign Key to Category
   category     Category    @relation("CategoryToProduct", fields: [categoryId], references: [id])
-  brandId      String // Foreign Key to Brand
-  brand        Brand       @relation("BrandToProduct", fields: [brandId], references: [id])
+  designerId   String // Foreign Key to Designer
+  designer     Designer    @relation("DesignerToProduct", fields: [designerId], references: [id])
   name         String
   description  String?
   retailPrice  Decimal
@@ -131,7 +131,7 @@ model Product {
   @@index([categoryId])
   @@index([sizeId])
   @@index([colorId])
-  @@index([brandId])
+  @@index([designerId])
   @@index([sellerId])
 }
 
@@ -146,9 +146,8 @@ model Order {
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 
-  userId   String // Foreign Key to User
-  User     User    @relation("OrderToUser", fields: [userId], references: [id])
-
+  userId String // Foreign Key to User
+  User   User   @relation("OrderToUser", fields: [userId], references: [id])
 
   @@index([storeId])
   @@index([userId])
