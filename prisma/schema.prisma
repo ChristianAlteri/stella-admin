@@ -68,6 +68,8 @@ model Category {
   store       Store     @relation("StoreToCategory", fields: [storeId], references: [id])
   billboardId String // Foreign Key to Billboard
   billboard   Billboard @relation(fields: [billboardId], references: [id])
+  orderId String // Foreign Key to Order
+  order   Order @relation(fields: [orderId], references: [id])
   name        String
   clicks      Int?      @default(0)
   products    Product[] @relation("CategoryToProduct")
@@ -76,6 +78,7 @@ model Category {
 
   @@index([storeId])
   @@index([billboardId])
+  @@index([orderId])
 }
 
 model Designer {
@@ -84,6 +87,8 @@ model Designer {
   store       Store     @relation("StoreToDesigner", fields: [storeId], references: [id])
   billboardId String // Foreign Key to Billboard
   billboard   Billboard @relation(fields: [billboardId], references: [id])
+  orderId String // Foreign Key to Order
+  order   Order @relation(fields: [orderId], references: [id])
   name        String
   products    Product[] @relation("DesignerToProduct")
   createdAt   DateTime  @default(now())
@@ -91,6 +96,7 @@ model Designer {
 
   @@index([storeId])
   @@index([billboardId])
+  @@index([orderId])
 }
 
 model Product {
@@ -140,11 +146,14 @@ model Order {
   storeId    String // Foreign Key to Store
   store      Store       @relation("StoreToOrder", fields: [storeId], references: [id])
   orderItems OrderItem[] // Relation to OrderItem model
+  ordersInCategory Category[] // Relation to Category model
+  ordersInDesigner Designer[] // Relation to Designer model
   isPaid     Boolean     @default(false)
   phone      String      @default("")
   address    String      @default("")
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
+
 
   userId String // Foreign Key to User
   User   User   @relation("OrderToUser", fields: [userId], references: [id])

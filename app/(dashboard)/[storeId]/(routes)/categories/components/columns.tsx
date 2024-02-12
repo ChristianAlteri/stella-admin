@@ -9,6 +9,8 @@ export type CategoryColumn = {
   name: string;
   billboardLabel: string;
   createdAt: string;
+  imageUrl: string; 
+  productsUrl: string;
 }
 
 export const columns: ColumnDef<CategoryColumn>[] = [
@@ -18,12 +20,32 @@ export const columns: ColumnDef<CategoryColumn>[] = [
   },
   {
     accessorKey: "billboard",
-    header: "Billboard",
+    header: "Billboard Name",
     cell: ({ row }) => row.original.billboardLabel,
+  },
+  {
+    accessorKey: "imageUrl",
+    header: "Billboard Image",
+    cell: ({ row }) => 
+      <>
+        <a className="hover:underline" href={row.original.imageUrl}>
+          <img src={row.original.imageUrl} alt="Image" style={{ width: '100px', height: 'auto' }}></img> 
+        </a>
+      </>,
   },
   {
     accessorKey: "createdAt",
     header: "Created At",
+  },
+  {
+    accessorKey: "productsUrl", // This is the accessor key for the products URL
+    header: "Products", // Link to the products page
+    cell: ({ row }) => <a className="hover:underline" href={row.original.productsUrl}>Link to Products</a>
+  },
+  {
+    accessorKey: "ordersUrl", // This is the accessor key for the orders URL
+    header: "Orders", // Link to the orders page
+    cell: ({ row }) => <a className="hover:underline" href={row.original.productsUrl}>Link to Orders</a>
   },
   {
     id: "actions",

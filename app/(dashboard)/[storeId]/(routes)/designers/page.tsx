@@ -23,7 +23,7 @@ const DesignerPage = async ({
     }
   });
 
-  console.log("DESIGNERS", designers);
+  // console.log("DESIGNERS", designers);
 
   const formattedDesigners: DesignerColumn[] = designers.map((item) => ({
     id: item.id,

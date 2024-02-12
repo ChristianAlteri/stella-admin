@@ -15,18 +15,25 @@ const CategoriesPage = async ({
       storeId: params.storeId
     },
     include: {
-      billboard: true
+      billboard: true,
+      products: true,
+      order: true
     },
     orderBy: {
       createdAt: 'desc'
     }
   });
 
+  // console.log("CATEGORIES", categories);
+
   const formattedCategories: CategoryColumn[] = categories.map((item) => ({
     id: item.id,
     name: item.name,
     billboardLabel: item.billboard?.label,
     createdAt: format(item.createdAt, 'MMMM do, yyyy'),
+    imageUrl: item.billboard?.imageUrl,
+    productsUrl: `/api/${params.storeId}/categories/products`,
+    ordersUrl: `/api/${params.storeId}/categories/orders`,
   }));
 
   return (

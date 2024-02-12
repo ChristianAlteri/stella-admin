@@ -20,13 +20,18 @@ export const columns: ColumnDef<DesignerColumn>[] = [
   },
   {
     accessorKey: "billboard",
-    header: "Billboard",
+    header: "Billboard Name",
     cell: ({ row }) => row.original.billboardLabel,
   },
   {
     accessorKey: "imageUrl",
-    header: "Image",
-    cell: ({ row }) => <img src={row.original.imageUrl} alt="Image" style={{ width: '100px', height: 'auto' }}/>,
+    header: "Billboard Image",
+    cell: ({ row }) => 
+      <>
+        <a className="hover:underline" href={row.original.imageUrl}>
+          <img src={row.original.imageUrl} alt="Image" style={{ width: '100px', height: 'auto' }}></img> 
+        </a>
+      </>,
   },
   {
     accessorKey: "createdAt",
@@ -36,6 +41,11 @@ export const columns: ColumnDef<DesignerColumn>[] = [
     accessorKey: "productsUrl", // This is the accessor key for the products URL
     header: "Products", // Link to the products page
     cell: ({ row }) => <a className="hover:underline" href={row.original.productsUrl}>Link to Products</a>
+  },
+  {
+    accessorKey: "ordersUrl", // This is the accessor key for the orders URL
+    header: "Orders", // Link to the orders page
+    cell: ({ row }) => <a className="hover:underline" href={row.original.productsUrl}>Link to Orders</a>
   },
   {
     id: "actions",

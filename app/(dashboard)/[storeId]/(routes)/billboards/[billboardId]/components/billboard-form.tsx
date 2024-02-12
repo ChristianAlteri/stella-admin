@@ -6,7 +6,7 @@ import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { toast } from "react-hot-toast"
-import { Trash } from "lucide-react"
+import { Trash2 } from "lucide-react"
 import { Billboard } from "@prisma/client"
 import { useParams, useRouter } from "next/navigation"
 
@@ -130,7 +130,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
             size="sm"
             onClick={() => setOpen(true)}
           >
-            <Trash className="h-4 w-4" />
+            <Trash2 className="h-4 w-4" />
           </Button>
         )}
       </div>
