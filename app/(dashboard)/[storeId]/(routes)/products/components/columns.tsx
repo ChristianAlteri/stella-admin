@@ -46,21 +46,21 @@ export const columns: ColumnDef<ProductColumn>[] = [
     header: "Designer",
   },
   {
+    accessorKey: "description",
+    header: "Description",
+    cell: ({ row }) => (
+      <div className="flex items-center gap-x-2 overflow-y-auto">
+        {row.original.description}
+      </div>
+    )
+  },
+  {
     accessorKey: "likes",
     header: "Likes",
   },
   {
     accessorKey: "clicks",
     header: "Clicks",
-  },
-  {
-    accessorKey: "description",
-    header: "Description",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-x-2 overflow-x-auto">
-        {row.original.description}
-      </div>
-    )
   },
   // {
   //   accessorKey: "location",
@@ -79,20 +79,8 @@ export const columns: ColumnDef<ProductColumn>[] = [
     header: "Condition",
   },
   {
-    accessorKey: "measurements",
-    header: "Measurements",
-  },
-  {
-    accessorKey: "reference",
-    header: "Reference",
-  },
-  {
     accessorKey: "sex",
     header: "Sex",
-  },
-  {
-    accessorKey: "material",
-    header: "Material",
   },
   {
     accessorKey: "isFeatured",
@@ -105,6 +93,18 @@ export const columns: ColumnDef<ProductColumn>[] = [
   {
     accessorKey: "isOnSale",
     header: "OnSale",
+  },
+  {
+    accessorKey: "material",
+    header: "Material",
+  },
+  {
+    accessorKey: "measurements",
+    header: "Measurements",
+  },
+  {
+    accessorKey: "reference",
+    header: "Reference",
   },
   {
     accessorKey: "color",
@@ -125,7 +125,9 @@ export const columns: ColumnDef<ProductColumn>[] = [
   //   header: "Preview Image",
   //   cell: ({ row }) => 
   //     <>
-  //       <a className="hover:underline" href={row.original.imageUrl}>
+  //       {/* <a className="hover:underline" href={row.original.imageUrl}> */}
+  //       <a className="hover:underline" >
+
   //         <img src={row.original.imageUrl} alt="Image" style={{ width: '100px', height: 'auto' }}></img> 
   //       </a>
   //     </>,

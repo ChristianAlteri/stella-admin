@@ -29,7 +29,7 @@ const ProductsPage = async ({
     }
   });
 
-  console.log("PRODUCTS", products);
+  // console.log("ALL PRODUCTS", products);
 
   const formattedProducts: ProductColumn[] = products.map((item) => ({
     id: item.id,
