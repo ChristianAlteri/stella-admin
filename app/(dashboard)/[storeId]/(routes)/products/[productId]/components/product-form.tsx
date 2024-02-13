@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { toast } from "react-hot-toast"
 import { Trash } from "lucide-react"
-import { Category, Color, Image, Product, Size } from "@prisma/client"
+import { Category, Color, Designer, Image, Product, Size } from "@prisma/client"
 import { useParams, useRouter } from "next/navigation"
 
 import { Input } from "@/components/ui/input"
@@ -57,6 +57,7 @@ interface ProductFormProps {
     images: Image[]
   } | null;
   categories: Category[];
+  designers: Designer[];
   colors: Color[];
   sizes: Size[];
 };
@@ -64,6 +65,7 @@ interface ProductFormProps {
 export const ProductForm: React.FC<ProductFormProps> = ({
   initialData,
   categories,
+  designers,
   sizes,
   colors
 }) => {
@@ -184,6 +186,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               </FormItem>
             )}
           />
+          {/* Product  */}
           <div className="md:grid md:grid-cols-3 gap-8">
             <FormField
               control={form.control}
@@ -198,12 +201,26 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 </FormItem>
               )}
             />
+            {/* Price  */}
             <FormField
               control={form.control}
               name="ourPrice"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Price</FormLabel>
+                  <FormLabel>Our Price</FormLabel>
+                  <FormControl>
+                    <Input type="number" disabled={loading} placeholder="99.99" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="retailPrice"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>RR Price</FormLabel>
                   <FormControl>
                     <Input type="number" disabled={loading} placeholder="9.99" {...field} />
                   </FormControl>
@@ -211,6 +228,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 </FormItem>
               )}
             />
+            {/* Category selector */}
             <FormField
               control={form.control}
               name="categoryId"
@@ -220,11 +238,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   <Select disabled={loading} onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue defaultValue={field.value} placeholder="Select a category" />
+                        <SelectValue defaultValue="No category" placeholder="Select a category" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {categories.map((category) => (
+                      {categories?.map((category) => (
                         <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>
                       ))}
                     </SelectContent>
@@ -233,6 +251,30 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 </FormItem>
               )}
             />
+            {/* Designer selector */}
+            <FormField
+              control={form.control}
+              name="designerId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Designer</FormLabel>
+                  <Select disabled={loading} onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue defaultValue={field.value} placeholder="Select a Designer" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {designers?.map((designer) => (
+                        <SelectItem key={designer.id} value={designer.id}>{designer.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* Size selector */}
             <FormField
               control={form.control}
               name="sizeId"
@@ -255,6 +297,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 </FormItem>
               )}
             />
+            {/* Color selector */}
             <FormField
               control={form.control}
               name="colorId"
@@ -268,7 +311,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {colors.map((color) => (
+                      {colors?.map((color) => (
                         <SelectItem key={color.id} value={color.id}>{color.name}</SelectItem>
                       ))}
                     </SelectContent>
@@ -277,6 +320,68 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 </FormItem>
               )}
             />
+            {/* Condition selector */}
+            <FormField
+              control={form.control}
+              name="condition"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Condition</FormLabel>
+                  <Select disabled={loading} onValueChange={field.onChange} value="" defaultValue="Good">
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue defaultValue="Good" placeholder="Select a condition" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="New">New</SelectItem>
+                      <SelectItem value="Excellent">Excellent</SelectItem>
+                      <SelectItem value="Good">Good</SelectItem>
+                      <SelectItem value="Used">Used</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* Sex selector */}
+            <FormField
+              control={form.control}
+              name="sex"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Sex</FormLabel>
+                  <Select disabled={loading} onValueChange={field.onChange} value="" defaultValue="Unisex">
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue defaultValue="Unisex" placeholder="Select a sex" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Female">Female</SelectItem>
+                      <SelectItem value="Male">Male</SelectItem>
+                      <SelectItem value="Unisex">Unisex</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* Measurements */}
+            {/* <FormField
+              control={form.control}
+              name="measurements"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Measurements</FormLabel>
+                  <FormControl>
+                    <Input disabled={loading} placeholder="Measurements" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            /> */}
+            {/* Checkbox selectors */}
             <FormField
               control={form.control}
               name="isFeatured"
@@ -295,6 +400,29 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                     </FormLabel>
                     <FormDescription>
                       This product will appear on the home page
+                    </FormDescription>
+                  </div>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="isOnSale"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      // @ts-ignore
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>
+                      On Sale
+                    </FormLabel>
+                    <FormDescription>
+                      This product will appear on the sale page
                     </FormDescription>
                   </div>
                 </FormItem>

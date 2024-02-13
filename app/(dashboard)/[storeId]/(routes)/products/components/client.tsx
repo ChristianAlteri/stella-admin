@@ -31,7 +31,7 @@ interface ProductClientProps {
         />
         <Button onClick={() => router.push(`/${params.storeId}/products/new`)} size="sm">
           <PlusCircle className="mr-2 h-4 w-4" />
-          Create New
+          Add New
         </Button>
       </div>
       <Separator />

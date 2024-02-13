@@ -30,7 +30,59 @@ export type ProductColumn = {
 export const columns: ColumnDef<ProductColumn>[] = [
   {
     accessorKey: "name",
-    header: "name",
+    header: "Name",
+  },
+  {
+    accessorKey: "ourPrice",
+    header: "Price",
+  },
+  {
+    accessorKey: "retailPrice",
+    header: "RRP",
+  },
+  {
+    accessorKey: "designer",
+    header: "Designer",
+  },
+  {
+    accessorKey: "likes",
+    header: "Likes",
+  },
+  {
+    accessorKey: "clicks",
+    header: "Clicks",
+  },
+  // {
+  //   accessorKey: "location",
+  //   header: "Location",
+  // },
+  {
+    accessorKey: "category",
+    header: "Category",
+  },
+  {
+    accessorKey: "size",
+    header: "Size",
+  },
+  {
+    accessorKey: "condition",
+    header: "Condition",
+  },
+  {
+    accessorKey: "measurements",
+    header: "Measurements",
+  },
+  {
+    accessorKey: "reference",
+    header: "Reference",
+  },
+  {
+    accessorKey: "sex",
+    header: "Sex",
+  },
+  {
+    accessorKey: "material",
+    header: "Material",
   },
   {
     accessorKey: "isFeatured",
@@ -42,59 +94,7 @@ export const columns: ColumnDef<ProductColumn>[] = [
   },
   {
     accessorKey: "isOnSale",
-    header: "On Sale",
-  },
-  {
-    accessorKey: "ourPrice",
-    header: "Our Price",
-  },
-  {
-    accessorKey: "retailPrice",
-    header: "Real Retail Price",
-  },
-  // {
-  //   accessorKey: "location",
-  //   header: "Location",
-  // },
-  {
-    accessorKey: "condition",
-    header: "Condition",
-  },
-  {
-    accessorKey: "sex",
-    header: "Sex",
-  },
-  {
-    accessorKey: "material",
-    header: "Material",
-  },
-  {
-    accessorKey: "measurements",
-    header: "Measurements",
-  },
-  {
-    accessorKey: "likes",
-    header: "Likes",
-  },
-  {
-    accessorKey: "clicks",
-    header: "Clicks",
-  },
-  {
-    accessorKey: "reference",
-    header: "Reference",
-  },
-  {
-    accessorKey: "category",
-    header: "Category",
-  },
-  {
-    accessorKey: "designer",
-    header: "Designer",
-  },
-  {
-    accessorKey: "size",
-    header: "Size",
+    header: "OnSale",
   },
   {
     accessorKey: "color",
