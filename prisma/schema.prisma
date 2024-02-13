@@ -37,16 +37,16 @@ model User {
   orders Order[] @relation("OrderToUser")
 }
 
-model Seller {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  name         String   @unique
-  createdAt    DateTime @default(now())
-  instagramUrl String?
+// model Seller {
+//   id           String   @id @default(uuid())
+//   email        String   @unique
+//   name         String   @unique
+//   createdAt    DateTime @default(now())
+//   instagramUrl String?
 
-  // Purchase history
-  products Product[] @relation("ProductToSeller")
-}
+//   // Purchase history
+//   products Product[] @relation("ProductToSeller")
+// }
 
 model Billboard {
   id         String     @id @default(uuid())
@@ -108,7 +108,7 @@ model Product {
   designerId   String // Foreign Key to Designer
   designer     Designer    @relation("DesignerToProduct", fields: [designerId], references: [id])
   name         String
-  description  String?
+  description  String
   retailPrice  Decimal
   ourPrice     Decimal
   location     String?
@@ -122,8 +122,8 @@ model Product {
   isOnSale     Boolean     @default(false)
   isFeatured   Boolean     @default(false)
   isArchived   Boolean     @default(false)
-  sellerId     String // Foreign Key to Seller
-  seller       Seller      @relation("ProductToSeller", fields: [sellerId], references: [id])
+  // sellerId     String // Foreign Key to Seller
+  // seller       Seller      @relation("ProductToSeller", fields: [sellerId], references: [id])
   sizeId       String // Foreign Key to Size
   size         Size        @relation(fields: [sizeId], references: [id])
   colorId      String // Foreign Key to Color
@@ -138,7 +138,7 @@ model Product {
   @@index([sizeId])
   @@index([colorId])
   @@index([designerId])
-  @@index([sellerId])
+  // @@index([sellerId])
 }
 
 model Order {

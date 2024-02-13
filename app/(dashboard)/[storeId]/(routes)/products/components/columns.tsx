@@ -7,6 +7,7 @@ import { CellAction } from "./cell-action"
 export type ProductColumn = {
   id: string;
   name: string;
+  description: string;
   ourPrice: string;
   retailPrice: string;
   designer: string;
@@ -51,6 +52,15 @@ export const columns: ColumnDef<ProductColumn>[] = [
   {
     accessorKey: "clicks",
     header: "Clicks",
+  },
+  {
+    accessorKey: "description",
+    header: "Description",
+    cell: ({ row }) => (
+      <div className="flex items-center gap-x-2 overflow-x-auto">
+        {row.original.description}
+      </div>
+    )
   },
   // {
   //   accessorKey: "location",

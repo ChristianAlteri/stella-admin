@@ -27,9 +27,12 @@ import { AlertModal } from "@/components/modals/alert-modal"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import ImageUpload from "@/components/ui/image-upload"
 import { Checkbox } from "@/components/ui/checkbox"
+import { TbFaceId, TbFaceIdError } from "react-icons/tb"
+import { DescriptionInput } from "@/components/ui/descriptionInput"
 
 const formSchema = z.object({
   name: z.string().min(1),
+  description: z.string().min(1),
   images: z.object({ url: z.string() }).array(),
   ourPrice: z.coerce.number().min(1),
   retailPrice: z.coerce.number().min(1),
@@ -90,6 +93,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       clicks: parseFloat(String(initialData?.clicks)),
     } : {
       name: '',
+      description: '',
       images: [],
       ourPrice: 0,
       retailPrice: 0,
@@ -111,6 +115,27 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     }
   });
 
+    // Custom Toast Error
+    const toastError = (message: string) => {
+      toast.error(message, {
+        style: {
+          background: "white",
+          color: "black",
+        },
+        icon: <TbFaceIdError size={30} />,
+      });
+    };
+    // Custom Toast Success
+    const toastSuccess = (message: string) => {
+      toast.error(message, {
+        style: {
+          background: "white",
+          color: "green",
+        },
+        icon: <TbFaceId size={30} />,
+      });
+    };
+
   const onSubmit = async (data: ProductFormValues) => {
     try {
       setLoading(true);
@@ -121,9 +146,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       }
       router.refresh();
       router.push(`/${params.storeId}/products`);
-      toast.success(toastMessage);
+      toastSuccess(toastMessage);
     } catch (error: any) {
-      toast.error('Something went wrong.');
+      toastError('Something went wrong.');
     } finally {
       setLoading(false);
     }
@@ -135,9 +160,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       await axios.delete(`/api/${params.storeId}/products/${params.productId}`);
       router.refresh();
       router.push(`/${params.storeId}/products`);
-      toast.success('Product deleted.');
+      toastSuccess('Product deleted.');
     } catch (error: any) {
-      toast.error('Something went wrong.');
+      toastError('Something went wrong.');
     } finally {
       setLoading(false);
       setOpen(false);
@@ -201,6 +226,44 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 </FormItem>
               )}
             />
+            {/* Description */}
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl >
+                       <DescriptionInput type="string"
+                    disabled={loading} placeholder="Description" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* Size selector */}
+            <FormField
+              control={form.control}
+              name="sizeId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Size</FormLabel>
+                  <Select disabled={loading} onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue defaultValue={field.value} placeholder="Select a size" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {sizes.map((size) => (
+                        <SelectItem key={size.id} value={size.id}>{size.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             {/* Price  */}
             <FormField
               control={form.control}
@@ -224,6 +287,30 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   <FormControl>
                     <Input type="number" disabled={loading} placeholder="9.99" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* Condition selector */}
+            <FormField
+              control={form.control}
+              name="condition"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Condition</FormLabel>
+                  <Select disabled={loading} onValueChange={field.onChange} value="" defaultValue="Good">
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue defaultValue="Good" placeholder="Select a condition" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="New">New</SelectItem>
+                      <SelectItem value="Excellent">Excellent</SelectItem>
+                      <SelectItem value="Good">Good</SelectItem>
+                      <SelectItem value="Used">Used</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
@@ -274,29 +361,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 </FormItem>
               )}
             />
-            {/* Size selector */}
-            <FormField
-              control={form.control}
-              name="sizeId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Size</FormLabel>
-                  <Select disabled={loading} onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue defaultValue={field.value} placeholder="Select a size" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {sizes.map((size) => (
-                        <SelectItem key={size.id} value={size.id}>{size.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             {/* Color selector */}
             <FormField
               control={form.control}
@@ -314,30 +378,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                       {colors?.map((color) => (
                         <SelectItem key={color.id} value={color.id}>{color.name}</SelectItem>
                       ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {/* Condition selector */}
-            <FormField
-              control={form.control}
-              name="condition"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Condition</FormLabel>
-                  <Select disabled={loading} onValueChange={field.onChange} value="" defaultValue="Good">
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue defaultValue="Good" placeholder="Select a condition" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="New">New</SelectItem>
-                      <SelectItem value="Excellent">Excellent</SelectItem>
-                      <SelectItem value="Good">Good</SelectItem>
-                      <SelectItem value="Used">Used</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

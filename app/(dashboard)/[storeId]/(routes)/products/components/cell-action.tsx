@@ -1,11 +1,12 @@
 "use client";
 
 import axios from "axios";
-import { useState } from "react";
-import { Copy, Edit, MoreHorizontal, Trash, Trash2 } from "lucide-react";
-import { toast } from "react-hot-toast";
+import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "react-hot-toast";
 
+import { AlertModal } from "@/components/modals/alert-modal";
 import { Button } from "@/components/ui/button";
 import { 
   DropdownMenu, 
@@ -14,61 +15,60 @@ import {
   DropdownMenuLabel, 
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { AlertModal } from "@/components/modals/alert-modal";
 
-import { BillboardColumn } from "./columns";
+import { ProductColumn } from "./columns";
 import { TbFaceId, TbFaceIdError } from "react-icons/tb";
 
 interface CellActionProps {
-  data: BillboardColumn;
+  data: ProductColumn;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({
   data,
 }) => {
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
   const router = useRouter();
   const params = useParams();
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  // Custom Toast Error
-  const toastError = (message: string) => {
-    toast.error(message, {
-      style: {
-        background: "white",
-        color: "black",
-      },
-      icon: <TbFaceIdError size={30} />,
-    });
-  };
-  // Custom Toast Success
-  const toastSuccess = (message: string) => {
-    toast.error(message, {
-      style: {
-        background: "white",
-        color: "green",
-      },
-      icon: <TbFaceId size={30} />,
-    });
-  };
+// Custom Toast Error
+const toastError = (message: string) => {
+  toast.error(message, {
+    style: {
+      background: "white",
+      color: "black",
+    },
+    icon: <TbFaceIdError size={30} />,
+  });
+};
+// Custom Toast Success
+const toastSuccess = (message: string) => {
+  toast.error(message, {
+    style: {
+      background: "white",
+      color: "green",
+    },
+    icon: <TbFaceId size={30} />,
+  });
+};
 
   const onConfirm = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/${params.storeId}/billboards/${data.id}`);
-      toastSuccess('Billboard deleted.');
+      await axios.delete(`/api/${params.storeId}/products/${data.id}`);
+      toastSuccess('Product deleted.');
       router.refresh();
     } catch (error) {
-        toastError('Make sure you removed all categories using this billboard first.');
+      toastError('Something went wrong');
     } finally {
-      setOpen(false);
       setLoading(false);
+      setOpen(false);
     }
   };
 
   const onCopy = (id: string) => {
     navigator.clipboard.writeText(id);
-    toastSuccess('Billboard ID copied to clipboard.');
+    toast.success('Product ID copied to clipboard.');
   }
 
   return (
@@ -87,21 +87,21 @@ export const CellAction: React.FC<CellActionProps> = ({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel className="underline">Actions</DropdownMenuLabel>
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuItem
             onClick={() => onCopy(data.id)}
           >
             <Copy className="mr-2 h-4 w-4" /> Copy Id
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => router.push(`/${params.storeId}/billboards/${data.id}`)}
+            onClick={() => router.push(`/${params.storeId}/products/${data.id}`)}
           >
-            <Edit className="mr-2 h-4 w-4" /> Edit
+            <Edit className="mr-2 h-4 w-4" /> Update
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => setOpen(true)}
           >
-            <Trash2 className="mr-2 h-4 w-4" /> Delete
+            <Trash className="mr-2 h-4 w-4" /> Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
