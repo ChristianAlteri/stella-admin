@@ -142,7 +142,7 @@ export async function POST(
         },
       },
     });
-    console.log('[PRODUCTS_POST]', product);
+    // console.log('[PRODUCTS_POST]', product);
     return NextResponse.json(product);
   } catch (error) {
     console.log('[PRODUCTS_POST]', error);

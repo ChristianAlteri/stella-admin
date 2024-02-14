@@ -30,6 +30,7 @@ const ProductsPage = async ({
   });
 
   // console.log("ALL PRODUCTS", products);
+  // console.log("Images", products[0].images[0].url);
 
   const formattedProducts: ProductColumn[] = products.map((item) => ({
     id: item.id,
@@ -53,7 +54,7 @@ const ProductsPage = async ({
     size: item.size.name,
     color: item.color.value,
     createdAt: format(item.createdAt, 'MMMM do, yyyy'),
-    // imageUrl: item.images.
+    imageUrl: item.images[0].url
   }));
 
   return (

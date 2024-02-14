@@ -26,12 +26,28 @@ export type ProductColumn = {
   likes: number | null | undefined;
   clicks: number | null | undefined;
   reference: string | null | undefined;
+  imageUrl: string;
 }
 
 export const columns: ColumnDef<ProductColumn>[] = [
   {
     accessorKey: "name",
     header: "Name",
+    cell: ({ row }) => 
+      <div className="flex text-red-900" >
+       {row.original.name} 
+      </div>
+  },
+  {
+    accessorKey: "imageUrl",
+    header: "imageUrl",
+    cell: ({ row }) => (
+      <>
+        <a className="hover:underline" href={row.original.imageUrl}>
+          <img src={row.original.imageUrl} alt="Image" style={{ width: '100px', height: 'auto' }}></img> 
+        </a>
+      </>
+    )
   },
   {
     accessorKey: "ourPrice",
@@ -138,6 +154,9 @@ export const columns: ColumnDef<ProductColumn>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => <CellAction data={row.original} />
+    cell: ({ row }) => 
+      <div className="flex" >
+        <CellAction data={row.original} />
+      </div>
   },
 ];

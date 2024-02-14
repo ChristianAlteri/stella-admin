@@ -38,12 +38,15 @@ export async function DELETE(
 ) {
   try {
     const { userId } = auth();
+    const { productId } = params;
+    console.log('[PRODUCT_ID]', productId);
+    console.log('[PARAMS]', params);
 
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 403 });
     }
 
-    if (!params.productId) {
+    if (!productId) {
       return new NextResponse("Product id is required", { status: 400 });
     }
 
@@ -60,10 +63,10 @@ export async function DELETE(
 
     const product = await prismadb.product.delete({
       where: {
-        id: params.productId
+        id: productId
       },
     });
-  
+    console.log('[PRODUCT_DELETE]', product);
     return NextResponse.json(product);
   } catch (error) {
     console.log('[PRODUCT_DELETE]', error);
@@ -120,9 +123,9 @@ export async function PATCH(
       return new NextResponse("Images are required", { status: 400 });
     }
 
-    if (!ourPrice) {
-      return new NextResponse("Price is required", { status: 400 });
-    }
+    // if (!ourPrice) {
+    //   return new NextResponse("Price is required", { status: 400 });
+    // }
 
     // if (!categoryId) {
     //   return new NextResponse("Category id is required", { status: 400 });
@@ -167,13 +170,33 @@ export async function PATCH(
         isFeatured,
         isArchived,
         isOnSale,
-        categoryId,
-        designerId,
-        colorId,
-        sizeId,
+        // categoryId,
+        // designerId,
+        // colorId,
+        // sizeId,
         // sellerId,
         images: {
           deleteMany: {},
+        },
+        category: {
+          connect: {
+            id: categoryId
+          }
+        },
+        designer: {
+          connect: {
+            id: designerId
+          }
+        },
+        size: {
+          connect: {
+            id: sizeId
+          }
+        },
+        color: {
+          connect: {
+            id: colorId
+          }
         },
       },
     });

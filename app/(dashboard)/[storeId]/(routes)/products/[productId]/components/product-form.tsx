@@ -89,6 +89,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       ...initialData,
       ourPrice: parseFloat(String(initialData?.ourPrice)),
       retailPrice: parseFloat(String(initialData?.retailPrice)),
+      colorId: initialData?.colorId.toString(),
       likes: parseFloat(String(initialData?.likes)),
       clicks: parseFloat(String(initialData?.clicks)),
     } : {
