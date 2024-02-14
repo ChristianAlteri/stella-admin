@@ -27,9 +27,19 @@ export type ProductColumn = {
   clicks: number | null | undefined;
   reference: string | null | undefined;
   imageUrl: string;
+  designerId: string;
+  categoryId: string;
+  storeId: string;
 }
 
 export const columns: ColumnDef<ProductColumn>[] = [
+  {
+    id: "actions",
+    cell: ({ row }) => 
+      <div className="flex" >
+        <CellAction data={row.original} />
+      </div>
+  },
   {
     accessorKey: "name",
     header: "Name",
@@ -52,6 +62,10 @@ export const columns: ColumnDef<ProductColumn>[] = [
   {
     accessorKey: "ourPrice",
     header: "Price",
+    cell: ({ row }) => 
+      <div className="flex text-red-600" >
+        {row.original.ourPrice} 
+      </div>
   },
   {
     accessorKey: "retailPrice",
@@ -60,6 +74,13 @@ export const columns: ColumnDef<ProductColumn>[] = [
   {
     accessorKey: "designer",
     header: "Designer",
+    cell: ({ row }) => (
+      <div className="flex items-center gap-x-2 overflow-y-auto">
+         <a className="hover:underline" href={`/api/${row.original.storeId}/designers/${row.original.designerId}`}>
+          {row.original.designer}
+        </a>
+      </div>
+    )
   },
   {
     accessorKey: "description",
@@ -85,6 +106,10 @@ export const columns: ColumnDef<ProductColumn>[] = [
   {
     accessorKey: "category",
     header: "Category",
+    cell: ({ row }) => 
+        <div className="flex items-center gap-x-2 overflow-y-auto">
+          <a className="hover:underline" href={`/api/${row.original.storeId}/categories/${row.original.categoryId}`}>{row.original.category}</a>
+        </div>
   },
   {
     accessorKey: "size",
@@ -151,12 +176,5 @@ export const columns: ColumnDef<ProductColumn>[] = [
   {
     accessorKey: "createdAt",
     header: "Date",
-  },
-  {
-    id: "actions",
-    cell: ({ row }) => 
-      <div className="flex" >
-        <CellAction data={row.original} />
-      </div>
-  },
+  }
 ];

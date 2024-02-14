@@ -17,7 +17,8 @@ export async function GET(
         id: params.designerId
       },
       include: {
-        billboard: true
+        billboard: true,
+        products: true,
       }
     });
   

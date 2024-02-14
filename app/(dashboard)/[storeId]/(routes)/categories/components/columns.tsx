@@ -11,6 +11,8 @@ export type CategoryColumn = {
   createdAt: string;
   imageUrl: string; 
   productsUrl: string;
+  categoryId: string,
+  storeId: string,
 }
 
 export const columns: ColumnDef<CategoryColumn>[] = [
@@ -40,7 +42,7 @@ export const columns: ColumnDef<CategoryColumn>[] = [
   {
     accessorKey: "productsUrl", // This is the accessor key for the products URL
     header: "Products", // Link to the products page
-    cell: ({ row }) => <a className="hover:underline" href={row.original.productsUrl}>Link to Products</a>
+    cell: ({ row }) => <a className="hover:underline" href={`/api/${row.original.storeId}/categories/${row.original.categoryId}`}>Link to Products</a>
   },
   {
     accessorKey: "ordersUrl", // This is the accessor key for the orders URL

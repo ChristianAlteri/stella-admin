@@ -34,6 +34,8 @@ const CategoriesPage = async ({
     imageUrl: item.billboard?.imageUrl,
     productsUrl: `/api/${params.storeId}/categories/products`,
     ordersUrl: `/api/${params.storeId}/categories/orders`,
+    categoryId: item.id,
+    storeId: item.storeId,
   }));
 
   return (

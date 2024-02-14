@@ -23,7 +23,7 @@ const DesignerPage = async ({
     }
   });
 
-  // console.log("DESIGNERS", designers);
+  console.log("DESIGNERS", designers);
 
   const formattedDesigners: DesignerColumn[] = designers.map((item) => ({
     id: item.id,
@@ -31,7 +31,9 @@ const DesignerPage = async ({
     billboardLabel: item.billboard?.label,
     createdAt: format(item.createdAt, 'MMMM do, yyyy'),
     imageUrl: item.billboard?.imageUrl,
-    productsUrl: `/api/${params.storeId}/designers/products`
+    productsUrl: `/api/${params.storeId}/designers/products`,
+    designerId: item.id,
+    storeId: item.storeId,
   }));
 
   return (

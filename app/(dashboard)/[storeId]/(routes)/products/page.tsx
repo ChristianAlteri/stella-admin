@@ -54,7 +54,10 @@ const ProductsPage = async ({
     size: item.size.name,
     color: item.color.value,
     createdAt: format(item.createdAt, 'MMMM do, yyyy'),
-    imageUrl: item.images[0].url
+    imageUrl: item.images[0].url,
+    designerId: item.designerId,
+    categoryId: item.categoryId,
+    storeId: item.storeId,
   }));
 
   return (
