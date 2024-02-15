@@ -12,7 +12,7 @@ export async function POST(
 
     const body = await req.json();
 
-    const { name, billboardId } = body;
+    const { name, billboardId, productId, designerId, categoryId, instagramHandle } = body;
 
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 403 });
@@ -22,9 +22,18 @@ export async function POST(
       return new NextResponse("Name is required", { status: 400 });
     }
 
-    if (!billboardId) {
-      return new NextResponse("Designer Id is required", { status: 400 });
-    }
+    // if (!billboardId) {
+    //   return new NextResponse("Designer Id is required", { status: 400 });
+    // }
+    // if (!productId) {
+    //   return new NextResponse("productId is required", { status: 400 });
+    // }
+    // if (!designerId) {
+    //   return new NextResponse("designerId is required", { status: 400 });
+    // }
+    // if (!categoryId) {
+    //   return new NextResponse("categoryId is required", { status: 400 });
+    // }
 
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
@@ -41,17 +50,18 @@ export async function POST(
       return new NextResponse("Unauthorized", { status: 405 });
     }
 
-    const designer = await prismadb.designer.create({
+    const seller = await prismadb.seller.create({
       data: {
         name,
+        instagramHandle,
         billboardId,
         storeId: params.storeId,
       }
     });
   
-    return NextResponse.json(designer);
+    return NextResponse.json(seller);
   } catch (error) {
-    console.log('[DESIGNER_POST]', error);
+    console.log('[SELLERS_POST]', error);
     return new NextResponse("Internal error", { status: 500 });
   }
 };
@@ -65,19 +75,21 @@ export async function GET(
       return new NextResponse("Store id is required", { status: 400 });
     }
 
-    const designer = await prismadb.designer.findMany({
+    const sellers = await prismadb.seller.findMany({
       where: {
         storeId: params.storeId
       },
       include: {
-        billboard: true,
         products: true,
+        designers: true,
+        categories: true,
+        billboard: true,
       },
     });
   
-    return NextResponse.json(designer);
+    return NextResponse.json(sellers);
   } catch (error) {
-    console.log('[DESIGNER_GET]', error);
+    console.log('[SELLER_GET]', error);
     return new NextResponse("Internal error", { status: 500 });
   }
 };

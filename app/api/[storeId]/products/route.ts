@@ -140,6 +140,11 @@ export async function POST(
             id: colorId
           }
         },
+        seller: {
+          connect: {
+            id: sellerId
+          }
+        },
       },
     });
     // console.log('[PRODUCTS_POST]', product);

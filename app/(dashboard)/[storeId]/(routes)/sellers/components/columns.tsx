@@ -4,36 +4,24 @@ import { ColumnDef } from "@tanstack/react-table"
 
 import { CellAction } from "./cell-action"
 
-export type DesignerColumn = {
+export type SellerColumn = {
   id: string
   name: string;
-  billboardLabel: string | undefined;
+  instagramHandle: string;
   createdAt: string;
-  imageUrl: string | undefined; 
   productsUrl: string;
   storeId: string;
-  designerId: string | undefined;
+  sellerId: string;
 }
 
-export const columns: ColumnDef<DesignerColumn>[] = [
+export const columns: ColumnDef<SellerColumn>[] = [
   {
     accessorKey: "name",
     header: "Name",
   },
   {
-    accessorKey: "billboard",
-    header: "Billboard Name",
-    cell: ({ row }) => row.original.billboardLabel,
-  },
-  {
-    accessorKey: "imageUrl",
-    header: "Billboard Image",
-    cell: ({ row }) => 
-      <>
-        <a className="hover:underline" href={row.original.imageUrl}>
-          <img src={row.original.imageUrl} alt="Image" style={{ width: '100px', height: 'auto' }}></img> 
-        </a>
-      </>,
+    accessorKey: "instagramHandle",
+    header: "Instagram",
   },
   {
     accessorKey: "createdAt",
@@ -42,7 +30,7 @@ export const columns: ColumnDef<DesignerColumn>[] = [
   {
     accessorKey: "productsUrl", // This is the accessor key for the products URL
     header: "Products", // Link to the products page
-    cell: ({ row }) => <a className="hover:underline" href={`/api/${row.original.storeId}/designers/${row.original.designerId}`}>Link to Products</a>
+    cell: ({ row }) => <a className="hover:underline" href={`/api/${row.original.storeId}/sellers/${row.original.sellerId}`}>Link to Products</a>
   },
   {
     accessorKey: "ordersUrl", // This is the accessor key for the orders URL

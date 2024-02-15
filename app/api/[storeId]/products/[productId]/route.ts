@@ -20,6 +20,7 @@ export async function GET(
         images: true,
         category: true,
         designer: true,
+        seller: true,
         size: true,
         color: true,
       }
@@ -196,6 +197,11 @@ export async function PATCH(
         color: {
           connect: {
             id: colorId
+          }
+        },
+        seller: {
+          connect: {
+            id: sellerId
           }
         },
       },

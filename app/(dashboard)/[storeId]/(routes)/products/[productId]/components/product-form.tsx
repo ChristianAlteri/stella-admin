@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { toast } from "react-hot-toast"
 import { Trash } from "lucide-react"
-import { Category, Color, Designer, Image, Product, Size } from "@prisma/client"
+import { Category, Color, Designer, Image, Product, Seller, Size } from "@prisma/client"
 import { useParams, useRouter } from "next/navigation"
 
 import { Input } from "@/components/ui/input"
@@ -37,6 +37,7 @@ const formSchema = z.object({
   ourPrice: z.coerce.number().min(1),
   retailPrice: z.coerce.number().min(1),
   designerId: z.string().min(1),
+  sellerId: z.string().min(1),
   categoryId: z.string().min(1),
   colorId: z.string().min(1),
   sizeId: z.string().min(1),
@@ -60,6 +61,7 @@ interface ProductFormProps {
     images: Image[]
   } | null;
   categories: Category[];
+  sellers: Seller[];
   designers: Designer[];
   colors: Color[];
   sizes: Size[];
@@ -69,6 +71,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   initialData,
   categories,
   designers,
+  sellers,
   sizes,
   colors
 }) => {
@@ -99,6 +102,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       ourPrice: 0,
       retailPrice: 0,
       designerId: '',
+      sellerId: '',
       categoryId: '',
       colorId: '',
       sizeId: '',
@@ -242,22 +246,22 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 </FormItem>
               )}
             />
-            {/* Size selector */}
+            {/* Seller selector */}
             <FormField
               control={form.control}
-              name="sizeId"
+              name="sellerId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Size</FormLabel>
+                  <FormLabel>Seller</FormLabel>
                   <Select disabled={loading} onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue defaultValue={field.value} placeholder="Select a size" />
+                        <SelectValue defaultValue={field.value} placeholder="Select a seller" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {sizes.map((size) => (
-                        <SelectItem key={size.id} value={size.id}>{size.name}</SelectItem>
+                      {sellers?.map((seller) => (
+                        <SelectItem key={seller.id} value={seller.id}>{seller.instagramHandle}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -288,6 +292,29 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   <FormControl>
                     <Input type="number" disabled={loading} placeholder="9.99" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* Size selector */}
+            <FormField
+              control={form.control}
+              name="sizeId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Size</FormLabel>
+                  <Select disabled={loading} onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue defaultValue={field.value} placeholder="Select a size" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {sizes?.map((size) => (
+                        <SelectItem key={size.id} value={size.id}>{size.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

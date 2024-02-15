@@ -12,6 +12,7 @@ export type ProductColumn = {
   retailPrice: string;
   designer: string;
   category: string;
+  sellerHandle: string;
   size: string;
   color: string;
   createdAt: string;
@@ -116,6 +117,10 @@ export const columns: ColumnDef<ProductColumn>[] = [
     header: "Size",
   },
   {
+    accessorKey: "sellerHandle",
+    header: "Seller",
+  },
+  {
     accessorKey: "condition",
     header: "Condition",
   },
@@ -155,7 +160,7 @@ export const columns: ColumnDef<ProductColumn>[] = [
         {row.original.color}
         <div
         className="w-4 h-4 rounded border"
-          style={{ backgroundColor: row.original.color }}
+          style={{ backgroundColor: row.original.color}}
         >
         </div>
       </div>

@@ -19,6 +19,7 @@ const ProductsPage = async ({
     },
     include: {
       designer: true,
+      seller: true,
       category: true,
       color: true,
       size: true,
@@ -51,12 +52,14 @@ const ProductsPage = async ({
     reference: item.reference,
     category: item.category.name,
     designer: item.designer.name,
+    sellerHandle: item.seller.instagramHandle,
     size: item.size.name,
     color: item.color.value,
     createdAt: format(item.createdAt, 'MMMM do, yyyy'),
     imageUrl: item.images[0].url,
     designerId: item.designerId,
     categoryId: item.categoryId,
+    sellerId: item.seller.id,
     storeId: item.storeId,
   }));
 
