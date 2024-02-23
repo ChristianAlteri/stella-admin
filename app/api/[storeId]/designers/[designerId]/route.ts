@@ -18,7 +18,14 @@ export async function GET(
       },
       include: {
         billboard: true,
-        products: true,
+        products: {
+          include: {
+            images: true,
+            designer: true,
+            seller: true,
+            category: true,
+          },
+        }
       }
     });
   
@@ -113,7 +120,7 @@ export async function PATCH(
       },
       data: {
         name,
-        billboardId
+        billboardId,
       }
     });
   

@@ -17,10 +17,15 @@ export async function GET(
         id: params.sellerId
       },
       include: {
-        products: true,
-        designers: true,
-        categories: true,
         billboard: true,
+        products: {
+          include: {
+            images: true,
+            designer: true,
+            seller: true,
+            category: true,
+          },
+        }
       }
     });
   
