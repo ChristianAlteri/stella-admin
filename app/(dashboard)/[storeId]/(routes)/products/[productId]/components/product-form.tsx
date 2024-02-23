@@ -37,6 +37,7 @@ const formSchema = z.object({
   ourPrice: z.coerce.number().min(1),
   retailPrice: z.coerce.number().min(1),
   designerId: z.string().min(1),
+  designerName: z.string().min(1),
   sellerId: z.string().min(1),
   categoryId: z.string().min(1),
   colorId: z.string().min(1),
@@ -102,6 +103,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       ourPrice: 0,
       retailPrice: 0,
       designerId: '',
+      designerName: '',
       sellerId: '',
       categoryId: '',
       colorId: '',
@@ -382,6 +384,28 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                     <SelectContent>
                       {designers?.map((designer) => (
                         <SelectItem key={designer.id} value={designer.id}>{designer.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="designerName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Designer Name</FormLabel>
+                  <Select disabled={loading} onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue defaultValue={field.value} placeholder="Select a Designer" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {designers?.map((designer) => (
+                        <SelectItem key={designer.id} value={designer.name}>{designer.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

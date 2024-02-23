@@ -18,11 +18,12 @@ export async function POST(
       retailPrice, 
       categoryId, 
       designerId, 
+      designerName,
       description, 
+      sellerId,
       colorId, 
       sizeId, 
       images, 
-      sellerId,
       isFeatured, 
       isArchived, 
       location,
@@ -79,7 +80,7 @@ export async function POST(
         userId
       }
     });
-    console.log("storeByUserId", storeByUserId);
+    // console.log("storeByUserId", storeByUserId);
 
     if (!storeByUserId) {
       return new NextResponse("Unauthorized", { status: 405 });
@@ -90,6 +91,7 @@ export async function POST(
       data: {
         name,
         description,
+        designerName,
         ourPrice,
         retailPrice,
         location,
@@ -163,6 +165,7 @@ export async function GET(
     const { searchParams } = new URL(req.url)
     const categoryId = searchParams.get('categoryId') || undefined;
     const designerId = searchParams.get('designerId') || undefined;
+    const sellerId = searchParams.get('sellerId') || undefined;
     const colorId = searchParams.get('colorId') || undefined;
     const sizeId = searchParams.get('sizeId') || undefined;
     const isFeatured = searchParams.get('isFeatured');
@@ -177,6 +180,7 @@ export async function GET(
         storeId: params.storeId,
         categoryId,
         designerId,
+        sellerId,
         colorId,
         sizeId,
         isFeatured: isFeatured ? true : undefined,
@@ -189,7 +193,7 @@ export async function GET(
         designer: true,
         color: true,
         size: true,
-        // seller: true,
+        seller: true,
       },
       orderBy: {
         createdAt: 'desc',

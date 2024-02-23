@@ -40,7 +40,7 @@ interface SellerClientProps {
       <Heading title="API" description="API call for Sellers" />
       <Separator />
       <div>IS THIS NECCESARY</div>
-      <ApiList entityName="seller" entityIdName="sellerId" />
+      <ApiList entityName="sellers" entityIdName="sellerId" />
     </>
   );
 };

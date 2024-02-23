@@ -79,43 +79,46 @@ model Category {
   id          String    @id @default(uuid())
   storeId     String // Foreign Key to Store
   store       Store     @relation("StoreToCategory", fields: [storeId], references: [id])
-  billboardId String? // Foreign Key to Billboard
-  billboard   Billboard? @relation(fields: [billboardId], references: [id])
-  sellerId    String? // Foreign Key to Seller
-  seller      Seller?    @relation("SellerToCategory", fields: [sellerId], references: [id])
+  billboardId String // Foreign Key to Billboard
+  billboard   Billboard @relation(fields: [billboardId], references: [id])
+
+
   // orderId String // Foreign Key to Order
   // order   Order @relation(fields: [orderId], references: [id])
   name        String
   clicks      Int?      @default(0)
   products    Product[] @relation("CategoryToProduct")
+  sellers     Seller[] @relation("SellerToCategory")
+
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   // @@index([orderId])
   @@index([storeId])
   @@index([billboardId])
-  @@index([sellerId])
+
 }
 
 model Designer {
   id          String    @id @default(uuid())
   storeId     String // Foreign Key to Store
   store       Store     @relation("StoreToDesigner", fields: [storeId], references: [id])
-  billboardId String? // Foreign Key to Billboard
-  billboard   Billboard? @relation(fields: [billboardId], references: [id])
-  sellerId    String? // Foreign Key to Seller
-  seller      Seller?    @relation("SellerToDesigner", fields: [sellerId], references: [id])
+  billboardId String // Foreign Key to Billboard
+  billboard   Billboard @relation(fields: [billboardId], references: [id])
+
+
   // orderId String // Foreign Key to Order
   // order   Order @relation(fields: [orderId], references: [id])
   name        String
   products    Product[] @relation("DesignerToProduct")
+  seller      Seller[] @relation("SellerToDesigner")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   // @@index([orderId])
   @@index([storeId])
   @@index([billboardId])
-  @@index([sellerId])
+
 }
 
 model Product {
@@ -126,9 +129,10 @@ model Product {
   category     Category    @relation("CategoryToProduct", fields: [categoryId], references: [id])
   designerId   String // Foreign Key to Designer
   designer     Designer    @relation("DesignerToProduct", fields: [designerId], references: [id])
-  sellerId     String // Foreign Key to Designer
+  sellerId     String // Foreign Key to Seller
   seller       Seller      @relation("SellerToProduct", fields: [sellerId], references: [id])
   name         String
+  designerName String
   description  String
   retailPrice  Decimal
   ourPrice     Decimal
@@ -167,11 +171,12 @@ model Order {
   storeId    String // Foreign Key to Store
   store      Store       @relation("StoreToOrder", fields: [storeId], references: [id])
   orderItems OrderItem[] // Relation to OrderItem model
-  // ordersInCategory Category[] // Relation to Category model
-  // ordersInDesigner Designer[] // Relation to Designer model
+
+
   isPaid     Boolean     @default(false)
   phone      String      @default("")
   address    String      @default("")
+  email      String      @default("")
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 

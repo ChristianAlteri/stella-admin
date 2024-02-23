@@ -91,6 +91,7 @@ export async function PATCH(
       retailPrice, 
       categoryId, 
       designerId, 
+      designerName,
       description, 
       colorId, 
       sizeId, 
@@ -158,6 +159,7 @@ export async function PATCH(
       data: {
         name,
         description,
+        designerName,
         ourPrice,
         retailPrice,
         location,

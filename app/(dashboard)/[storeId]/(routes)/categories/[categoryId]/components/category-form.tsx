@@ -79,7 +79,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
       name: '',
-      billboardId: ''
+      billboardId: '',
     }
   });
 
