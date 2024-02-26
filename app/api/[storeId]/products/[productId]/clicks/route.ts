@@ -30,25 +30,25 @@ export async function PATCH(
     { params }: { params: { productId: string, storeId: string } }
   ) {
     try {
-        console.log('We are in the PATCH likes endpoint');
+        console.log('We are in the PATCH CLICKS endpoint');
     //   const { userId } = auth();
       
       const body = await req.json();
       
-      const { likes } = body;
+      const { clicks } = body;
       
 
     const likedProduct = await prismadb.product.update({
         where: {
           id: params.productId
         },
-        data: { likes }
+        data: { clicks }
     });
 
-        // console.log('[LIKES_PATCH]', likedProduct);
-      return new NextResponse("Likes updated successfully", { status: 200 });
+        // console.log('[CLICKS_PATCH]', likedProduct);
+      return new NextResponse("CLICKS updated successfully", { status: 200 });
     } catch (error) {
-      console.log('[LIKES_PATCH]', error);
+      console.log('[CLICKS_PATCH]', error);
       return new NextResponse("Internal error", { status: 500 });
     }
   }
