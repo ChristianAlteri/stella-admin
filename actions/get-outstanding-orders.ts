@@ -16,5 +16,17 @@ export const getoutStandingOrders = async (storeId: string) => {
     }
   });
 
-  return outstandingOrders;
+  const modifiedOrders = outstandingOrders.map(order => ({
+    ...order,
+    orderItems: order.orderItems.map(item => ({
+      ...item,
+      product: {
+        ...item.product,
+        retailPrice: item.product.retailPrice.toString(), // Convert Decimal to String
+        ourPrice: item.product.ourPrice.toString(), // Convert Decimal to String
+      },
+    })),
+  }));
+
+  return modifiedOrders;
 };
