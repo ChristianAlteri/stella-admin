@@ -80,10 +80,17 @@ export async function GET(
         storeId: params.storeId
       },
       include: {
-        products: true,
-        designers: true,
-        categories: true,
         billboard: true,
+        products: {
+          include: {
+            images: true,
+            designer: true,
+            seller: true,
+            category: true,
+            size: true,
+            color: true,
+          },
+        }
       },
     });
   

@@ -78,6 +78,8 @@ export async function GET(
             designer: true,
             seller: true,
             category: true,
+            size: true,
+            color: true,
           },
         }
       }
