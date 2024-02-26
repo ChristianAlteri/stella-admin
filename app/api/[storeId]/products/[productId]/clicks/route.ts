@@ -30,9 +30,7 @@ export async function PATCH(
     { params }: { params: { productId: string, storeId: string } }
   ) {
     try {
-        console.log('We are in the PATCH CLICKS endpoint');
-    //   const { userId } = auth();
-      
+
       const body = await req.json();
       
       const { clicks } = body;

@@ -19,7 +19,7 @@ model Store {
   categories Category[]  @relation("StoreToCategory")
   designers  Designer[]  @relation("StoreToDesigner")
   products   Product[]   @relation("StoreToProduct")
-  sellers   Seller[]      @relation("StoreToSeller")
+  sellers    Seller[]    @relation("StoreToSeller")
   sizes      Size[]      @relation("StoreToSize")
   colors     Color[]     @relation("StoreToColor")
   orders     Order[]     @relation("StoreToOrder")
@@ -35,7 +35,7 @@ model User {
   geoLocation String?
 
   // Purchase history
-  orders Order[] @relation("OrderToUser")
+  // orders Order[] @relation("OrderToUser")
 }
 
 model Seller {
@@ -43,8 +43,8 @@ model Seller {
   instagramHandle String   @unique
   name            String   @unique
   createdAt       DateTime @default(now())
-  storeId    String
-  store      Store      @relation("StoreToSeller", fields: [storeId], references: [id])
+  storeId         String
+  store           Store    @relation("StoreToSeller", fields: [storeId], references: [id])
 
   billboardId String // Foreign Key to Billboard
   billboard   Billboard @relation(fields: [billboardId], references: [id])
@@ -82,21 +82,19 @@ model Category {
   billboardId String // Foreign Key to Billboard
   billboard   Billboard @relation(fields: [billboardId], references: [id])
 
-
   // orderId String // Foreign Key to Order
   // order   Order @relation(fields: [orderId], references: [id])
-  name        String
-  clicks      Int?      @default(0)
-  products    Product[] @relation("CategoryToProduct")
-  sellers     Seller[] @relation("SellerToCategory")
+  name     String
+  clicks   Int?      @default(0)
+  products Product[] @relation("CategoryToProduct")
+  sellers  Seller[]  @relation("SellerToCategory")
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // @@index([orderId])
   @@index([storeId])
   @@index([billboardId])
-
 }
 
 model Designer {
@@ -106,19 +104,17 @@ model Designer {
   billboardId String // Foreign Key to Billboard
   billboard   Billboard @relation(fields: [billboardId], references: [id])
 
-
   // orderId String // Foreign Key to Order
   // order   Order @relation(fields: [orderId], references: [id])
-  name        String
-  products    Product[] @relation("DesignerToProduct")
-  seller      Seller[] @relation("SellerToDesigner")
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  name      String
+  products  Product[] @relation("DesignerToProduct")
+  seller    Seller[]  @relation("SellerToDesigner")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   // @@index([orderId])
   @@index([storeId])
   @@index([billboardId])
-
 }
 
 model Product {
@@ -167,24 +163,24 @@ model Product {
 }
 
 model Order {
-  id         String      @id @default(uuid())
-  storeId    String // Foreign Key to Store
-  store      Store       @relation("StoreToOrder", fields: [storeId], references: [id])
-  orderItems OrderItem[] // Relation to OrderItem model
+  id               String      @id @default(uuid())
+  storeId          String // Foreign Key to Store
+  store            Store       @relation("StoreToOrder", fields: [storeId], references: [id])
+  orderItems       OrderItem[] // Relation to OrderItem model
+  isPaid           Boolean     @default(false)
+  hasBeenDispatched Boolean     @default(false)
 
+  phone     String   @default("")
+  address   String   @default("")
+  email     String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  isPaid     Boolean     @default(false)
-  phone      String      @default("")
-  address    String      @default("")
-  email      String      @default("")
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-
-  userId String // Foreign Key to User
-  User   User   @relation("OrderToUser", fields: [userId], references: [id])
+  // userId String? // Foreign Key to User
+  // user   User?   @relation("OrderToUser", fields: [userId], references: [id])
+  // @@index([userId])
 
   @@index([storeId])
-  @@index([userId])
 }
 
 // Intermediary for a many-to-many relationship
