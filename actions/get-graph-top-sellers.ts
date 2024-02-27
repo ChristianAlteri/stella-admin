@@ -24,13 +24,17 @@ export const getGraphTopSeller = async (storeId: string): Promise<GraphData[]> =
     },
   });
 
+
+  // console.log("sellersSoldItems", sellersSoldItems);
+
   // Object to track items sold by seller and month
   const itemsSold: { [key: string]: { [key: number]: number } } = {};
 
+  // Accumulate sales per seller per month
   for (const seller of sellersSoldItems) {
     for (const product of seller.products) {
       const sellerName = seller.name;
-      const month = new Date(product.createdAt).getMonth();
+      const month = new Date(product.createdAt).getMonth(); // Ensure date is correct
       if (!itemsSold[sellerName]) {
         itemsSold[sellerName] = {};
       }
@@ -38,28 +42,34 @@ export const getGraphTopSeller = async (storeId: string): Promise<GraphData[]> =
     }
   }
 
+
+  // console.log("itemsSold", itemsSold);
+
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const graphData: GraphData[] = months.map((monthName, index) => ({
     name: monthName,
     sellers: [],
   }));
 
-  // Populate graph data
+  // Populate graph data with sales info
   for (const [sellerName, salesByMonth] of Object.entries(itemsSold)) {
     for (const [month, totalItemsSold] of Object.entries(salesByMonth)) {
       const monthIndex = parseInt(month);
-      // Create SellerData for the month
-      const sellerData: SellerData = { name: sellerName, totalItemsSold: totalItemsSold };
-      // Add or update sellerData in the correct month
-      let sellerEntry = graphData[monthIndex].sellers.find(seller => seller.name === sellerName);
-      if (sellerEntry) {
-        sellerEntry.totalItemsSold += totalItemsSold; // Update existing
-      } else {
-        graphData[monthIndex].sellers.push(sellerData); // Add new
+      // Ensure month index is within range
+      if (monthIndex >= 0 && monthIndex < months.length) {
+        // Create or update SellerData for the month
+        let sellerEntry = graphData[monthIndex].sellers.find(seller => seller.name === sellerName);
+        if (sellerEntry) {
+          sellerEntry.totalItemsSold += totalItemsSold; // Update existing
+        } else {
+          graphData[monthIndex].sellers.push({ name: sellerName, totalItemsSold: totalItemsSold }); // Add new
+        }
       }
     }
   }
 
-  console.log(sellersSoldItems); // Log the fetched data for debugging
+
+  // console.log("graphData", graphData);
+
   return graphData; // Return the prepared graph data
 };

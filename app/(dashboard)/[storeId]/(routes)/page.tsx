@@ -35,7 +35,7 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({
   const outstandingOrders = await getoutStandingOrders(params.storeId);
   const topSellers = await getGraphTopSeller(params.storeId);
 
-  console.log(topSellers.map((seller) =>  seller.sellers));
+  // console.log(topSellers.map((seller) =>  seller.sellers));
 
     
 
@@ -94,12 +94,14 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({
             {/* Graph revenue by month */}
           <Card className="col-span-2">
             <CardHeader>
-              <CardTitle>Overview</CardTitle>
+              <CardTitle>Revenue by Month</CardTitle>
             </CardHeader>
             <CardContent className="pl-2">
               <RevenueGraph data={graphRevenue} />
             </CardContent>
           </Card> 
+          <br />
+          <br />
               {/* Graph top seller by month */}
           <Card className="col-span-2">
             <CardHeader>
