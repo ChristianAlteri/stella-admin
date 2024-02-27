@@ -1,17 +1,22 @@
+import React from "react";
 import { CreditCard, DollarSign, Package } from "lucide-react";
 
 import { Separator } from "@/components/ui/separator";
-// import { Overview } from "@/components/overview";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
+
+import axios from "axios";
+import OrderStatus from "@/components/ui/order-status";
+import { RevenueGraph } from "@/components/ui/revenue-graph";
+import { TopSellerGraph } from "@/components/ui/top-seller-graph";
 
 import { getSalesCount } from "@/actions/get-sales-count";
 import { getTotalRevenue } from "@/actions/get-total-revenue";
 import { getGraphRevenue } from "@/actions/get-graph-revenue";
 import { getStockCount } from "@/actions/get-stock-count";
 import { getoutStandingOrders } from "@/actions/get-outstanding-orders";
-import axios from "axios";
-import OrderStatus from "@/components/ui/order-status";
+import { getGraphTopSeller } from "@/actions/get-graph-top-sellers";
 
 
 interface DashboardPageProps {
@@ -28,6 +33,9 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({
   const salesCount = await getSalesCount(params.storeId);
   const stockCount = await getStockCount(params.storeId);
   const outstandingOrders = await getoutStandingOrders(params.storeId);
+  const topSellers = await getGraphTopSeller(params.storeId);
+
+  console.log(topSellers.map((seller) =>  seller.sellers));
 
     
 
@@ -82,14 +90,26 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({
                 ))}
             </CardContent>
           </Card>
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Overview</CardTitle>
-          </CardHeader>
-          <CardContent className="pl-2">
-            {/* <Overview data={graphRevenue} /> */}
-          </CardContent>
-        </Card>
+          <div className="">
+            {/* Graph revenue by month */}
+          <Card className="col-span-2">
+            <CardHeader>
+              <CardTitle>Overview</CardTitle>
+            </CardHeader>
+            <CardContent className="pl-2">
+              <RevenueGraph data={graphRevenue} />
+            </CardContent>
+          </Card> 
+              {/* Graph top seller by month */}
+          <Card className="col-span-2">
+            <CardHeader>
+              <CardTitle>Top Sellers</CardTitle>
+            </CardHeader>
+            <CardContent className="pl-2">
+              <TopSellerGraph data={topSellers} />
+            </CardContent>
+          </Card>
+          </div>
       </div>
     </div>
   );

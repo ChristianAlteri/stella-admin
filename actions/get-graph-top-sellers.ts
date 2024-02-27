@@ -1,0 +1,65 @@
+import prismadb from "@/lib/prismadb";
+
+interface SellerData {
+  name: string;
+  totalItemsSold: number; // Track total items sold per seller per month
+}
+
+interface GraphData {
+  name: string; // This represents the month
+  sellers: SellerData[]; // Array to hold sellers' data for the month
+}
+
+export const getGraphTopSeller = async (storeId: string): Promise<GraphData[]> => {
+  const sellersSoldItems = await prismadb.seller.findMany({
+    where: {
+      storeId,
+    },
+    include: {
+      products: {
+        where: {
+          isArchived: true, // Assuming this means the product has been sold
+        },
+      },
+    },
+  });
+
+  // Object to track items sold by seller and month
+  const itemsSold: { [key: string]: { [key: number]: number } } = {};
+
+  for (const seller of sellersSoldItems) {
+    for (const product of seller.products) {
+      const sellerName = seller.name;
+      const month = new Date(product.createdAt).getMonth();
+      if (!itemsSold[sellerName]) {
+        itemsSold[sellerName] = {};
+      }
+      itemsSold[sellerName][month] = (itemsSold[sellerName][month] || 0) + 1;
+    }
+  }
+
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const graphData: GraphData[] = months.map((monthName, index) => ({
+    name: monthName,
+    sellers: [],
+  }));
+
+  // Populate graph data
+  for (const [sellerName, salesByMonth] of Object.entries(itemsSold)) {
+    for (const [month, totalItemsSold] of Object.entries(salesByMonth)) {
+      const monthIndex = parseInt(month);
+      // Create SellerData for the month
+      const sellerData: SellerData = { name: sellerName, totalItemsSold: totalItemsSold };
+      // Add or update sellerData in the correct month
+      let sellerEntry = graphData[monthIndex].sellers.find(seller => seller.name === sellerName);
+      if (sellerEntry) {
+        sellerEntry.totalItemsSold += totalItemsSold; // Update existing
+      } else {
+        graphData[monthIndex].sellers.push(sellerData); // Add new
+      }
+    }
+  }
+
+  console.log(sellersSoldItems); // Log the fetched data for debugging
+  return graphData; // Return the prepared graph data
+};
