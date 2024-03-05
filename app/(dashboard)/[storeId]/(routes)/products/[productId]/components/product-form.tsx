@@ -242,7 +242,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   <FormLabel>Description</FormLabel>
                   <FormControl >
                        <DescriptionInput type="string"
-                    disabled={loading} placeholder="Description" {...field} />
+                    disabled={loading} placeholder="Use '- ' to split dot points" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -384,28 +384,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                     <SelectContent>
                       {designers?.map((designer) => (
                         <SelectItem key={designer.id} value={designer.id}>{designer.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="designerName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Designer Name</FormLabel>
-                  <Select disabled={loading} onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue defaultValue={field.value} placeholder="Select a Designer" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {designers?.map((designer) => (
-                        <SelectItem key={designer.id} value={designer.name}>{designer.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

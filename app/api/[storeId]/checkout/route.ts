@@ -71,9 +71,13 @@ export async function POST(
     phone_number_collection: {
       enabled: true,
     },
-    // shipping_address_collection: {
-    //     allowed_countries: ['US', 'CA', 'GB', 'AU', 'IT'], 
-    //   },
+    shipping_address_collection: {
+      allowed_countries: ['US', 'CA', 'GB', 'AU', 'IT'], // Adjust country list as needed
+    },
+    shipping_options: [
+      { shipping_rate: 'shr_1Oor5xBvscKKdpTG4Z2tIKyI' }, // Add your shipping rate IDs
+      // Add more shipping rates as needed
+    ],
     success_url: `${process.env.FRONTEND_STORE_URL}/cart?success=1`,
     cancel_url: `${process.env.FRONTEND_STORE_URL}/cart?canceled=1`,
     metadata: {
@@ -81,8 +85,5 @@ export async function POST(
     },
   });
 
-//   return NextResponse.json({ url: session.url }, {
-//     headers: corsHeaders
-//   });
   return NextResponse.json({ url: session.url }, { status: 200 });
 };

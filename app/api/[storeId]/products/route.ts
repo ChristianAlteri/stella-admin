@@ -159,9 +159,10 @@ export async function POST(
 
 export async function GET(
   req: Request,
-  { params }: { params: { storeId: string } },
+  { params }: { params: { storeId: string, productName: string } },
 ) {
   try {
+
     const { searchParams } = new URL(req.url)
     const categoryId = searchParams.get('categoryId') || undefined;
     const designerId = searchParams.get('designerId') || undefined;
@@ -170,6 +171,7 @@ export async function GET(
     const sizeId = searchParams.get('sizeId') || undefined;
     const isFeatured = searchParams.get('isFeatured');
     const isOnSale = searchParams.get('isOnSale');
+    const name = searchParams.get('productName') || undefined;
 
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
@@ -183,6 +185,7 @@ export async function GET(
         sellerId,
         colorId,
         sizeId,
+        name,
         isFeatured: isFeatured ? true : undefined,
         isOnSale: isOnSale ? true : undefined,
         isArchived: false,
@@ -199,7 +202,7 @@ export async function GET(
         createdAt: 'desc',
       }
     });
-  
+
     return NextResponse.json(products);
   } catch (error) {
     console.log('[PRODUCTS_GET]', error);

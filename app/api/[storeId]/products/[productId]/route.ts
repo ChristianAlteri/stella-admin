@@ -125,14 +125,6 @@ export async function PATCH(
       return new NextResponse("Images are required", { status: 400 });
     }
 
-    // if (!ourPrice) {
-    //   return new NextResponse("Price is required", { status: 400 });
-    // }
-
-    // if (!categoryId) {
-    //   return new NextResponse("Category id is required", { status: 400 });
-    // }
-
     if (!colorId) {
       return new NextResponse("Color id is required", { status: 400 });
     }

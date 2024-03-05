@@ -29,7 +29,7 @@ const OrderStatus: React.FC<OrderStatusProps> = ({
                     <div className="text-sm font-medium">{order.createdAt.toDateString()}</div>
                     <div className="text-sm font-medium">
                         {order.orderItems.map((item: any) => 
-                            <div>
+                            <div key={item.id}>
                                 <a className="hover:underline" href={`/${params.storeId}/products/${item.product.id}`}>{item.product.name}</a>
                             </div>
                         )}

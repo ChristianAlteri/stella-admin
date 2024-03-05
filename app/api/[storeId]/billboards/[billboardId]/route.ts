@@ -12,11 +12,24 @@ export async function GET(
       return new NextResponse("Billboard id is required", { status: 400 });
     }
 
+
+      
+   
+    
     const billboard = await prismadb.billboard.findUnique({
       where: {
         id: params.billboardId
       }
     });
+    
+    if (!billboard) {
+      const labelBillboard = await prismadb.billboard.findMany({
+        where: {
+          label: params.billboardId
+        }
+      });
+      return NextResponse.json(labelBillboard);
+    }
   
     return NextResponse.json(billboard);
   } catch (error) {
