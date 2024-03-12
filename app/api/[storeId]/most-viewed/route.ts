@@ -45,7 +45,7 @@ export async function GET(
         seller: true,
       },
       orderBy: {
-        likes: 'desc', // Order by clicks in descending order
+        clicks: 'desc', // Order by clicks in descending order
       }
     });
   
