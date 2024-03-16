@@ -7,8 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Check, Trash } from "lucide-react";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import {
   Command,
   CommandEmpty,
@@ -62,11 +60,10 @@ import { cn } from "@/lib/utils";
 const formSchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
-  // images: z.object({ url: z.string() }).array(),
+  images: z.object({ url: z.string() }).array(),
   ourPrice: z.coerce.number().min(1),
   retailPrice: z.coerce.number().min(1),
   designerId: z.string().min(1),
-  // designerName: z.string().min(1),
   sellerId: z.string().min(1),
   categoryId: z.string().min(1),
   colorId: z.string().min(1),
@@ -75,14 +72,9 @@ const formSchema = z.object({
   isArchived: z.boolean().default(false).optional(),
   isOnSale: z.boolean().default(false).optional(),
   isCharity: z.boolean().default(false).optional(),
-  // location: z.string().nullable(),
   condition: z.string().nullable(),
-  // sex: z.string().nullable(),
-  // material: z.string().nullable(),
-  // measurements: z.string().nullable(),
-  // reference: z.string().nullable(),
-  // likes: z.coerce.number().nullable(),
-  // clicks: z.coerce.number().nullable(),
+  material: z.string().nullable(),
+  measurements: z.string().nullable(),
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
@@ -133,11 +125,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       : {
           name: "",
           description: "",
-          // images: [],
+          images: [],
           ourPrice: 0,
           retailPrice: 0,
           designerId: "",
-          // designerName: '',
           sellerId: "",
           categoryId: "",
           colorId: "",
@@ -146,14 +137,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           isArchived: false,
           isOnSale: false,
           isCharity: false,
-          // location: '',
           condition: "",
-          // sex: '',
-          // material: '',
-          // measurements: '',
-          // reference: '',
-          // likes: 0,
-          // clicks: 0,
+          material: "",
+          measurements: "",
         },
   });
 
@@ -179,7 +165,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   };
 
   const onSubmit = async (data: ProductFormValues) => {
-    console.log("front end click");
     try {
       setLoading(true);
       if (initialData) {
@@ -245,6 +230,32 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           <div className="md:grid md:grid-cols-5 gap-8">
             <FormField
               control={form.control}
+              name="images"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Images</FormLabel>
+                  <FormControl>
+                    <ImageUpload
+                      value={field.value.map((image) => image.url)}
+                      disabled={loading}
+                      onChange={(url) =>
+                        field.onChange([...field.value, { url }])
+                      }
+                      onRemove={(url) =>
+                        field.onChange([
+                          ...field.value.filter(
+                            (current) => current.url !== url
+                          ),
+                        ])
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
@@ -277,8 +288,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                     />
                   </FormControl>
                   <FormMessage>
-                    Use bullet points for details. Start with "- ". E.g., "- S/S
-                    1999. - Sourced from Itay"
+                    Use bullet points for details. Start with &apos;-
+                    &apos;&apos;. E.g., &apos;- S/S 1999. - Sourced from
+                    Italy&apos;
                   </FormMessage>
                 </FormItem>
               )}
@@ -333,38 +345,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                     Enter a price it has sold for and or retails for. Minimum
                     value is $0.01.
                   </FormMessage>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="sizeId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Size</FormLabel>
-                  <Select
-                    disabled={loading}
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          defaultValue={field.value}
-                          placeholder="Select a size"
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {sizes?.map((size) => (
-                        <SelectItem key={size.id} value={size.id}>
-                          {size.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -581,7 +561,38 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   <FormMessage />
                 </FormItem>
               )}
+              //TODO: change condition and material to be conditionId and materialId  like category, also change material to be a search like category
             />
+            <FormField
+              control={form.control}
+              name="material"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="material">Material</FormLabel>
+                  <Select
+                    disabled={loading}
+                    onValueChange={field.onChange}
+                    value={field.value ?? ""}
+                    defaultValue="Cotton"
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          defaultValue="Cotton"
+                          placeholder="Select a material"
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Cotton">Cotton</SelectItem>
+                      <SelectItem value="Leather">Leather</SelectItem>
+                      <SelectItem value="Silk">Silk</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            /> 
             <FormField
               control={form.control}
               name="colorId"
@@ -661,7 +672,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   <div className="space-y-1 leading-none">
                     <FormLabel>Featured</FormLabel>
                     <FormDescription>
-                      This product will appear on the 'our picks' page
+                      This product will appear on the &apos;our picks&apos; page
                     </FormDescription>
                   </div>
                 </FormItem>
@@ -730,7 +741,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 </FormItem>
               )}
             />
-            TODO: ADD isCharity
           </div>
           <Button disabled={loading} className="ml-auto" type="submit">
             {action}
@@ -759,26 +769,3 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               </FormItem>
             )}
           /> */
-
-/* <FormField
-              control={form.control}
-              name="sex"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Sex</FormLabel>
-                  <Select disabled={loading} onValueChange={field.onChange} value="" defaultValue="Unisex">
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue defaultValue="Unisex" placeholder="Select a sex" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Female">Female</SelectItem>
-                      <SelectItem value="Male">Male</SelectItem>
-                      <SelectItem value="Unisex">Unisex</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */

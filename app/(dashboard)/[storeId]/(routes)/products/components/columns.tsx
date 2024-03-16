@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 
 import { CellAction } from "./cell-action"
+import Image from "next/image";
 
 export type ProductColumn = {
   id: string;
@@ -19,14 +20,12 @@ export type ProductColumn = {
   isFeatured: boolean;
   isArchived: boolean;
   isOnSale: boolean;
-  location: string | null | undefined;
+  isCharity: boolean;
   condition: string | null | undefined;
-  sex: string | null | undefined;
   material: string | null | undefined;
   measurements: string | null | undefined;
   likes: number | null | undefined;
   clicks: number | null | undefined;
-  reference: string | null | undefined;
   imageUrl: string;
   designerId: string;
   categoryId: string;
@@ -55,7 +54,7 @@ export const columns: ColumnDef<ProductColumn>[] = [
     cell: ({ row }) => (
       <>
         <a className="hover:underline" href={row.original.imageUrl}>
-          <img src={row.original.imageUrl} alt="Image" style={{ width: '100px', height: 'auto' }}></img> 
+          <Image src={row.original.imageUrl} alt="Image" width={100} height={100}></Image> 
         </a>
       </>
     )

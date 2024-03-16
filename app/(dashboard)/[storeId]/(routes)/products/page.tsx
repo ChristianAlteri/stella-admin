@@ -6,7 +6,7 @@ import { ProductColumn } from "./components/columns"
 import { ProductClient } from "./components/client";
 
 import { formatter } from "@/lib/utils";
-// import a geolocation formatter function
+
 
 const ProductsPage = async ({
   params
@@ -40,16 +40,14 @@ const ProductsPage = async ({
     isFeatured: item.isFeatured,
     isArchived: item.isArchived,
     isOnSale: item.isOnSale,
+    isCharity: item.isCharity,
     ourPrice: formatter.format(item.ourPrice.toNumber()),
     retailPrice: formatter.format(item.retailPrice.toNumber()),
-    location: item.location || null,
     condition: item.condition,
-    sex: item.sex,
     material: item.material,
     measurements: item.measurements,
     likes: item.likes,
     clicks: item.clicks,
-    reference: item.reference,
     category: item.category.name,
     designer: item.designer.name,
     sellerHandle: item.seller.instagramHandle,

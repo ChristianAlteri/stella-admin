@@ -91,7 +91,6 @@ export async function PATCH(
       retailPrice, 
       categoryId, 
       designerId, 
-      designerName,
       description, 
       colorId, 
       sizeId, 
@@ -100,16 +99,13 @@ export async function PATCH(
       isFeatured, 
       isArchived, 
       isCharity, 
-      location,
+      isOnSale, 
       condition,
-      sex,
       material,
       measurements,
       likes,
-      clicks,
-      reference,
-      isOnSale  } = body;
-
+      clicks } = body;
+      
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 403 });
     }
@@ -152,17 +148,13 @@ export async function PATCH(
       data: {
         name,
         description,
-        designerName,
         ourPrice,
         retailPrice,
-        location,
         condition,
-        sex,
         material,
         measurements,
         likes,
         clicks,
-        reference,
         isFeatured,
         isArchived,
         isOnSale,

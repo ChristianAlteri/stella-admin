@@ -20,7 +20,6 @@ export async function POST(
       retailPrice, 
       categoryId, 
       designerId, 
-      designerName,
       description, 
       sellerId,
       colorId, 
@@ -28,14 +27,12 @@ export async function POST(
       images, 
       isFeatured, 
       isArchived, 
-      location,
+      isCharity, 
       condition,
-      sex,
       material,
       measurements,
       likes,
       clicks,
-      reference,
       isOnSale 
     } = body;
 
@@ -93,17 +90,14 @@ export async function POST(
       data: {
         name,
         description,
-        designerName,
         ourPrice,
         retailPrice,
-        location,
         condition,
-        sex,
         material,
         measurements,
         likes,
         clicks,
-        reference,
+        isCharity,
         isFeatured,
         isArchived,
         isOnSale,
@@ -164,8 +158,8 @@ export async function GET(
   { params }: { params: { storeId: string, productName: string } },
 ) {
   try {
-
     const { searchParams } = new URL(req.url)
+    console.log("These are the parameters ur searching by", searchParams);
     const categoryId = searchParams.get('categoryId') || undefined;
     const designerId = searchParams.get('designerId') || undefined;
     const sellerId = searchParams.get('sellerId') || undefined;
