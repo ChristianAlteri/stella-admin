@@ -22,6 +22,7 @@ import {
 import {
   Category,
   Color,
+  Condition,
   Designer,
   Image,
   Product,
@@ -68,11 +69,11 @@ const formSchema = z.object({
   categoryId: z.string().min(1),
   colorId: z.string().min(1),
   sizeId: z.string().min(1),
+  conditionId: z.string().min(1),
   isFeatured: z.boolean().default(false).optional(),
   isArchived: z.boolean().default(false).optional(),
   isOnSale: z.boolean().default(false).optional(),
   isCharity: z.boolean().default(false).optional(),
-  condition: z.string().nullable(),
   material: z.string().nullable(),
   measurements: z.string().nullable(),
 });
@@ -90,6 +91,7 @@ interface ProductFormProps {
   designers: Designer[];
   colors: Color[];
   sizes: Size[];
+  conditions: Condition[];
 }
 
 export const ProductForm: React.FC<ProductFormProps> = ({
@@ -99,6 +101,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   sellers,
   sizes,
   colors,
+  conditions
 }) => {
   const params = useParams();
   const router = useRouter();
@@ -133,11 +136,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           categoryId: "",
           colorId: "",
           sizeId: "",
+          conditionId: "",
           isFeatured: false,
           isArchived: false,
           isOnSale: false,
           isCharity: false,
-          condition: "",
           material: "",
           measurements: "",
         },
@@ -530,37 +533,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   <FormMessage />
                 </FormItem>
               )}
-            />
-            <FormField
-              control={form.control}
-              name="condition"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel htmlFor="condition">Condition</FormLabel>
-                  <Select
-                    disabled={loading}
-                    onValueChange={field.onChange}
-                    value={field.value ?? ""}
-                    defaultValue="Good"
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          defaultValue="Good"
-                          placeholder="Select a condition"
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="New">New</SelectItem>
-                      <SelectItem value="Excellent">Excellent</SelectItem>
-                      <SelectItem value="Good">Good</SelectItem>
-                      <SelectItem value="Used">Used</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
               //TODO: change condition and material to be conditionId and materialId  like category, also change material to be a search like category
             />
             <FormField
@@ -649,6 +621,38 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                       {sizes?.map((size) => (
                         <SelectItem key={size.id} value={size.id}>
                           {size.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="conditionId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="conditionId">Condition</FormLabel>
+                  <Select
+                    disabled={loading}
+                    onValueChange={field.onChange}
+                    value={field.value ?? ""}
+                    defaultValue="Small"
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          defaultValue="Small"
+                          placeholder="Select a Condition"
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {conditions?.map((condition) => (
+                        <SelectItem key={condition.id} value={condition.id}>
+                          {condition.name}
                         </SelectItem>
                       ))}
                     </SelectContent>

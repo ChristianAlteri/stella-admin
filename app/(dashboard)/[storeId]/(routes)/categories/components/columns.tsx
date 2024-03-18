@@ -32,7 +32,7 @@ export const columns: ColumnDef<CategoryColumn>[] = [
     cell: ({ row }) => 
       <>
         <a className="hover:underline" href={row.original.imageUrl}>
-          <Image src={row.original.imageUrl} alt="Image" style={{ width: '100px', height: 'auto' }}></Image> 
+          <Image src={row.original.imageUrl} alt="Image" width={100} height={50}></Image> 
         </a>
       </>,
   },

@@ -23,7 +23,7 @@ export const columns: ColumnDef<BillboardColumn>[] = [
     cell: ({ row }) => 
       <>
         <a className="hover:underline" href={row.original.imageUrl}>
-          <Image src={row.original.imageUrl} alt="Image" style={{ width: '100px', height: 'auto' }}></Image> 
+          <Image src={row.original.imageUrl} alt="Image" width={100} height={100}></Image> 
         </a>
       </>,
   },

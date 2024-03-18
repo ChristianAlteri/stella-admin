@@ -22,6 +22,7 @@ export async function GET(
         designer: true,
         seller: true,
         size: true,
+        condition: true,
         color: true,
       }
     });
@@ -94,13 +95,13 @@ export async function PATCH(
       description, 
       colorId, 
       sizeId, 
+      conditionId, 
       images, 
       sellerId,
       isFeatured, 
       isArchived, 
       isCharity, 
       isOnSale, 
-      condition,
       material,
       measurements,
       likes,
@@ -150,7 +151,6 @@ export async function PATCH(
         description,
         ourPrice,
         retailPrice,
-        condition,
         material,
         measurements,
         likes,
@@ -180,6 +180,11 @@ export async function PATCH(
         size: {
           connect: {
             id: sizeId
+          }
+        },
+        condition: {
+          connect: {
+            id: conditionId
           }
         },
         color: {

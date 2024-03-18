@@ -23,6 +23,7 @@ const ProductsPage = async ({
       category: true,
       color: true,
       size: true,
+      condition: true,
       images: true
     },
     orderBy: {
@@ -43,7 +44,6 @@ const ProductsPage = async ({
     isCharity: item.isCharity,
     ourPrice: formatter.format(item.ourPrice.toNumber()),
     retailPrice: formatter.format(item.retailPrice.toNumber()),
-    condition: item.condition,
     material: item.material,
     measurements: item.measurements,
     likes: item.likes,
@@ -53,6 +53,7 @@ const ProductsPage = async ({
     sellerHandle: item.seller.instagramHandle,
     size: item.size.name,
     color: item.color.value,
+    condition: item.condition.value,
     createdAt: format(item.createdAt, 'MMMM do, yyyy'),
     imageUrl: item.images[0].url,
     designerId: item.designerId,

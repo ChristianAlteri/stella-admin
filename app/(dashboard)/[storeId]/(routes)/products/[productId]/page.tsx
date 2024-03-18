@@ -40,6 +40,12 @@ const ProductPage = async ({
     },
   });
 
+  const conditions = await prismadb.condition.findMany({
+    where: {
+      storeId: params.storeId,
+    },
+  });
+
   const colors = await prismadb.color.findMany({
     where: {
       storeId: params.storeId,
@@ -54,6 +60,7 @@ const ProductPage = async ({
           designers={designers}
           colors={colors}
           sizes={sizes}
+          conditions={conditions}
           sellers={sellers}
           initialData={product}
         />

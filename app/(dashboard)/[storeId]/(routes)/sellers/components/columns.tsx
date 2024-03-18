@@ -12,6 +12,7 @@ export type SellerColumn = {
   productsUrl: string;
   storeId: string;
   sellerId: string;
+  imageUrl: string | undefined; 
 }
 
 export const columns: ColumnDef<SellerColumn>[] = [
@@ -26,6 +27,16 @@ export const columns: ColumnDef<SellerColumn>[] = [
   {
     accessorKey: "createdAt",
     header: "Created At",
+  },
+  {
+    accessorKey: "imageUrl",
+    header: "Billboard Image",
+    cell: ({ row }) => 
+      <>
+        <a className="hover:underline" href={row.original.imageUrl}>
+        <img src={row.original.imageUrl} alt="Image" style={{ width: '100px', height: 'auto' }}></img> 
+        </a>
+      </>,
   },
   {
     accessorKey: "productsUrl", // This is the accessor key for the products URL

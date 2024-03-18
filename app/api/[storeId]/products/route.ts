@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs';
+import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs";
 
-import prismadb from '@/lib/prismadb';
+import prismadb from "@/lib/prismadb";
+import { Prisma } from "@prisma/client";
 
 export async function POST(
   req: Request,
@@ -9,31 +10,31 @@ export async function POST(
 ) {
   try {
     const { userId } = auth();
-    
+
     const body = await req.json();
     console.log("are we inside post");
     console.log("body", body);
 
-    const { 
-      name, 
-      ourPrice, 
-      retailPrice, 
-      categoryId, 
-      designerId, 
-      description, 
+    const {
+      name,
+      ourPrice,
+      retailPrice,
+      categoryId,
+      designerId,
+      description,
       sellerId,
-      colorId, 
-      sizeId, 
-      images, 
-      isFeatured, 
-      isArchived, 
-      isCharity, 
-      condition,
+      colorId,
+      sizeId,
+      conditionId,
+      images,
+      isFeatured,
+      isArchived,
+      isCharity,
       material,
       measurements,
       likes,
       clicks,
-      isOnSale 
+      isOnSale,
     } = body;
 
     if (!userId) {
@@ -72,12 +73,12 @@ export async function POST(
       return new NextResponse("Store id is required", { status: 400 });
     }
     console.log(params.storeId);
-    
+
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: params.storeId,
-        userId
-      }
+        userId,
+      },
     });
     // console.log("storeByUserId", storeByUserId);
 
@@ -92,7 +93,6 @@ export async function POST(
         description,
         ourPrice,
         retailPrice,
-        condition,
         material,
         measurements,
         likes,
@@ -108,70 +108,93 @@ export async function POST(
         // storeId: params.storeId,
         images: {
           createMany: {
-            data: [
-              ...images.map((image: { url: string }) => image),
-            ],
+            data: [...images.map((image: { url: string }) => image)],
           },
         },
         store: {
           connect: {
-            id: storeByUserId.id 
-          }
+            id: storeByUserId.id,
+          },
         },
         category: {
           connect: {
-            id: categoryId
-          }
+            id: categoryId,
+          },
         },
         designer: {
           connect: {
-            id: designerId
-          }
+            id: designerId,
+          },
         },
         size: {
           connect: {
-            id: sizeId
-          }
+            id: sizeId,
+          },
+        },
+        condition: {
+          connect: {
+            id: conditionId,
+          },
         },
         color: {
           connect: {
-            id: colorId
-          }
+            id: colorId,
+          },
         },
         seller: {
           connect: {
-            id: sellerId
-          }
+            id: sellerId,
+          },
         },
       },
     });
     // console.log('[PRODUCTS_POST]', product);
     return NextResponse.json(product);
   } catch (error) {
-    console.log('[PRODUCTS_POST]', error);
+    console.log("[PRODUCTS_POST]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
-};
+}
 
 export async function GET(
   req: Request,
-  { params }: { params: { storeId: string, productName: string } },
+  { params }: { params: { storeId: string; productName: string } }
 ) {
   try {
-    const { searchParams } = new URL(req.url)
+    const { searchParams } = new URL(req.url);
+    const categoryId = searchParams.get("categoryId") || undefined;
+    const designerId = searchParams.get("designerId") || undefined;
+    const sellerId = searchParams.get("sellerId") || undefined;
+    const colorId = searchParams.get("colorId") || undefined;
+    const sizeId = searchParams.get("sizeId") || undefined;
+    const conditionId = searchParams.get("conditionId") || undefined;
+    const isFeatured = searchParams.get("isFeatured");
+    const isOnSale = searchParams.get("isOnSale");
+    const name = searchParams.get("productName") || undefined;
+    const sort = searchParams.get("sort") || undefined;
+
     console.log("These are the parameters ur searching by", searchParams);
-    const categoryId = searchParams.get('categoryId') || undefined;
-    const designerId = searchParams.get('designerId') || undefined;
-    const sellerId = searchParams.get('sellerId') || undefined;
-    const colorId = searchParams.get('colorId') || undefined;
-    const sizeId = searchParams.get('sizeId') || undefined;
-    const isFeatured = searchParams.get('isFeatured');
-    const isOnSale = searchParams.get('isOnSale');
-    const name = searchParams.get('productName') || undefined;
 
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
     }
+
+    let orderBy;
+    if (sort === "low-to-high") {
+      orderBy = {
+        ourPrice: "asc" as Prisma.SortOrder,
+      };
+    } else if (sort === "high-to-low") {
+      orderBy = {
+        ourPrice: "desc" as Prisma.SortOrder,
+      };
+    } else {
+      orderBy = {
+        createdAt: "desc" as Prisma.SortOrder,
+      };
+    }
+
+    console.log("sort", orderBy);
 
     const products = await prismadb.product.findMany({
       where: {
@@ -181,6 +204,7 @@ export async function GET(
         sellerId,
         colorId,
         sizeId,
+        conditionId,
         name,
         isFeatured: isFeatured ? true : undefined,
         isOnSale: isOnSale ? true : undefined,
@@ -192,16 +216,15 @@ export async function GET(
         designer: true,
         color: true,
         size: true,
+        condition: true,
         seller: true,
       },
-      orderBy: {
-        createdAt: 'desc',
-      }
+      orderBy,
     });
 
     return NextResponse.json(products);
   } catch (error) {
-    console.log('[PRODUCTS_GET]', error);
+    console.log("[PRODUCTS_GET]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
-};
+}

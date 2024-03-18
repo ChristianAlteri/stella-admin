@@ -16,12 +16,12 @@ export type ProductColumn = {
   sellerHandle: string;
   size: string;
   color: string;
+  condition: string;
   createdAt: string;
   isFeatured: boolean;
   isArchived: boolean;
   isOnSale: boolean;
   isCharity: boolean;
-  condition: string | null | undefined;
   material: string | null | undefined;
   measurements: string | null | undefined;
   likes: number | null | undefined;
@@ -116,12 +116,12 @@ export const columns: ColumnDef<ProductColumn>[] = [
     header: "Size",
   },
   {
-    accessorKey: "sellerHandle",
-    header: "Seller",
-  },
-  {
     accessorKey: "condition",
     header: "Condition",
+  },
+  {
+    accessorKey: "sellerHandle",
+    header: "Seller",
   },
   {
     accessorKey: "sex",
