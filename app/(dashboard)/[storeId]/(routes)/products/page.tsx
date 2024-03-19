@@ -24,7 +24,8 @@ const ProductsPage = async ({
       color: true,
       size: true,
       condition: true,
-      images: true
+      images: true,
+      material: true
     },
     orderBy: {
       createdAt: 'desc'
@@ -44,7 +45,6 @@ const ProductsPage = async ({
     isCharity: item.isCharity,
     ourPrice: formatter.format(item.ourPrice.toNumber()),
     retailPrice: formatter.format(item.retailPrice.toNumber()),
-    material: item.material,
     measurements: item.measurements,
     likes: item.likes,
     clicks: item.clicks,
@@ -54,6 +54,7 @@ const ProductsPage = async ({
     size: item.size.name,
     color: item.color.value,
     condition: item.condition.value,
+    material: item.material.value,
     createdAt: format(item.createdAt, 'MMMM do, yyyy'),
     imageUrl: item.images[0].url,
     designerId: item.designerId,

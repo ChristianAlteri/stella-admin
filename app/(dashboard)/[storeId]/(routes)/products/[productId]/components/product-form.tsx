@@ -25,6 +25,7 @@ import {
   Condition,
   Designer,
   Image,
+  Material,
   Product,
   Seller,
   Size,
@@ -70,11 +71,11 @@ const formSchema = z.object({
   colorId: z.string().min(1),
   sizeId: z.string().min(1),
   conditionId: z.string().min(1),
+  materialId: z.string().min(1),
   isFeatured: z.boolean().default(false).optional(),
   isArchived: z.boolean().default(false).optional(),
   isOnSale: z.boolean().default(false).optional(),
   isCharity: z.boolean().default(false).optional(),
-  material: z.string().nullable(),
   measurements: z.string().nullable(),
 });
 
@@ -92,6 +93,7 @@ interface ProductFormProps {
   colors: Color[];
   sizes: Size[];
   conditions: Condition[];
+  materials: Material[];
 }
 
 export const ProductForm: React.FC<ProductFormProps> = ({
@@ -101,7 +103,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   sellers,
   sizes,
   colors,
-  conditions
+  conditions,
+  materials,
 }) => {
   const params = useParams();
   const router = useRouter();
@@ -137,11 +140,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           colorId: "",
           sizeId: "",
           conditionId: "",
+          materialId: "",
           isFeatured: false,
           isArchived: false,
           isOnSale: false,
           isCharity: false,
-          material: "",
           measurements: "",
         },
   });
@@ -533,38 +536,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   <FormMessage />
                 </FormItem>
               )}
-              //TODO: change condition and material to be conditionId and materialId  like category, also change material to be a search like category
             />
-            <FormField
-              control={form.control}
-              name="material"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel htmlFor="material">Material</FormLabel>
-                  <Select
-                    disabled={loading}
-                    onValueChange={field.onChange}
-                    value={field.value ?? ""}
-                    defaultValue="Cotton"
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          defaultValue="Cotton"
-                          placeholder="Select a material"
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Cotton">Cotton</SelectItem>
-                      <SelectItem value="Leather">Leather</SelectItem>
-                      <SelectItem value="Silk">Silk</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> 
             <FormField
               control={form.control}
               name="colorId"
@@ -653,6 +625,38 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                       {conditions?.map((condition) => (
                         <SelectItem key={condition.id} value={condition.id}>
                           {condition.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="materialId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="materialId">Material</FormLabel>
+                  <Select
+                    disabled={loading}
+                    onValueChange={field.onChange}
+                    value={field.value ?? ""}
+                    defaultValue="Small"
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          defaultValue="Small"
+                          placeholder="Select a Material"
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {materials?.map((material) => (
+                        <SelectItem key={material.id} value={material.id}>
+                          {material.name}
                         </SelectItem>
                       ))}
                     </SelectContent>

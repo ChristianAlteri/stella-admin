@@ -120,12 +120,12 @@ export const columns: ColumnDef<ProductColumn>[] = [
     header: "Condition",
   },
   {
-    accessorKey: "sellerHandle",
-    header: "Seller",
+    accessorKey: "material",
+    header: "Material",
   },
   {
-    accessorKey: "sex",
-    header: "Sex",
+    accessorKey: "sellerHandle",
+    header: "Seller",
   },
   {
     accessorKey: "isFeatured",
@@ -140,16 +140,8 @@ export const columns: ColumnDef<ProductColumn>[] = [
     header: "OnSale",
   },
   {
-    accessorKey: "material",
-    header: "Material",
-  },
-  {
     accessorKey: "measurements",
     header: "Measurements",
-  },
-  {
-    accessorKey: "reference",
-    header: "Reference",
   },
   {
     accessorKey: "color",

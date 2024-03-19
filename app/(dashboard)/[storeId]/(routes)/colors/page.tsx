@@ -4,6 +4,7 @@ import prismadb from "@/lib/prismadb";
 
 import { ColorColumn } from "./components/columns"
 import { ColorClient } from "./components/client";
+import { getTopSellingColorCount } from "@/actions/get-top-selling-color";
 
 const ColorsPage = async ({
   params
@@ -19,6 +20,7 @@ const ColorsPage = async ({
     }
   });
 
+
   const formattedColors: ColorColumn[] = colors.map((item) => ({
     id: item.id,
     name: item.name,
@@ -26,10 +28,13 @@ const ColorsPage = async ({
     createdAt: format(item.createdAt, 'MMMM do, yyyy'),
   }));
 
+  const topSellingColors = await getTopSellingColorCount(params.storeId);
+  console.log("topSellingColors", topSellingColors);
+
   return (
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
-        <ColorClient data={formattedColors} />
+        <ColorClient data={formattedColors} topSellingData={topSellingColors} />
       </div>
     </div>
   );

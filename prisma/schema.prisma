@@ -23,6 +23,7 @@ model Store {
   sizes      Size[]      @relation("StoreToSize")
   colors     Color[]     @relation("StoreToColor")
   condition  Condition[] @relation("StoreToCondition")
+  material   Material[]  @relation("StoreToMaterial")
   orders     Order[]     @relation("StoreToOrder")
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
@@ -73,7 +74,6 @@ model Seller {
   @@index([storeId])
 }
 
-
 model Category {
   id          String    @id @default(uuid())
   storeId     String // Foreign Key to Store
@@ -116,7 +116,6 @@ model Product {
   description  String
   retailPrice  Decimal
   ourPrice     Decimal
-  material     String?
   measurements String?
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
@@ -141,20 +140,25 @@ model Product {
   colorId      String // Foreign Key to Color
   color        Color       @relation(fields: [colorId], references: [id])
   conditionId  String // Foreign Key to Color
-  condition    Condition    @relation(fields: [conditionId], references: [id])
+  condition    Condition   @relation(fields: [conditionId], references: [id])
+  materialId  String // Foreign Key to Color
+  material    Material   @relation(fields: [materialId], references: [id])
+
+
 
   @@index([storeId])
   @@index([categoryId])
   @@index([sizeId])
   @@index([colorId])
   @@index([conditionId])
+  @@index([materialId])
   @@index([designerId])
   @@index([sellerId])
 }
 
 model Order {
   id                String      @id @default(uuid())
-  storeId           String      // Foreign Key to Store
+  storeId           String // Foreign Key to Store
   store             Store       @relation("StoreToOrder", fields: [storeId], references: [id])
   orderItems        OrderItem[] // Relation to OrderItem model
   isPaid            Boolean     @default(false)
@@ -173,7 +177,6 @@ model Order {
   @@index([storeId])
 }
 
-
 model OrderItem {
   id        String  @id @default(uuid())
   orderId   String // Foreign Key to Order
@@ -187,7 +190,7 @@ model OrderItem {
 
 model Size {
   id        String    @id @default(uuid())
-  storeId   String    // Foreign Key to Store
+  storeId   String // Foreign Key to Store
   store     Store     @relation("StoreToSize", fields: [storeId], references: [id])
   name      String
   value     String
@@ -200,7 +203,7 @@ model Size {
 
 model Color {
   id        String    @id @default(uuid())
-  storeId   String    // Foreign Key to Store
+  storeId   String // Foreign Key to Store
   store     Store     @relation("StoreToColor", fields: [storeId], references: [id])
   name      String
   value     String
@@ -224,22 +227,22 @@ model Color {
 //   @@index([storeId])
 // }
 
-// model Material {
-//   id        String    @id @default(uuid())
-//   storeId   String    // Foreign Key to Store
-//   store     Store     @relation("StoreToColor", fields: [storeId], references: [id])
-//   name      String
-//   value     String
-//   products  Product[] // Relation to Product model
-//   createdAt DateTime  @default(now())
-//   updatedAt DateTime  @updatedAt
+model Material {
+  id        String    @id @default(uuid())
+  storeId   String // Foreign Key to Store
+  store     Store     @relation("StoreToMaterial", fields: [storeId], references: [id])
+  name      String
+  value     String
+  products  Product[] // Relation to Product model
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
-//   @@index([storeId])
-// }
+  @@index([storeId])
+}
 
 model Condition {
   id        String    @id @default(uuid())
-  storeId   String    // Foreign Key to Store
+  storeId   String // Foreign Key to Store
   store     Store     @relation("StoreToCondition", fields: [storeId], references: [id])
   name      String
   value     String
@@ -252,9 +255,9 @@ model Condition {
 
 model Image {
   id        String   @id @default(uuid())
-  productId String    // Foreign Key to Product
+  productId String // Foreign Key to Product
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  url       String    // URL of the image
+  url       String // URL of the image
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

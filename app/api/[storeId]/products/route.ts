@@ -12,7 +12,6 @@ export async function POST(
     const { userId } = auth();
 
     const body = await req.json();
-    console.log("are we inside post");
     console.log("body", body);
 
     const {
@@ -26,6 +25,7 @@ export async function POST(
       colorId,
       sizeId,
       conditionId,
+      materialId,
       images,
       isFeatured,
       isArchived,
@@ -93,7 +93,6 @@ export async function POST(
         description,
         ourPrice,
         retailPrice,
-        material,
         measurements,
         likes,
         clicks,
@@ -136,6 +135,11 @@ export async function POST(
             id: conditionId,
           },
         },
+        material: {
+          connect: {
+            id: materialId,
+          },
+        },
         color: {
           connect: {
             id: colorId,
@@ -167,6 +171,7 @@ export async function GET(
     const sellerId = searchParams.get("sellerId") || undefined;
     const colorId = searchParams.get("colorId") || undefined;
     const sizeId = searchParams.get("sizeId") || undefined;
+    const materialId = searchParams.get("materialId") || undefined;
     const conditionId = searchParams.get("conditionId") || undefined;
     const isFeatured = searchParams.get("isFeatured");
     const isOnSale = searchParams.get("isOnSale");
@@ -205,6 +210,7 @@ export async function GET(
         colorId,
         sizeId,
         conditionId,
+        materialId,
         name,
         isFeatured: isFeatured ? true : undefined,
         isOnSale: isOnSale ? true : undefined,
@@ -217,6 +223,7 @@ export async function GET(
         color: true,
         size: true,
         condition: true,
+        material: true,
         seller: true,
       },
       orderBy,

@@ -60,6 +60,11 @@ export function MainNav({
       active: pathname === `/${params.storeId}/conditions`,
     },
     {
+      href: `/${params.storeId}/materials`,
+      label: 'Materials',
+      active: pathname === `/${params.storeId}/materials`,
+    },
+    {
       href: `/${params.storeId}/colors`,
       label: 'Colors',
       active: pathname === `/${params.storeId}/colors`,

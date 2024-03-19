@@ -76,7 +76,6 @@ CREATE TABLE "Product" (
     "description" STRING NOT NULL,
     "retailPrice" DECIMAL(65,30) NOT NULL,
     "ourPrice" DECIMAL(65,30) NOT NULL,
-    "material" STRING,
     "measurements" STRING,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -93,6 +92,7 @@ CREATE TABLE "Product" (
     "sizeId" STRING NOT NULL,
     "colorId" STRING NOT NULL,
     "conditionId" STRING NOT NULL,
+    "materialId" STRING NOT NULL,
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
 );
@@ -143,6 +143,18 @@ CREATE TABLE "Color" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Color_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Material" (
+    "id" STRING NOT NULL,
+    "storeId" STRING NOT NULL,
+    "name" STRING NOT NULL,
+    "value" STRING NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Material_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -229,6 +241,9 @@ CREATE INDEX "Product_colorId_idx" ON "Product"("colorId");
 CREATE INDEX "Product_conditionId_idx" ON "Product"("conditionId");
 
 -- CreateIndex
+CREATE INDEX "Product_materialId_idx" ON "Product"("materialId");
+
+-- CreateIndex
 CREATE INDEX "Product_designerId_idx" ON "Product"("designerId");
 
 -- CreateIndex
@@ -248,6 +263,9 @@ CREATE INDEX "Size_storeId_idx" ON "Size"("storeId");
 
 -- CreateIndex
 CREATE INDEX "Color_storeId_idx" ON "Color"("storeId");
+
+-- CreateIndex
+CREATE INDEX "Material_storeId_idx" ON "Material"("storeId");
 
 -- CreateIndex
 CREATE INDEX "Condition_storeId_idx" ON "Condition"("storeId");
