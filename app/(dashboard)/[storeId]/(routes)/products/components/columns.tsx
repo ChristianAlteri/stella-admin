@@ -133,11 +133,15 @@ export const columns: ColumnDef<ProductColumn>[] = [
   },
   {
     accessorKey: "isArchived",
-    header: "Archived",
+    header: "Sold",
   },
   {
     accessorKey: "isOnSale",
     header: "OnSale",
+  },
+  {
+    accessorKey: "isCharity",
+    header: "isCharity",
   },
   {
     accessorKey: "measurements",

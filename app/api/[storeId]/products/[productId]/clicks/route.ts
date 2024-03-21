@@ -1,6 +1,6 @@
 // This is an example of a dedicated PATCH endpoint for updating likes
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server"
 
 import prismadb from "@/lib/prismadb";
 
