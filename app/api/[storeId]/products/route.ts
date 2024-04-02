@@ -26,11 +26,12 @@ export async function POST(
       sizeId,
       conditionId,
       materialId,
+      subcategoryId,
+      genderId,
       images,
       isFeatured,
       isArchived,
       isCharity,
-      material,
       measurements,
       likes,
       clicks,
@@ -145,6 +146,16 @@ export async function POST(
             id: colorId,
           },
         },
+        subcategory: {
+          connect: {
+            id: subcategoryId,
+          },
+        },
+        gender: {
+          connect: {
+            id: genderId,
+          },
+        },
         seller: {
           connect: {
             id: sellerId,
@@ -173,8 +184,12 @@ export async function GET(
     const sizeId = searchParams.get("sizeId") || undefined;
     const materialId = searchParams.get("materialId") || undefined;
     const conditionId = searchParams.get("conditionId") || undefined;
+    const genderId = searchParams.get("genderId") || undefined;
+    const subcategoryId = searchParams.get("subcategoryId") || undefined;
     const isFeatured = searchParams.get("isFeatured");
     const isOnSale = searchParams.get("isOnSale");
+    const isHidden = searchParams.get("isHidden");
+    const isCharity = searchParams.get("isCharity");
     const name = searchParams.get("productName") || undefined;
     const sort = searchParams.get("sort") || undefined;
 
@@ -211,9 +226,13 @@ export async function GET(
         sizeId,
         conditionId,
         materialId,
+        genderId,
+        subcategoryId,
         name,
         isFeatured: isFeatured ? true : undefined,
         isOnSale: isOnSale ? true : undefined,
+        isCharity: isCharity ? true : undefined,
+        isHidden: isHidden ? true : undefined,
         isArchived: false,
       },
       include: {
@@ -225,6 +244,8 @@ export async function GET(
         condition: true,
         material: true,
         seller: true,
+        subcategory: true,
+        gender: true,
       },
       orderBy,
     });

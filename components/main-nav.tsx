@@ -45,6 +45,11 @@ export function MainNav({
       active: pathname === `/${params.storeId}/categories`,
     },
     {
+      href: `/${params.storeId}/sub-categories`,
+      label: 'Sub-categories',
+      active: pathname === `/${params.storeId}/sub-categories`,
+    },
+    {
       href: `/${params.storeId}/billboards`,
       label: 'Billboards',
       active: pathname === `/${params.storeId}/billboards`,
@@ -68,6 +73,11 @@ export function MainNav({
       href: `/${params.storeId}/colors`,
       label: 'Colors',
       active: pathname === `/${params.storeId}/colors`,
+    },
+    {
+      href: `/${params.storeId}/genders`,
+      label: 'Genders',
+      active: pathname === `/${params.storeId}/genders`,
     },
     {
       href: `/${params.storeId}/settings`,

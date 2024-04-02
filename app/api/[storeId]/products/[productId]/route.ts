@@ -25,6 +25,8 @@ export async function GET(
         condition: true,
         material: true,
         color: true,
+        gender: true,
+        subcategory: true,
       }
     });
     console.log('[PRODUCT_GET]', product);
@@ -98,12 +100,15 @@ export async function PATCH(
       sizeId, 
       conditionId, 
       materialId,
+      subcategoryId,
+      genderId,
       images, 
       sellerId,
       isFeatured, 
       isArchived, 
       isCharity, 
       isOnSale, 
+      isHidden,
       measurements,
       likes,
       clicks } = body;
@@ -159,6 +164,7 @@ export async function PATCH(
         isArchived,
         isOnSale,
         isCharity,
+        isHidden,
         // categoryId,
         // designerId,
         // colorId,
@@ -195,6 +201,16 @@ export async function PATCH(
         material: {
           connect: {
             id: materialId
+          }
+        },
+        gender: {
+          connect: {
+            id: genderId
+          }
+        },
+        subcategory: {
+          connect: {
+            id: subcategoryId
           }
         },
         seller: {

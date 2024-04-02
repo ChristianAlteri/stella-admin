@@ -93,6 +93,8 @@ CREATE TABLE "Product" (
     "colorId" STRING NOT NULL,
     "conditionId" STRING NOT NULL,
     "materialId" STRING NOT NULL,
+    "genderId" STRING NOT NULL,
+    "subcategoryId" STRING NOT NULL,
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
 );
@@ -143,6 +145,30 @@ CREATE TABLE "Color" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Color_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Gender" (
+    "id" STRING NOT NULL,
+    "storeId" STRING NOT NULL,
+    "name" STRING NOT NULL,
+    "value" STRING NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Gender_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Subcategory" (
+    "id" STRING NOT NULL,
+    "storeId" STRING NOT NULL,
+    "name" STRING NOT NULL,
+    "value" STRING NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Subcategory_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -229,6 +255,12 @@ CREATE INDEX "Designer_billboardId_idx" ON "Designer"("billboardId");
 CREATE INDEX "Product_storeId_idx" ON "Product"("storeId");
 
 -- CreateIndex
+CREATE INDEX "Product_sellerId_idx" ON "Product"("sellerId");
+
+-- CreateIndex
+CREATE INDEX "Product_designerId_idx" ON "Product"("designerId");
+
+-- CreateIndex
 CREATE INDEX "Product_categoryId_idx" ON "Product"("categoryId");
 
 -- CreateIndex
@@ -244,10 +276,10 @@ CREATE INDEX "Product_conditionId_idx" ON "Product"("conditionId");
 CREATE INDEX "Product_materialId_idx" ON "Product"("materialId");
 
 -- CreateIndex
-CREATE INDEX "Product_designerId_idx" ON "Product"("designerId");
+CREATE INDEX "Product_genderId_idx" ON "Product"("genderId");
 
 -- CreateIndex
-CREATE INDEX "Product_sellerId_idx" ON "Product"("sellerId");
+CREATE INDEX "Product_subcategoryId_idx" ON "Product"("subcategoryId");
 
 -- CreateIndex
 CREATE INDEX "Order_storeId_idx" ON "Order"("storeId");
@@ -263,6 +295,12 @@ CREATE INDEX "Size_storeId_idx" ON "Size"("storeId");
 
 -- CreateIndex
 CREATE INDEX "Color_storeId_idx" ON "Color"("storeId");
+
+-- CreateIndex
+CREATE INDEX "Gender_storeId_idx" ON "Gender"("storeId");
+
+-- CreateIndex
+CREATE INDEX "Subcategory_storeId_idx" ON "Subcategory"("storeId");
 
 -- CreateIndex
 CREATE INDEX "Material_storeId_idx" ON "Material"("storeId");

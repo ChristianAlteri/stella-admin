@@ -24,11 +24,13 @@ import {
   Color,
   Condition,
   Designer,
+  Gender,
   Image,
   Material,
   Product,
   Seller,
   Size,
+  Subcategory,
 } from "@prisma/client";
 import { useParams, useRouter } from "next/navigation";
 
@@ -68,14 +70,17 @@ const formSchema = z.object({
   designerId: z.string().min(1),
   sellerId: z.string().min(1),
   categoryId: z.string().min(1),
+  subcategoryId: z.string().min(1),
   colorId: z.string().min(1),
   sizeId: z.string().min(1),
   conditionId: z.string().min(1),
   materialId: z.string().min(1),
+  genderId: z.string().min(1),
   isFeatured: z.boolean().default(false).optional(),
   isArchived: z.boolean().default(false).optional(),
   isOnSale: z.boolean().default(false).optional(),
   isCharity: z.boolean().default(false).optional(),
+  isHidden: z.boolean().default(false).optional(),
   measurements: z.string().nullable(),
 });
 
@@ -94,6 +99,8 @@ interface ProductFormProps {
   sizes: Size[];
   conditions: Condition[];
   materials: Material[];
+  subcategories: Subcategory[];
+  genders: Gender[];
 }
 
 export const ProductForm: React.FC<ProductFormProps> = ({
@@ -105,6 +112,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   colors,
   conditions,
   materials,
+  subcategories,
+  genders,
 }) => {
   const params = useParams();
   const router = useRouter();
@@ -137,14 +146,17 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           designerId: "",
           sellerId: "",
           categoryId: "",
+          subcategoryId: "",
           colorId: "",
           sizeId: "",
           conditionId: "",
           materialId: "",
+          genderId: "",
           isFeatured: false,
           isArchived: false,
           isOnSale: false,
           isCharity: false,
+          isHidden: false,
           measurements: "",
         },
   });
@@ -539,6 +551,67 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             />
             <FormField
               control={form.control}
+              name="subcategoryId"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel htmlFor="subcategory">Sub-category</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            "w-[200px] justify-between",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value
+                            ? subcategories.find(
+                                (subcategory) => subcategory.id === field.value
+                              )?.name
+                            : "Select subcategory"}
+                          <div className="ml-2 h-4 w-4 shrink-0 opacity-50">
+                            ^
+                          </div>
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[200px] p-0">
+                      <Command>
+                        <CommandInput placeholder="Search subcategories..." />
+                        <CommandEmpty>No subcategories found.</CommandEmpty>
+                        <CommandGroup>
+                          {subcategories?.map((subcategory) => (
+                            <CommandItem
+                              value={subcategory.id}
+                              key={subcategory.id}
+                              onSelect={() => {
+                                form.setValue("subcategoryId", subcategory.id);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  field.value === subcategory.id
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                              {subcategory.name}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormDescription>Select from the subcategory</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="colorId"
               render={({ field }) => (
                 <FormItem>
@@ -643,12 +716,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                     disabled={loading}
                     onValueChange={field.onChange}
                     value={field.value ?? ""}
-                    defaultValue="Small"
+                    defaultValue="Cotton"
                   >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue
-                          defaultValue="Small"
+                          defaultValue="Cotton"
                           placeholder="Select a Material"
                         />
                       </SelectTrigger>
@@ -657,6 +730,38 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                       {materials?.map((material) => (
                         <SelectItem key={material.id} value={material.id}>
                           {material.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="genderId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="genderId">Gender</FormLabel>
+                  <Select
+                    disabled={loading}
+                    onValueChange={field.onChange}
+                    value={field.value ?? ""}
+                    defaultValue="Womenswear"
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          defaultValue="Womenswear"
+                          placeholder="Select a Gender"
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {genders?.map((gender) => (
+                        <SelectItem key={gender.id} value={gender.id}>
+                          {gender.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -744,6 +849,27 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                     <FormLabel>Charity</FormLabel>
                     <FormDescription>
                       Some of this products proceeds will go to charity.
+                    </FormDescription>
+                  </div>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="isHidden"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      // @ts-ignore
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>Hidden</FormLabel>
+                    <FormDescription>
+                      This product will appear blurred until changed to false, defaults to false.
                     </FormDescription>
                   </div>
                 </FormItem>
