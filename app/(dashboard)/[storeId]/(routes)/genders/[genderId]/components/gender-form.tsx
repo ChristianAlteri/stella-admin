@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -147,6 +148,9 @@ export const GenderForm: React.FC<GenderFormProps> = ({
                   <FormControl>
                     <Input disabled={loading} placeholder="Gender name" {...field} />
                   </FormControl>
+                  <FormDescription>
+                      Make sure to upload Womans first, then Mens or the app will break!
+                    </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

@@ -29,10 +29,10 @@ export async function GET(
         subcategory: true,
       }
     });
-    console.log('[PRODUCT_GET]', product);
+    // console.log('[PRODUCT_GET]', product);
     return NextResponse.json(product);
   } catch (error) {
-    console.log('[PRODUCT_GET]', error);
+    // console.log('[PRODUCT_GET]', error);
     return new NextResponse("Internal error", { status: 500 });
   }
 };
