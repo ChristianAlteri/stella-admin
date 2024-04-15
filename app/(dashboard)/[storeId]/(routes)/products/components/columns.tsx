@@ -17,13 +17,15 @@ export type ProductColumn = {
   size: string;
   color: string;
   condition: string;
+  gender: string;
+  subcategory: string;
   createdAt: string;
   isFeatured: boolean;
   isArchived: boolean;
   isOnSale: boolean;
   isCharity: boolean;
+  isHidden: boolean;
   material: string | null | undefined;
-  measurements: string | null | undefined;
   likes: number | null | undefined;
   clicks: number | null | undefined;
   imageUrl: string;
@@ -83,6 +85,18 @@ export const columns: ColumnDef<ProductColumn>[] = [
     )
   },
   {
+    accessorKey: "sellerHandle",
+    header: "Seller",
+  },
+  {
+    accessorKey: "category",
+    header: "Category",
+    cell: ({ row }) => 
+        <div className="flex items-center gap-x-2 overflow-y-auto">
+          <a className="hover:underline" href={`/api/${row.original.storeId}/categories/${row.original.categoryId}`}>{row.original.category}</a>
+        </div>
+  },
+  {
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => (
@@ -103,29 +117,40 @@ export const columns: ColumnDef<ProductColumn>[] = [
   //   accessorKey: "location",
   //   header: "Location",
   // },
-  {
-    accessorKey: "category",
-    header: "Category",
-    cell: ({ row }) => 
-        <div className="flex items-center gap-x-2 overflow-y-auto">
-          <a className="hover:underline" href={`/api/${row.original.storeId}/categories/${row.original.categoryId}`}>{row.original.category}</a>
-        </div>
-  },
+  
   {
     accessorKey: "size",
     header: "Size",
-  },
-  {
-    accessorKey: "condition",
-    header: "Condition",
   },
   {
     accessorKey: "material",
     header: "Material",
   },
   {
-    accessorKey: "sellerHandle",
-    header: "Seller",
+    accessorKey: "condition",
+    header: "Condition",
+  },
+  {
+    accessorKey: "gender",
+    header: "Gender",
+  },
+  {
+    accessorKey: "subcategory",
+    header: "Subcategory",
+  },
+  {
+    accessorKey: "color",
+    header: "Color",
+    cell: ({ row }) => (
+      <div className="flex items-center gap-x-2">
+        {row.original.color}
+        <div
+        className="w-4 h-4 rounded border"
+          style={{ backgroundColor: row.original.color}}
+        >
+        </div>
+      </div>
+    )
   },
   {
     accessorKey: "isFeatured",
@@ -144,22 +169,8 @@ export const columns: ColumnDef<ProductColumn>[] = [
     header: "isCharity",
   },
   {
-    accessorKey: "measurements",
-    header: "Measurements",
-  },
-  {
-    accessorKey: "color",
-    header: "Color",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-x-2">
-        {row.original.color}
-        <div
-        className="w-4 h-4 rounded border"
-          style={{ backgroundColor: row.original.color}}
-        >
-        </div>
-      </div>
-    )
+    accessorKey: "isHidden",
+    header: "isHidden",
   },
   // {
   //   accessorKey: "imageUrl",

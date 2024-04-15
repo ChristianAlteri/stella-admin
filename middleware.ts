@@ -24,9 +24,17 @@ export default clerkMiddleware((auth, request) => {
   const { pathname } = request.nextUrl;
 
   // Exclude paths starting with /api, /_next/static, and /public from protection.
-  if (!pathname.startsWith('/api') && !pathname.startsWith('/_next/static') && !pathname.startsWith('/public')) {
+  if (!pathname.startsWith('/api') && !pathname.startsWith('/_next/static') && !pathname.startsWith('/public') && !pathname.startsWith('/sign-in') && !pathname.startsWith('/sign-up')) {
     auth().protect();
   }
+
+  // if (pathname.startsWith('/api') || 
+  //     pathname.startsWith('/_next/static') || 
+  //     pathname.startsWith('/public') ||
+  //     pathname.startsWith('/sign-in') ||
+  //     pathname.startsWith('/sign-up')) {
+  //   return NextResponse.next();
+  // }
 
   return NextResponse.next();
 });
