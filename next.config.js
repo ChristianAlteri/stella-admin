@@ -22,7 +22,7 @@ const nextConfig = {
     ];
   },
   images: {
-    domains: ["res.cloudinary.com"],
+    domains: ["res.cloudinary.com", "stella-ecomm-media-bucket.s3.amazonaws.com"],
   },
 };
 

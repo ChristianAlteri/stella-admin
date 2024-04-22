@@ -56,6 +56,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import ImageUpload from "@/components/ui/image-upload";
+import S3Upload from "@/components/ui/s3-upload";
 import { Checkbox } from "@/components/ui/checkbox";
 import { TbFaceId, TbFaceIdError } from "react-icons/tb";
 import { DescriptionInput } from "@/components/ui/descriptionInput";
@@ -183,6 +184,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   };
 
   const onSubmit = async (data: ProductFormValues) => {
+    console.log("SUBFORM", data);
     try {
       setLoading(true);
       if (initialData) {
@@ -253,7 +255,64 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 <FormItem>
                   <FormLabel>Images</FormLabel>
                   <FormControl>
-                    <ImageUpload
+                    <S3Upload
+                      value={field.value
+                        .map((image) => {
+                          if (
+                            typeof image === "object" &&
+                            !Array.isArray(image) &&
+                            image.url
+                          ) {
+                            console.log("Image object:", image);
+                            return image.url; // Return the URL from the object
+                          } else if (Array.isArray(image)) {
+                            // It's an array, likely containing URLs
+                            console.log("Image array:", image);
+                            return image; // Returning the array to be flattened later
+                          }
+                          console.log("Unexpected image data format:", image);
+                          return null; // Return null for any unhandled data types
+                        })
+                        .flat()} // Ensure all data is flattened into a single array of URLs
+                      disabled={loading}
+                      onChange={(input) => {
+                        const urlsToAdd = Array.isArray(input)
+                          ? input
+                          : [input]; // Ensure input is always an array
+                        console.log("Adding URLs:", urlsToAdd);
+                        urlsToAdd.forEach((url) => {
+                          if (typeof url === "string") {
+                            field.onChange([...field.value, { url }]);
+                          } else {
+                            console.log(
+                              "Attempted to add non-string URL:",
+                              url
+                            );
+                          }
+                        });
+                      }}
+                      onRemove={(url) => {
+                        if (typeof url === "string") {
+                          console.log("Removing URL:", url);
+                          field.onChange([
+                            ...field.value.filter(
+                              (current) =>
+                                (typeof current === "object" &&
+                                  current.url !== url) ||
+                                (Array.isArray(current) &&
+                                  !current.includes(url))
+                            ),
+                          ]);
+                        } else {
+                          console.log(
+                            "Attempted to remove non-string URL:",
+                            url
+                          );
+                        }
+                      }}
+                    />
+
+                    {/* <ImageUpload
                       value={field.value.map((image) => image.url)}
                       disabled={loading}
                       onChange={(url) =>
@@ -266,7 +325,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                           ),
                         ])
                       }
-                    />
+                    /> */}
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -869,7 +928,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   <div className="space-y-1 leading-none">
                     <FormLabel>Hidden</FormLabel>
                     <FormDescription>
-                      This product will appear blurred until changed to false, defaults to false.
+                      This product will appear blurred until changed to false,
+                      defaults to false.
                     </FormDescription>
                   </div>
                 </FormItem>
