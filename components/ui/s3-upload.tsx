@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { ImagePlus, Trash, Trash2 } from "lucide-react";
+import ReactPlayer from "react-player";
 
 interface S3UploadProps {
   disabled?: boolean;
@@ -17,6 +18,7 @@ const S3Upload: React.FC<S3UploadProps> = ({
   onRemove,
   value,
 }) => {
+  
   const s3Client = new S3Client({
     region: "eu-west-2",
     credentials: {
@@ -38,7 +40,7 @@ const S3Upload: React.FC<S3UploadProps> = ({
           Key: `uploads/${fileName}`,
           Body: file,
         };
-  
+
         try {
           await s3Client.send(new PutObjectCommand(uploadParams));
           const imageUrl = `https://${process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME}.s3.amazonaws.com/uploads/${fileName}`;
@@ -49,15 +51,16 @@ const S3Upload: React.FC<S3UploadProps> = ({
         }
       })
     );
-  
+
     // Filter out any null values to ensure all elements are strings
     const validUrls = newUrls.filter((url): url is string => url !== null);
-  
     const updatedUrls = [...value, ...validUrls];
+    if (updatedUrls.length === 1){
+      onChange([updatedUrls[0]])
+    }
     onChange(updatedUrls);
     setUploading(false);
   };
-  
 
   const handleFileInput = () => {
     fileInputRef.current?.click();
@@ -66,9 +69,12 @@ const S3Upload: React.FC<S3UploadProps> = ({
   return (
     <div>
       <div className="mb-4 flex items-center gap-4">
-        {value.map((url) => (
+        {value.map((url) =>
           typeof url === "string" ? (
-            <div key={url} className="relative w-[200px] h-[200px] rounded-md overflow-hidden">
+            <div
+              key={url}
+              className="relative w-[200px] h-[200px] rounded-md overflow-hidden"
+            >
               <div className="z-10 absolute top-2 right-2">
                 <Button
                   type="button"
@@ -79,10 +85,32 @@ const S3Upload: React.FC<S3UploadProps> = ({
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
-              <Image fill className="object-cover" alt="Image" src={url} />
+              {/* <Image fill className="object-cover" alt="Image" src={url} /> */}
+              {url.match(/https:\/\/.*\.(video|mp4|MP4|mov).*/) ? (
+                <ReactPlayer
+                  key={url}
+                  url={url}
+                  width={"50%"}
+                  loop={true}
+                  playing={true}
+                  muted={true}
+                  alt={`Image from ${url}`}
+                  className="rounded-md transition-opacity duration-200 ease-in-out"
+                />
+              ) : (
+                <Image
+                  key={url}
+                  src={url}
+                  alt={`Image from ${url}`}
+                  width={100}
+                  height={0}
+                  loading="lazy"
+                  className="rounded-md transition-opacity duration-200 ease-in-out"
+                />
+              )}
             </div>
           ) : null
-        ))}
+        )}
       </div>
       <Button
         type="button"

@@ -58,7 +58,7 @@ export const columns: ColumnDef<ProductColumn>[] = [
       <>
         <a className="hover:underline" href={row.original.imageUrl}>
           {/* <Image src={row.original.imageUrl} alt="Image" width={100} height={100}></Image>  */}
-          {row.original?.imageUrl.match(/https:\/\/.*\.(video|mp4|MP4).*/) ? (
+          {row.original?.imageUrl.match(/https:\/\/.*\.(video|mp4|MP4|mov).*/) ? (
             <ReactPlayer
               key={row.original.id}
               url={row.original.imageUrl}
