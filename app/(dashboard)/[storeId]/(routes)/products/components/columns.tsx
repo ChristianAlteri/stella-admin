@@ -1,9 +1,10 @@
-"use client"
+"use client";
 
-import { ColumnDef } from "@tanstack/react-table"
+import { ColumnDef } from "@tanstack/react-table";
 
-import { CellAction } from "./cell-action"
+import { CellAction } from "./cell-action";
 import Image from "next/image";
+import ReactPlayer from "react-player";
 
 export type ProductColumn = {
   id: string;
@@ -32,23 +33,23 @@ export type ProductColumn = {
   designerId: string;
   categoryId: string;
   storeId: string;
-}
+};
 
 export const columns: ColumnDef<ProductColumn>[] = [
   {
     id: "actions",
-    cell: ({ row }) => 
-      <div className="flex" >
+    cell: ({ row }) => (
+      <div className="flex">
         <CellAction data={row.original} />
       </div>
+    ),
   },
   {
     accessorKey: "name",
     header: "Name",
-    cell: ({ row }) => 
-      <div className="flex text-red-900" >
-       {row.original.name} 
-      </div>
+    cell: ({ row }) => (
+      <div className="flex text-red-900">{row.original.name}</div>
+    ),
   },
   {
     accessorKey: "imageUrl",
@@ -56,18 +57,39 @@ export const columns: ColumnDef<ProductColumn>[] = [
     cell: ({ row }) => (
       <>
         <a className="hover:underline" href={row.original.imageUrl}>
-          <Image src={row.original.imageUrl} alt="Image" width={100} height={100}></Image> 
+          {/* <Image src={row.original.imageUrl} alt="Image" width={100} height={100}></Image>  */}
+          {row.original?.imageUrl.match(/https:\/\/.*\.(video|mp4|MP4).*/) ? (
+            <ReactPlayer
+              key={row.original.id}
+              url={row.original.imageUrl}
+              width={"100%"}
+              loop={true}
+              playing={true}
+              muted={true}
+              alt={`Image from ${row.original.imageUrl}`}
+              className="rounded-md transition-opacity duration-200 ease-in-out"
+            />
+          ) : (
+            <Image
+              key={row.original.id}
+              src={row.original.imageUrl}
+              alt={`Image from ${row.original.imageUrl}`}
+              width={100}
+              height={0}
+              loading="lazy"
+              className="rounded-md transition-opacity duration-200 ease-in-out"
+            />
+          )}
         </a>
       </>
-    )
+    ),
   },
   {
     accessorKey: "ourPrice",
     header: "Price",
-    cell: ({ row }) => 
-      <div className="flex text-red-600" >
-        {row.original.ourPrice} 
-      </div>
+    cell: ({ row }) => (
+      <div className="flex text-red-600">{row.original.ourPrice}</div>
+    ),
   },
   {
     accessorKey: "retailPrice",
@@ -78,11 +100,14 @@ export const columns: ColumnDef<ProductColumn>[] = [
     header: "Designer",
     cell: ({ row }) => (
       <div className="flex items-center gap-x-2 overflow-y-auto">
-         <a className="hover:underline" href={`/api/${row.original.storeId}/designers/${row.original.designerId}`}>
+        <a
+          className="hover:underline"
+          href={`/api/${row.original.storeId}/designers/${row.original.designerId}`}
+        >
           {row.original.designer}
         </a>
       </div>
-    )
+    ),
   },
   {
     accessorKey: "sellerHandle",
@@ -91,10 +116,16 @@ export const columns: ColumnDef<ProductColumn>[] = [
   {
     accessorKey: "category",
     header: "Category",
-    cell: ({ row }) => 
-        <div className="flex items-center gap-x-2 overflow-y-auto">
-          <a className="hover:underline" href={`/api/${row.original.storeId}/categories/${row.original.categoryId}`}>{row.original.category}</a>
-        </div>
+    cell: ({ row }) => (
+      <div className="flex items-center gap-x-2 overflow-y-auto">
+        <a
+          className="hover:underline"
+          href={`/api/${row.original.storeId}/categories/${row.original.categoryId}`}
+        >
+          {row.original.category}
+        </a>
+      </div>
+    ),
   },
   {
     accessorKey: "description",
@@ -103,7 +134,7 @@ export const columns: ColumnDef<ProductColumn>[] = [
       <div className="flex items-center gap-x-2 overflow-y-auto">
         {row.original.description}
       </div>
-    )
+    ),
   },
   {
     accessorKey: "likes",
@@ -117,7 +148,7 @@ export const columns: ColumnDef<ProductColumn>[] = [
   //   accessorKey: "location",
   //   header: "Location",
   // },
-  
+
   {
     accessorKey: "size",
     header: "Size",
@@ -145,12 +176,11 @@ export const columns: ColumnDef<ProductColumn>[] = [
       <div className="flex items-center gap-x-2">
         {row.original.color}
         <div
-        className="w-4 h-4 rounded border"
-          style={{ backgroundColor: row.original.color}}
-        >
-        </div>
+          className="w-4 h-4 rounded border"
+          style={{ backgroundColor: row.original.color }}
+        ></div>
       </div>
-    )
+    ),
   },
   {
     accessorKey: "isFeatured",
@@ -175,17 +205,17 @@ export const columns: ColumnDef<ProductColumn>[] = [
   // {
   //   accessorKey: "imageUrl",
   //   header: "Preview Image",
-  //   cell: ({ row }) => 
+  //   cell: ({ row }) =>
   //     <>
   //       {/* <a className="hover:underline" href={row.original.imageUrl}> */}
   //       <a className="hover:underline" >
 
-  //         <img src={row.original.imageUrl} alt="Image" style={{ width: '100px', height: 'auto' }}></img> 
+  //         <img src={row.original.imageUrl} alt="Image" style={{ width: '100px', height: 'auto' }}></img>
   //       </a>
   //     </>,
   // },
   {
     accessorKey: "createdAt",
     header: "Date",
-  }
+  },
 ];
