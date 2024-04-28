@@ -58,16 +58,22 @@ export async function POST(
 
 export async function GET(
   req: Request,
-  { params }: { params: { storeId: string } }
+  { params }: { params: { storeId: string; name: string } }
 ) {
   try {
+    const { searchParams } = new URL(req.url);
+    const name = searchParams.get("name") || undefined;
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
     }
 
     const designer = await prismadb.designer.findMany({
       where: {
-        storeId: params.storeId
+        storeId: params.storeId,
+        name: {
+          contains: name,
+          mode: 'insensitive',
+        },
       },
       include: {
         billboard: true,

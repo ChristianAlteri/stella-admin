@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server"
 
-import prismadb from '@/lib/prismadb';
+import prismadb from "@/lib/prismadb";
+import { Prisma } from "@prisma/client";
  
 export async function POST(
   req: Request,
@@ -68,16 +69,23 @@ export async function POST(
 
 export async function GET(
   req: Request,
-  { params }: { params: { storeId: string } }
+  { params }: { params: { storeId: string; name: string } }
 ) {
   try {
+    const { searchParams } = new URL(req.url);
+    const name = searchParams.get("name") || undefined;
+    // console.log("SELLER SEARCH", searchParams);
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
     }
 
     const sellers = await prismadb.seller.findMany({
       where: {
-        storeId: params.storeId
+        storeId: params.storeId,
+        instagramHandle: {
+          contains: name,
+          mode: 'insensitive',
+        },
       },
       include: {
         billboard: true,
@@ -94,6 +102,7 @@ export async function GET(
       },
     });
   
+    // console.log('[SELLER_GET]', sellers);
     return NextResponse.json(sellers);
   } catch (error) {
     console.log('[SELLER_GET]', error);

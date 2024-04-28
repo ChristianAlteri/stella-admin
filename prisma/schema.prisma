@@ -307,4 +307,6 @@ model Image {
 //   clickList // array of product ids
 //   orderHistory // array of order ids
 //   purchaseHistory // array of product ids
+
+//  followingSeller // array of seller ids
 // }

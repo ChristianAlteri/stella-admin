@@ -32,6 +32,7 @@ export async function POST(
       isFeatured,
       isArchived,
       isCharity,
+      isHidden,
       measurements,
       likes,
       clicks,
@@ -101,6 +102,7 @@ export async function POST(
         isFeatured,
         isArchived,
         isOnSale,
+        isHidden,
         // categoryId,
         // designerId,
         // colorId,
@@ -190,6 +192,7 @@ export async function GET(
     const isOnSale = searchParams.get("isOnSale");
     const isHidden = searchParams.get("isHidden");
     const isCharity = searchParams.get("isCharity");
+
     const name = searchParams.get("productName") || undefined;
     const sort = searchParams.get("sort") || undefined;
 
@@ -214,8 +217,6 @@ export async function GET(
       };
     }
 
-    console.log("sort", orderBy);
-
     const products = await prismadb.product.findMany({
       where: {
         storeId: params.storeId,
@@ -228,7 +229,10 @@ export async function GET(
         materialId,
         genderId,
         subcategoryId,
-        name,
+        name: {
+          contains: name,
+          mode: 'insensitive',
+        },
         isFeatured: isFeatured ? true : undefined,
         isOnSale: isOnSale ? true : undefined,
         isCharity: isCharity ? true : undefined,
@@ -250,6 +254,7 @@ export async function GET(
       orderBy,
     });
 
+    // console.log(products);
     return NextResponse.json(products);
   } catch (error) {
     console.log("[PRODUCTS_GET]", error);
