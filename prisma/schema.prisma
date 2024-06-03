@@ -59,6 +59,7 @@ model Seller {
   instagramHandle String   @unique
   name            String   @unique
   createdAt       DateTime @default(now())
+  soldCount       Int      @default(0)
   storeId         String
   store           Store    @relation("StoreToSeller", fields: [storeId], references: [id])
 

@@ -45,7 +45,7 @@ export async function GET(
       };
     }
 
-    console.log("sort", orderBy);
+    // console.log("sort", orderBy);
 
     const likedProducts = await prismadb.product.findMany({
       where: {
@@ -81,11 +81,8 @@ export async function GET(
         subcategory: true,
         gender: true,
       },
-      orderBy: {
-        likes: 'desc', // Order by likes in descending order
-      }
+      orderBy,
     });
-    console.log("likedProducts", likedProducts);
     return NextResponse.json(likedProducts);
   } catch (error) {
     console.log('[PRODUCTS_GET]', error);

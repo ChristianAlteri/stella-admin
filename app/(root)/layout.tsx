@@ -20,6 +20,9 @@ export default async function SetupLayout({
             userId
         }
     });
+    console.log("CLG store", store);
+    console.log("CLG userId", userId);
+
 
     if (store) {
         redirect(`/${store.id}`);

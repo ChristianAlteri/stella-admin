@@ -10,6 +10,7 @@ export async function GET(
 ) {
   try {
     const { searchParams } = new URL(req.url);
+    console.log("searchParams", searchParams);
     const categoryId = searchParams.get("categoryId") || undefined;
     const designerId = searchParams.get("designerId") || undefined;
     const sellerId = searchParams.get("sellerId") || undefined;
@@ -30,6 +31,7 @@ export async function GET(
       return new NextResponse("Store id is required", { status: 400 });
     }
 
+   
     let orderBy;
     if (sort === "low-to-high") {
       orderBy = {
@@ -45,7 +47,7 @@ export async function GET(
       };
     }
 
-    console.log("sort", orderBy);
+    // console.log("sort", orderBy);
 
     const clickedProducts = await prismadb.product.findMany({
       where: {
@@ -81,9 +83,7 @@ export async function GET(
         subcategory: true,
         gender: true,
       },
-      orderBy: {
-        clicks: 'desc', // Order by clicks in descending order
-      }
+      orderBy,
     });
   
     return NextResponse.json(clickedProducts);

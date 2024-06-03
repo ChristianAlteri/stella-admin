@@ -196,7 +196,7 @@ export async function GET(
     const name = searchParams.get("productName") || undefined;
     const sort = searchParams.get("sort") || undefined;
 
-    console.log("These are the parameters ur searching by", searchParams);
+    // console.log("These are the parameters ur searching by", searchParams);
 
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
