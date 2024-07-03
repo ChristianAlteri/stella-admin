@@ -1,5 +1,5 @@
 import prismadb from "@/lib/prismadb";
-import { SellerForm } from "./components/designer-form";
+import { SellerForm } from "./components/seller-form";
 
 
 

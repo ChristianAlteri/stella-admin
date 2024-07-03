@@ -61,12 +61,18 @@ model Seller {
   createdAt       DateTime @default(now())
   soldCount       Int      @default(0)
   storeId         String
-  store           Store    @relation("StoreToSeller", fields: [storeId], references: [id])
 
-  billboardId String // Foreign Key to Billboard
-  billboard   Billboard @relation(fields: [billboardId], references: [id])
+  charityName   String?   @default("")
+  charityUrl    String?   @default("")
+  shoeSizeEU    String?   @default("")
+  topSize       String?   @default("")
+  bottomSize    String?   @default("")
 
-  // Sold by the seller
+  billboardId String? // Foreign Key to Billboard
+  billboard   Billboard? @relation(fields: [billboardId], references: [id])
+  store           Store  @relation("StoreToSeller", fields: [storeId], references: [id])
+
+  // Items listed by the seller
   products   Product[]  @relation("SellerToProduct")
   // Designers seller stocks
   designers  Designer[] @relation("SellerToDesigner")
@@ -81,8 +87,8 @@ model Category {
   id          String    @id @default(uuid())
   storeId     String // Foreign Key to Store
   store       Store     @relation("StoreToCategory", fields: [storeId], references: [id])
-  billboardId String // Foreign Key to Billboard
-  billboard   Billboard @relation(fields: [billboardId], references: [id])
+  billboardId String? // Foreign Key to Billboard
+  billboard   Billboard? @relation(fields: [billboardId], references: [id])
 
   name     String
   clicks   Int?      @default(0)
@@ -100,8 +106,8 @@ model Designer {
   id          String    @id @default(uuid())
   storeId     String // Foreign Key to Store
   store       Store     @relation("StoreToDesigner", fields: [storeId], references: [id])
-  billboardId String // Foreign Key to Billboard
-  billboard   Billboard @relation(fields: [billboardId], references: [id])
+  billboardId String? // Foreign Key to Billboard
+  billboard   Billboard? @relation(fields: [billboardId], references: [id])
 
   name      String
   products  Product[] @relation("DesignerToProduct")
@@ -164,26 +170,6 @@ model Product {
   @@index([subcategoryId])
 }
 
-model Order {
-  id                String      @id @default(uuid())
-  storeId           String // Foreign Key to Store
-  store             Store       @relation("StoreToOrder", fields: [storeId], references: [id])
-  orderItems        OrderItem[] // Relation to OrderItem model
-  isPaid            Boolean     @default(false)
-  hasBeenDispatched Boolean     @default(false)
-
-  phone     String   @default("")
-  address   String   @default("")
-  email     String   @default("")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // userId String? // Foreign Key to User
-  // user   User?   @relation("OrderToUser", fields: [userId], references: [id])
-  // @@index([userId])
-
-  @@index([storeId])
-}
 
 model OrderItem {
   id        String  @id @default(uuid())
@@ -311,3 +297,34 @@ model Image {
 
 //  followingSeller // array of seller ids
 // }
+
+model Order {
+  id                String      @id @default(uuid())
+  storeId           String // Foreign Key to Store
+  store             Store       @relation("StoreToOrder", fields: [storeId], references: [id])
+  orderItems        OrderItem[] // Relation to OrderItem model
+  isPaid            Boolean     @default(false)
+  hasBeenDispatched Boolean     @default(false)
+
+  phone     String   @default("")
+  address   String   @default("")
+  email     String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // TODO: Relation to user so we can track which user bought which product
+  // userId String? // Foreign Key to User
+  // user   User?   @relation("OrderToUser", fields: [userId], references: [id])
+  // @@index([userId])
+  // TODO: Relation to seller so we can track sales/which user bought which seller
+  // sellerId String // Foreign Key to Seller
+  // seller   Seller @relation(fields: [sellerId], references: [id])
+  // TODO: Relation to category so we can track sales/which user bought which category
+  // categoryId String // Foreign Key to Category
+  // category   Category @relation(fields: [categoryId], references: [id])
+  // TODO: Relation to designer so we can track sales/which user bought which designer
+  // designerId String // Foreign Key to Designer
+  // designer   Designer @relation(fields: [designerId], references: [id])
+
+  @@index([storeId])
+}

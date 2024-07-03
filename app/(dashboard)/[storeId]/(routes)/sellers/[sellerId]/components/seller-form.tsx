@@ -24,13 +24,17 @@ import { Separator } from "@/components/ui/separator"
 import { Heading } from "@/components/ui/heading"
 import { AlertModal } from "@/components/modals/alert-modal"
 import { TbFaceId, TbFaceIdError } from "react-icons/tb"
-import ImageUpload from "@/components/ui/image-upload"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const formSchema = z.object({
   name: z.string().min(1),
   instagramHandle: z.string().min(1),
   billboardId: z.string().min(1),
+  charityName: z.string().optional(),
+  charityUrl: z.string().optional(),
+  shoeSizeEU: z.string().min(1),
+  topSize: z.string().min(1),
+  bottomSize: z.string().min(1),
 });
 
 type SellerFormValues = z.infer<typeof formSchema>
@@ -78,10 +82,12 @@ export const SellerForm: React.FC<SellerFormProps> = ({
 
   const form = useForm<SellerFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || {
+    defaultValues: initialData ? {
+      name: initialData.name,
+      billboardId: initialData.billboardId || '',
+    } : {
       name: '',
-      instagramHandle: '',
-      billboardId: ''
+      billboardId: '',
     }
   });
 
@@ -89,12 +95,14 @@ export const SellerForm: React.FC<SellerFormProps> = ({
     try {
       setLoading(true);
       if (initialData) {
+        console.log("DATA", data);
         await axios.patch(`/api/${params.storeId}/sellers/${params.sellerId}`, data);
       } else {
         await axios.post(`/api/${params.storeId}/sellers`, data);
       }
       router.refresh();
       router.push(`/${params.storeId}/sellers`);
+      console.log("Seller", data);
       toastSuccess(toastMessage);
     } catch (error: any) {
         toastError('Something went wrong.');
@@ -117,6 +125,7 @@ export const SellerForm: React.FC<SellerFormProps> = ({
       setOpen(false);
     }
   }
+
 
   return (
     <>
@@ -163,7 +172,73 @@ export const SellerForm: React.FC<SellerFormProps> = ({
                 <FormItem>
                   <FormLabel>Instagram Handle</FormLabel>
                   <FormControl>
-                    <Input disabled={loading} placeholder="@..." {...field} />
+                    <Input disabled={loading} placeholder="just name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="charityName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Charity Name</FormLabel>
+                  <FormControl>
+                    <Input disabled={loading} placeholder="Oxfam" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="charityUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Charity URL</FormLabel>
+                  <FormControl>
+                    <Input disabled={loading} placeholder="www.oxfam.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="shoeSizeEU"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>EU Shoe Size</FormLabel>
+                  <FormControl>
+                    <Input disabled={loading} placeholder="39" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="topSize"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Top Size</FormLabel>
+                  <FormControl>
+                    <Input disabled={loading} placeholder="small" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="bottomSize"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Bottom Size</FormLabel>
+                  <FormControl>
+                    <Input disabled={loading} placeholder="medium" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

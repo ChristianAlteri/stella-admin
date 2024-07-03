@@ -10,7 +10,7 @@ export async function GET(
 ) {
   try {
     const { searchParams } = new URL(req.url);
-    console.log("searchParams", searchParams);
+
     const categoryId = searchParams.get("categoryId") || undefined;
     const designerId = searchParams.get("designerId") || undefined;
     const sellerId = searchParams.get("sellerId") || undefined;

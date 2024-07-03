@@ -29,9 +29,9 @@ const CategoriesPage = async ({
   const formattedCategories: CategoryColumn[] = categories.map((item) => ({
     id: item.id,
     name: item.name,
-    billboardLabel: item.billboard?.label,
+    billboardLabel: item.billboard?.label || '',
     createdAt: format(item.createdAt, 'MMMM do, yyyy'),
-    imageUrl: item.billboard?.imageUrl,
+    imageUrl: item.billboard?.imageUrl || '',
     productsUrl: `/api/${params.storeId}/categories/products`,
     ordersUrl: `/api/${params.storeId}/categories/orders`,
     categoryId: item.id,

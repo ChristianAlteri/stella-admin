@@ -26,6 +26,9 @@ export async function GET(
     const name = searchParams.get("productName") || undefined;
     const sort = searchParams.get("sort") || undefined;
 
+    const minPrice = searchParams.get("minPrice") ? parseFloat(searchParams.get("minPrice")!) : undefined;
+    const maxPrice = searchParams.get("maxPrice") ? parseFloat(searchParams.get("maxPrice")!) : undefined;
+
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
     }
@@ -38,6 +41,14 @@ export async function GET(
     } else if (sort === "high-to-low") {
       orderBy = {
         ourPrice: "desc" as Prisma.SortOrder,
+      };
+    } else if (sort === "most-liked") {
+      orderBy = {
+        likes: "desc" as Prisma.SortOrder,
+      };
+    } else if (sort === "most-viewed") {
+      orderBy = {
+        clicks: "desc" as Prisma.SortOrder,
       };
     } else {
       orderBy = {
@@ -65,6 +76,10 @@ export async function GET(
         isCharity: isCharity ? true : undefined,
         isHidden: isHidden ? true : undefined,
         isArchived: false,
+        ourPrice: {
+          gte: minPrice,
+          lte: maxPrice,
+        },
         likes: {
           gt: 0, // Greater than 0
         },
@@ -83,6 +98,8 @@ export async function GET(
       },
       orderBy,
     });
+    
+
     return NextResponse.json(likedProducts);
   } catch (error) {
     console.log('[PRODUCTS_GET]', error);

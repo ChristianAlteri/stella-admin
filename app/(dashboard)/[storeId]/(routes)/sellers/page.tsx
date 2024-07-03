@@ -33,11 +33,16 @@ const SellerPage = async ({
     name: item.name,
     createdAt: format(item.createdAt, 'MMMM do, yyyy'),
     storeId: item.storeId,
-    billboardLabel: item.billboard?.label,
-    imageUrl: item.billboard?.imageUrl,
+    billboardLabel: item.billboard?.label || '',
+    imageUrl: item.billboard?.imageUrl || '',
     productsUrl: `/api/${params.storeId}/sellers/products`,
     designerId: item.designers[0]?.id,
     sellerId: item.id,
+    charityName: item.charityName || '',
+    charityUrl: item.charityUrl || '',
+    shoeSizeEU: item.shoeSizeEU || '',
+    topSize: item.topSize || '',
+    bottomSize: item.bottomSize || '',
   }));
 
   return (

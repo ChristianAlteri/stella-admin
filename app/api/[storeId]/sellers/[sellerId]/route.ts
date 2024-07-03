@@ -87,8 +87,9 @@ export async function PATCH(
 
     const body = await req.json();
     
-    const { name, billboardId } = body;
+    const { name, billboardId, productId, designerId, categoryId, instagramHandle, charityName, charityUrl, shoeSizeEU, topSize, bottomSize } = body;
     
+    console.log("BODY",body);
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 403 });
     }
@@ -122,10 +123,16 @@ export async function PATCH(
       },
       data: {
         name,
-        billboardId
+        instagramHandle,
+        billboardId,
+        charityName,
+        charityUrl,
+        shoeSizeEU,
+        topSize,
+        bottomSize,
       }
     });
-  
+    console.log("SELLER", seller);
     return NextResponse.json(seller);
   } catch (error) {
     console.log('[SELLER_PATCH]', error);

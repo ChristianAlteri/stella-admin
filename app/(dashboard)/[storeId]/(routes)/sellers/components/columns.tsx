@@ -13,6 +13,11 @@ export type SellerColumn = {
   storeId: string;
   sellerId: string;
   imageUrl: string | undefined; 
+  charityName: string;
+  charityUrl: string;
+  shoeSizeEU: string;
+  topSize: string;
+  bottomSize: string;
 }
 
 export const columns: ColumnDef<SellerColumn>[] = [
@@ -47,6 +52,22 @@ export const columns: ColumnDef<SellerColumn>[] = [
     accessorKey: "ordersUrl", // This is the accessor key for the orders URL
     header: "Orders", // Link to the orders page
     cell: ({ row }) => <a className="hover:underline" href={row.original.productsUrl}>Link to Orders</a>
+  },
+  {
+    accessorKey: "charityName", 
+    header: "Charity Name", 
+  },
+  {
+    accessorKey: "shoeSizeEU", 
+    header: "Shoe Size EU", 
+  },
+  {
+    accessorKey: "topSize", 
+    header: "Top Size", 
+  },
+  {
+    accessorKey: "bottomSize", 
+    header: "Bottom Size", 
   },
   {
     id: "actions",

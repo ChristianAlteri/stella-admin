@@ -13,8 +13,9 @@ export async function POST(
 
     const body = await req.json();
 
-    const { name, billboardId, productId, designerId, categoryId, instagramHandle } = body;
+    const { name, billboardId, productId, designerId, categoryId, instagramHandle, charityName, charityUrl, shoeSizeEU, topSize, bottomSize } = body;
 
+    console.log("BODY", body);
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 403 });
     }
@@ -56,6 +57,11 @@ export async function POST(
         name,
         instagramHandle,
         billboardId,
+        charityName,
+        charityUrl,
+        shoeSizeEU,
+        topSize,
+        bottomSize,
         storeId: params.storeId,
       }
     });
@@ -74,7 +80,6 @@ export async function GET(
   try {
     const { searchParams } = new URL(req.url);
     const name = searchParams.get("name") || undefined;
-    // console.log("SELLER SEARCH", searchParams);
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
     }

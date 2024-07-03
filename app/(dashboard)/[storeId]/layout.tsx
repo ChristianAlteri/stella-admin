@@ -25,6 +25,7 @@ export default async function DashboardLayout({
             userId
         }
     });
+    //TODO: fix login bug
     console.log("store", store);
 
     if (!store) {

@@ -77,9 +77,12 @@ export const DesignerForm: React.FC<DesignerFormProps> = ({
 
   const form = useForm<DesignerFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || {
+    defaultValues: initialData ? {
+      name: initialData.name,
+      billboardId: initialData.billboardId || '',
+    } : {
       name: '',
-      billboardId: ''
+      billboardId: '',
     }
   });
 

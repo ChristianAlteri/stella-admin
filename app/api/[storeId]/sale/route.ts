@@ -9,7 +9,6 @@ export async function GET(
 ) {
   try {
     const { searchParams } = new URL(req.url)
-    console.log("searchParamsSALE", searchParams);
     const categoryId = searchParams.get('categoryId') || undefined;
     const designerId = searchParams.get('designerId') || undefined;
     const sellerId = searchParams.get('sellerId') || undefined;
@@ -17,6 +16,10 @@ export async function GET(
     const sizeId = searchParams.get('sizeId') || undefined;
     const isFeatured = searchParams.get('isFeatured');
     const isOnSale = searchParams.get('isOnSale');
+
+    const minPrice = searchParams.get("minPrice") ? parseFloat(searchParams.get("minPrice")!) : undefined;
+    const maxPrice = searchParams.get("maxPrice") ? parseFloat(searchParams.get("maxPrice")!) : undefined;
+
 
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
@@ -33,6 +36,10 @@ export async function GET(
         isFeatured: isFeatured ? true : undefined,
         isOnSale: true ,
         isArchived: false,
+        ourPrice: {
+          gte: minPrice,
+          lte: maxPrice,
+        },
       },
       include: {
         images: true,
@@ -46,7 +53,7 @@ export async function GET(
         createdAt: 'desc',
       }
     });
-  
+    // saleProducts.filter(a, b) => a.isOnSale - b.isOnSale;
     return NextResponse.json(saleProducts);
   } catch (error) {
     console.log('[PRODUCTS_GET]', error);
