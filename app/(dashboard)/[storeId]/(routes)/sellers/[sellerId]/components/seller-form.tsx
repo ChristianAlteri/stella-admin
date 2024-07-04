@@ -201,7 +201,9 @@ export const SellerForm: React.FC<SellerFormProps> = ({
                   <FormControl>
                     <Input disabled={loading} placeholder="www.oxfam.com" {...field} />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage>
+                   Make sure you include the https://
+                  </FormMessage>
                 </FormItem>
               )}
             />
