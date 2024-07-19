@@ -24,19 +24,11 @@ model Store {
   colors      Color[]       @relation("StoreToColor")
   condition   Condition[]   @relation("StoreToCondition")
   material    Material[]    @relation("StoreToMaterial")
-  gender       Gender[]       @relation("StoreToStyle")
+  gender      Gender[]      @relation("StoreToStyle")
   subcategory Subcategory[] @relation("StoreToSubcategory")
   orders      Order[]       @relation("StoreToOrder")
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
-}
-
-model User {
-  id          String   @id @default(uuid())
-  email       String   @unique
-  name        String   @unique
-  createdAt   DateTime @default(now())
-  geoLocation String?
 }
 
 model Billboard {
@@ -62,15 +54,15 @@ model Seller {
   soldCount       Int      @default(0)
   storeId         String
 
-  charityName   String?   @default("")
-  charityUrl    String?   @default("")
-  shoeSizeEU    String?   @default("")
-  topSize       String?   @default("")
-  bottomSize    String?   @default("")
+  charityName String? @default("")
+  charityUrl  String? @default("")
+  shoeSizeEU  String? @default("")
+  topSize     String? @default("")
+  bottomSize  String? @default("")
 
   billboardId String? // Foreign Key to Billboard
   billboard   Billboard? @relation(fields: [billboardId], references: [id])
-  store           Store  @relation("StoreToSeller", fields: [storeId], references: [id])
+  store       Store      @relation("StoreToSeller", fields: [storeId], references: [id])
 
   // Items listed by the seller
   products   Product[]  @relation("SellerToProduct")
@@ -84,9 +76,9 @@ model Seller {
 }
 
 model Category {
-  id          String    @id @default(uuid())
+  id          String     @id @default(uuid())
   storeId     String // Foreign Key to Store
-  store       Store     @relation("StoreToCategory", fields: [storeId], references: [id])
+  store       Store      @relation("StoreToCategory", fields: [storeId], references: [id])
   billboardId String? // Foreign Key to Billboard
   billboard   Billboard? @relation(fields: [billboardId], references: [id])
 
@@ -103,9 +95,9 @@ model Category {
 }
 
 model Designer {
-  id          String    @id @default(uuid())
+  id          String     @id @default(uuid())
   storeId     String // Foreign Key to Store
-  store       Store     @relation("StoreToDesigner", fields: [storeId], references: [id])
+  store       Store      @relation("StoreToDesigner", fields: [storeId], references: [id])
   billboardId String? // Foreign Key to Billboard
   billboard   Billboard? @relation(fields: [billboardId], references: [id])
 
@@ -153,8 +145,8 @@ model Product {
   condition     Condition   @relation(fields: [conditionId], references: [id])
   materialId    String // Foreign Key to Color
   material      Material    @relation(fields: [materialId], references: [id])
-  genderId       String // Foreign Key to Color
-  gender         Gender       @relation(fields: [genderId], references: [id])
+  genderId      String // Foreign Key to Color
+  gender        Gender      @relation(fields: [genderId], references: [id])
   subcategoryId String // Foreign Key to Color
   subcategory   Subcategory @relation(fields: [subcategoryId], references: [id])
 
@@ -169,7 +161,6 @@ model Product {
   @@index([genderId])
   @@index([subcategoryId])
 }
-
 
 model OrderItem {
   id        String  @id @default(uuid())
@@ -284,19 +275,49 @@ model Image {
   @@index([productId])
 }
 
-// model User {
-//   id        String   @id @default(uuid())
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-//   email     String   @unique
+model User {
+  id             String   @id @default(uuid())
+  email          String   @unique
+  // emailVerified  DateTime 
+  name           String   @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  hashedPassword String
 
-//   likeList  // array of product ids
-//   clickList // array of product ids
-//   orderHistory // array of order ids
-//   purchaseHistory // array of product ids
+  orders  Order[]  @relation("OrderToUser")
+  account Account? @relation("AccountToUser")
 
-//  followingSeller // array of seller ids
-// }
+  //   likeList  // array of product ids
+  //   clickList // array of product ids
+  //   orderHistory // array of order ids
+  //   purchaseHistory // array of product ids
+  //  followingSeller // array of seller ids
+}
+
+model Account {
+  id                String  @id @default(uuid())
+  userId            String? @unique // Foreign Key to User
+  type              String
+  provider          String  @unique
+  providerAccountId String  @unique
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+
+  user User? @relation("AccountToUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  //   likeList  // array of product ids
+  //   clickList // array of product ids
+  //   orderHistory // array of order ids
+  //   purchaseHistory // array of product ids
+  //  followingSeller // array of seller ids
+
+  @@index([userId])
+}
 
 model Order {
   id                String      @id @default(uuid())
@@ -312,10 +333,9 @@ model Order {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // TODO: Relation to user so we can track which user bought which product
-  // userId String? // Foreign Key to User
-  // user   User?   @relation("OrderToUser", fields: [userId], references: [id])
-  // @@index([userId])
+  userId String? // Foreign Key to User
+  user   User?   @relation("OrderToUser", fields: [userId], references: [id])
+
   // TODO: Relation to seller so we can track sales/which user bought which seller
   // sellerId String // Foreign Key to Seller
   // seller   Seller @relation(fields: [sellerId], references: [id])
@@ -326,5 +346,6 @@ model Order {
   // designerId String // Foreign Key to Designer
   // designer   Designer @relation(fields: [designerId], references: [id])
 
+  @@index([userId])
   @@index([storeId])
 }

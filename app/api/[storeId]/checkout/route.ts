@@ -79,14 +79,19 @@ export async function POST(
       { shipping_rate: 'shr_1Oor5xBvscKKdpTG4Z2tIKyI' }, // Add your shipping rate IDs
       // Add more shipping rates as needed
     ],
-    success_url: `${process.env.FRONTEND_STORE_URL}/cart?success=1`,
+    // success_url: `${process.env.FRONTEND_STORE_URL}/cart?success=1`,
+    success_url: `${process.env.FRONTEND_STORE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.FRONTEND_STORE_URL}/cart?canceled=1`,
     metadata: {
       orderId: order.id
     },
   });
 
-  // TODO: This is danagerous, we should only archive products that have been paid for. Right now ur archiving anything that has started to process
+
+  // Archive the products
+  // TODO: This is dangerous, we should only archive products that have been paid for. 
+  // Right now ur archiving anything that has started to process
+  // In production, try do this in the verify-payment route
   const singleProductIds = products.map(item => item.id);
   await prismadb.product.updateMany({
     where: { id: { in: singleProductIds } },
@@ -99,6 +104,7 @@ export async function POST(
     where: { id: { in: sellerIds } },
     data: { soldCount: { increment: 1 } },
   });
+
 
   return NextResponse.json({ url: session.url }, { status: 200 });
 };

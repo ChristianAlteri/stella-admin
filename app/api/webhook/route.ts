@@ -52,6 +52,8 @@ export async function POST(req: Request) {
       }
     });
 
+    console.log("Order at webhook", order);
+
     const productIds = order.orderItems.map((orderItem) => orderItem.productId);
 
     await prismadb.product.updateMany({
