@@ -53,6 +53,37 @@ export async function POST(request: Request) {
           },
         });
 
+        // Fetch the related order items to get the product IDs
+        const orderItems = await prismadb.orderItem.findMany({
+          where: { orderId },
+          select: { productId: true },
+        });
+        console.log("orderItems", orderItems);
+
+        const productIds = orderItems.map((item) => item.productId);
+
+        // Update the products to set isArchived to true
+        const soldProduct = await prismadb.product.updateMany({
+          where: { id: { in: productIds } },
+          data: { isArchived: true },
+        });
+
+        console.log("soldProduct", soldProduct);
+        // Fetch the products to get the seller IDs
+        const products = await prismadb.product.findMany({
+          where: { id: { in: productIds } },
+          select: { sellerId: true },
+        });
+
+        const sellerIds = products.map((product) => product.sellerId);
+
+        // Increment the soldCount for the corresponding sellers
+        const updatedSeller = await prismadb.seller.updateMany({
+          where: { id: { in: sellerIds } },
+          data: { soldCount: { increment: 1 } },
+        });
+        console.log("updatedSeller", updatedSeller);
+
         const userEmail = session.customer_details?.email || "";
         const userName = session.customer_details?.name || "";
 
@@ -66,7 +97,10 @@ export async function POST(request: Request) {
 
           if (!existingUser) {
             // Create a new user in our db (Un-registered with us but bought something)
-            const hashedPassword = await bcrypt.hash(session.customer_details?.email || "anondrobe", 12);
+            const hashedPassword = await bcrypt.hash(
+              session.customer_details?.email || "anondrobe",
+              12
+            );
             const user = await prismadb.user.create({
               data: {
                 email: session.customer_details?.email || "",
@@ -76,7 +110,10 @@ export async function POST(request: Request) {
             });
             console.log("Created a new user", user);
 
-            console.log("(Un-registered with us but bought something)", user.email);
+            console.log(
+              "(Un-registered with us but bought something)",
+              user.email
+            );
             if (!klaviyoProfile.data || klaviyoProfile.data.length === 0) {
               // Create a new profile in Klaviyo
               const newProfile = await createProfileInKlaviyo(
@@ -151,7 +188,8 @@ export async function POST(request: Request) {
           console.error("Error creating or checking user:", error);
         }
 
-        return NextResponse.json({ success: true });
+        console.log("SUCCESFULL ORDER", { success: true, productIds });
+        return NextResponse.json({ success: true, productIds });
       } else {
         return NextResponse.json(
           { success: false, message: "Order ID not found in session metadata" },

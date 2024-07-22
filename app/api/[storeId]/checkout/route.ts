@@ -88,23 +88,5 @@ export async function POST(
   });
 
 
-  // Archive the products
-  // TODO: This is dangerous, we should only archive products that have been paid for. 
-  // Right now ur archiving anything that has started to process
-  // In production, try do this in the verify-payment route
-  const singleProductIds = products.map(item => item.id);
-  await prismadb.product.updateMany({
-    where: { id: { in: singleProductIds } },
-    data: { isArchived: true },
-  });
-
-  // Increment the soldCount for the corresponding sellers
-  const sellerIds = products.map(product => product.sellerId);
-  await prismadb.seller.updateMany({
-    where: { id: { in: sellerIds } },
-    data: { soldCount: { increment: 1 } },
-  });
-
-
   return NextResponse.json({ url: session.url }, { status: 200 });
 };
