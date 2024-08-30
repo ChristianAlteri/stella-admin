@@ -25,6 +25,8 @@ export async function POST(
     return new NextResponse("CHECKOUT Product ids are required", { status: 400 });
   }
 
+  let discountCode = ['YjNYDSKe']
+
   const products = await prismadb.product.findMany({
     where: {
       id: {
@@ -47,6 +49,7 @@ export async function POST(
       }
     });
   });
+
 
   const order = await prismadb.order.create({
     data: {
@@ -79,7 +82,7 @@ export async function POST(
       { shipping_rate: 'shr_1Oor5xBvscKKdpTG4Z2tIKyI' }, // Add your shipping rate IDs
       // Add more shipping rates as needed
     ],
-    // success_url: `${process.env.FRONTEND_STORE_URL}/cart?success=1`,
+    allow_promotion_codes: true,
     success_url: `${process.env.FRONTEND_STORE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.FRONTEND_STORE_URL}/cart?canceled=1`,
     metadata: {

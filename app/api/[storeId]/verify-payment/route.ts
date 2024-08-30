@@ -58,35 +58,35 @@ export async function POST(request: Request) {
           where: { orderId },
           select: { productId: true },
         });
-        console.log("orderItems", orderItems);
+        // console.log("orderItems", orderItems);
 
         const productIds = orderItems.map((item) => item.productId);
-
+        
         // Update the products to set isArchived to true
         const soldProduct = await prismadb.product.updateMany({
           where: { id: { in: productIds } },
           data: { isArchived: true },
         });
-
-        console.log("soldProduct", soldProduct);
+        
         // Fetch the products to get the seller IDs
         const products = await prismadb.product.findMany({
           where: { id: { in: productIds } },
           select: { sellerId: true },
         });
-
+        
         const sellerIds = products.map((product) => product.sellerId);
-
+        
         // Increment the soldCount for the corresponding sellers
         const updatedSeller = await prismadb.seller.updateMany({
           where: { id: { in: sellerIds } },
           data: { soldCount: { increment: 1 } },
         });
-        console.log("updatedSeller", updatedSeller);
-
+        // console.log("updatedSeller", updatedSeller);
+        
         const userEmail = session.customer_details?.email || "";
         const userName = session.customer_details?.name || "";
-
+        const promoCode = userEmail.split('@')[0].replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+        
         try {
           // Find the user in our db
           const existingUser = await prismadb.user.findUnique({
@@ -118,7 +118,8 @@ export async function POST(request: Request) {
               // Create a new profile in Klaviyo
               const newProfile = await createProfileInKlaviyo(
                 userName,
-                userEmail
+                userEmail,
+                promoCode
               );
               const klaviyoProfileId = newProfile.data.id;
               // Add the user to the welcome list
@@ -153,7 +154,8 @@ export async function POST(request: Request) {
             if (!klaviyoProfile.data || klaviyoProfile.data.length === 0) {
               const newProfile = await createProfileInKlaviyo(
                 userName,
-                userEmail
+                userEmail,
+                promoCode
               );
               const klaviyoProfileId = newProfile.data[0].id;
               const newKlaviyoUser =
@@ -188,8 +190,9 @@ export async function POST(request: Request) {
           console.error("Error creating or checking user:", error);
         }
 
-        console.log("SUCCESFULL ORDER", { success: true, productIds });
+        console.log("SUCCESSFULL ORDER", { success: true, productIds, orderId });
         return NextResponse.json({ success: true, productIds });
+
       } else {
         return NextResponse.json(
           { success: false, message: "Order ID not found in session metadata" },

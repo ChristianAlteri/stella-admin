@@ -362,7 +362,7 @@ export async function GET(
       orderBy,
     });
 
-    // console.log("products", products);
+    // console.log("API CALL products", products);
     return NextResponse.json(products);
   } catch (error) {
     console.log("[PRODUCTS_GET]", error);

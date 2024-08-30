@@ -1,10 +1,14 @@
-import axios from 'axios';
+import axios from "axios";
 
-export async function createProfileInKlaviyo(name: string, email: string) {
+export async function createProfileInKlaviyo(
+  name: string,
+  email: string,
+  firstPurchasePromoCode: string
+) {
   const apiKey = process.env.NEXT_PUBLIC_KLAVIYO_API_KEY;
 
   if (!apiKey) {
-    throw new Error('Klaviyo API key is not set');
+    throw new Error("Klaviyo API key is not set");
   }
 
   let data = JSON.stringify({
@@ -13,23 +17,23 @@ export async function createProfileInKlaviyo(name: string, email: string) {
       attributes: {
         email: email,
         first_name: name,
-      },
-      properties: {
-        newKey: "New Value",
+        properties: {
+          firstPurchasePromoCode: `${firstPurchasePromoCode}`,
+        },
       },
     },
   });
 
   const options = {
-    method: 'post',
-    maxBodyLength: Infinity, 
-    url: 'https://a.klaviyo.com/api/profiles/',
+    method: "post",
+    maxBodyLength: Infinity,
+    url: "https://a.klaviyo.com/api/profiles/",
     headers: {
-      Revision: '2024-06-15',
-      'Content-Type': 'application/json',
-      Authorization: `Klaviyo-API-Key ${apiKey}`  
+      Revision: "2024-06-15",
+      "Content-Type": "application/json",
+      Authorization: `Klaviyo-API-Key ${apiKey}`,
     },
-    data: data
+    data: data,
   };
 
   try {
@@ -37,6 +41,6 @@ export async function createProfileInKlaviyo(name: string, email: string) {
     return response.data;
   } catch (error) {
     console.error("Error posting user to Klaviyo list", error);
-    throw error;  
+    throw error;
   }
 }

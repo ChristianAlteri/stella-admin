@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
-
+    
     const user = await prisma.user.create({
       data: {
         email,
@@ -38,13 +38,14 @@ export async function POST(req: Request) {
         hashedPassword,
       },
     });
-
+    const promoCode = user.name.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
     const headers = new Headers();
     headers.set("Access-Control-Allow-Origin", "*");
 
     const userKlaviyoProfile = await createProfileInKlaviyo(
       user.name,
-      user.email
+      user.email,
+      promoCode
     );
     const userKlaviyoProfileId = userKlaviyoProfile.data.id;
     console.log("KLAVIYO_RESPONSEPROFILE", userKlaviyoProfile);
@@ -57,8 +58,18 @@ export async function POST(req: Request) {
       userKlaviyoProfileId,
       "WPxyeH"
     );
-    console.log("KLAVIYO_RESPONSELIST", klaviyoResponseList);
-    console.log("USER_REGISTERED", user);
+
+    // Create a promotion code in Stripe linked to a coupon
+    const stripe = require('stripe')(process.env.STRIPE_API_KEY);
+    const promotionCode = await stripe.promotionCodes.create({
+      coupon: '2FkJJiek',
+      code: `${promoCode}`,
+      max_redemptions: 1,
+    });
+
+    // console.log("KLAVIYO_RESPONSELIST", klaviyoResponseList);
+    // console.log("USER_REGISTERED", user);
+    // console.log("promotionCode", promotionCode);
     return new NextResponse(JSON.stringify(user), { status: 201, headers });
   } catch (error: any) {
     console.log(error, "REGISTRATION ERROR");
