@@ -235,7 +235,7 @@ export async function PATCH(
         },
       },
     })
-    console.log('[PRODUCT_PATCH]', product);
+    // console.log('[PRODUCT_PATCH]', product);
     return NextResponse.json(product);
   } catch (error) {
     console.log('[PRODUCT_PATCH]', error);

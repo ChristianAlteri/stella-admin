@@ -23,6 +23,17 @@ export const getGraphTopSeller = async (storeId: string): Promise<GraphData[]> =
       },
     },
   });
+  // const alternateSellersSoldItems = await prismadb.seller.findMany({
+  //   where: { storeId },
+  // });
+  
+  // const sellerTally: { [key: string]: number } = {};
+  
+  // alternateSellersSoldItems.forEach(seller => {
+  //   sellerTally[seller.name] = (sellerTally[seller.name] || 0) + seller.soldCount;
+  // });
+  // console.log("alternateSellersSoldItems", alternateSellersSoldItems);
+  // console.log("sellerTally", sellerTally);
 
 
   // console.log("sellersSoldItems", sellersSoldItems);

@@ -8,16 +8,12 @@ export async function postUserToKlaviyoSuccessfulPurchaseList(
   listId: string
 ) {
   const apiKey = process.env.NEXT_PUBLIC_KLAVIYO_API_KEY;
-  console.log(apiKey, "API KEY");
 
   let data = JSON.stringify({
     data: [
       {
         type: "profile",
-
         id: profileId,
-        // id: "01J2K0B14ER1T2SSZ2Q1E2A425",
-
         attributes: {
           email_address: email,
           first_name: name,

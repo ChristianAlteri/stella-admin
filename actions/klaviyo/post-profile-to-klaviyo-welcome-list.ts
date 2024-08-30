@@ -42,7 +42,7 @@ export async function postUserToKlaviyoWelcomeList(
     const response = await axios(options);
     return response.data;
   } catch (error) {
-    console.error("Error posting user to Klaviyo list", error);
+    console.error("Error posting user to Klaviyo Welcome list", error);
     return null;
   }
 }
