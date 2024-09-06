@@ -36,7 +36,7 @@ interface SellerClientProps {
         </Button>
       </div>
       <Separator />
-      <DataTable columns={columns} data={data} searchKey="instagram" />
+      <DataTable columns={columns} data={data} searchKey="instagramHandle" />
       <Heading title="API" description="API call for Sellers" />
       <Separator />
       <div>IS THIS NECCESARY</div>

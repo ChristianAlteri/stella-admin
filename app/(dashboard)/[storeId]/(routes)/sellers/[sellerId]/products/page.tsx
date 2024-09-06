@@ -2,7 +2,7 @@ import prismadb from "@/lib/prismadb";
 
 // import { ProductForm } from "./components/product-form";
 
-const DesingerAndTheirProductPage = async ({
+const SellerAndTheirProductPage = async ({
   params
 }: {
   params: { productId: string, storeId: string }
@@ -43,10 +43,10 @@ const DesingerAndTheirProductPage = async ({
   return ( 
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
-      DesingerAndTheirProductPage
+        SellerAndTheirProductPage
       </div>
     </div>
   );
 }
 
-export default DesingerAndTheirProductPage;
+export default SellerAndTheirProductPage;

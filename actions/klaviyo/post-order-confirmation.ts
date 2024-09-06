@@ -9,6 +9,7 @@ export async function postOrderConfirmationEmail(
   products: any
 ) {
   const apiKey = process.env.NEXT_PUBLIC_KLAVIYO_API_KEY;
+  //TODO: Make sure this payload is reflected in the Klaviyo email
 
   let orderConfirmationPayload = JSON.stringify({
       "data": {
