@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@clerk/nextjs/server";
 
 import prismadb from "@/lib/prismadb";
 import { Prisma } from "@prisma/client";
- 
+
 export async function POST(
   req: Request,
   { params }: { params: { storeId: string } }
@@ -13,29 +13,28 @@ export async function POST(
 
     const body = await req.json();
 
-    const { name, billboardId, productId, designerId, categoryId, instagramHandle, charityName, charityUrl, shoeSizeEU, topSize, bottomSize } = body;
+    const {
 
-    console.log("BODY", body);
+      instagramHandle,
+      firstName,
+      lastName,
+      email,
+      phoneNumber,
+      shippingAddress,
+      country,
+      shoeSizeEU,
+      topSize,
+      bottomSize,
+      billboardId,
+      charityName,
+      charityUrl,
+      connectedAccountId,
+    } = body;
+    
+
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 403 });
     }
-
-    if (!name) {
-      return new NextResponse("Name is required", { status: 400 });
-    }
-
-    // if (!billboardId) {
-    //   return new NextResponse("Designer Id is required", { status: 400 });
-    // }
-    // if (!productId) {
-    //   return new NextResponse("productId is required", { status: 400 });
-    // }
-    // if (!designerId) {
-    //   return new NextResponse("designerId is required", { status: 400 });
-    // }
-    // if (!categoryId) {
-    //   return new NextResponse("categoryId is required", { status: 400 });
-    // }
 
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
@@ -45,7 +44,7 @@ export async function POST(
       where: {
         id: params.storeId,
         userId,
-      }
+      },
     });
 
     if (!storeByUserId) {
@@ -54,8 +53,13 @@ export async function POST(
 
     const seller = await prismadb.seller.create({
       data: {
-        name,
         instagramHandle,
+        firstName,
+        lastName,
+        email,
+        phoneNumber,
+        shippingAddress,
+        country,
         billboardId,
         charityName,
         charityUrl,
@@ -63,15 +67,16 @@ export async function POST(
         topSize,
         bottomSize,
         storeId: params.storeId,
-      }
+        stripe_connect_unique_id: connectedAccountId || "",
+      },
     });
-  
+    console.log("[CREATE_SELLER]", seller);
     return NextResponse.json(seller);
   } catch (error) {
-    console.log('[SELLERS_POST]', error);
+    console.log("[SELLERS_POST]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
-};
+}
 
 export async function GET(
   req: Request,
@@ -89,7 +94,7 @@ export async function GET(
         storeId: params.storeId,
         instagramHandle: {
           contains: name,
-          mode: 'insensitive',
+          mode: "insensitive",
         },
       },
       include: {
@@ -103,14 +108,14 @@ export async function GET(
             size: true,
             color: true,
           },
-        }
+        },
       },
     });
-  
+
     // console.log('[SELLER_GET]', sellers);
     return NextResponse.json(sellers);
   } catch (error) {
-    console.log('[SELLER_GET]', error);
+    console.log("[SELLER_GET]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
-};
+}

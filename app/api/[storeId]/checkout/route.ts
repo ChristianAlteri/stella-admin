@@ -1,18 +1,14 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
+import { v4 as uuidv4 } from 'uuid';
+
 
 import { stripe } from "@/lib/stripe";
 import prismadb from "@/lib/prismadb";
 
-// const corsHeaders = {
-//   "Access-Control-Allow-Origin": "*",
-//   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-//   "Access-Control-Allow-Headers": "Content-Type, Authorization",
-// };
-
 export async function OPTIONS(request: Request) {
-    // Just return a simple OK response without setting any CORS headers.
-    return new NextResponse(null, { status: 200 });
+  // Just return a simple OK response without setting any CORS headers.
+  return new NextResponse(null, { status: 200 });
 }
 
 export async function POST(
@@ -22,17 +18,45 @@ export async function POST(
   const { productIds } = await req.json();
 
   if (!productIds || productIds.length === 0) {
-    return new NextResponse("CHECKOUT Product ids are required", { status: 400 });
+    return new NextResponse("CHECKOUT Product ids are required", {
+      status: 400,
+    });
   }
 
-  let discountCode = ['YjNYDSKe']
-
+  // Fetch products and their associated seller
   const products = await prismadb.product.findMany({
     where: {
       id: {
-        in: productIds
-      }
-    }
+        in: productIds,
+      },
+    },
+    include: {
+      seller: true,
+    },
+  });
+
+  const order = await prismadb.order.create({
+    data: {
+      storeId: params.storeId,
+
+      isPaid: false,
+      orderItems: {
+        create: products.map((product) => ({
+          stripe_connect_unique_id: product.seller.stripe_connect_unique_id,
+          productAmount: product.ourPrice,
+          product: {
+            connect: {
+              id: product.id, // Connect the product to the orderItem
+            },
+          },
+          seller: {
+            connect: {
+              id: product.seller.id, // Connect the seller to the orderItem
+            },
+          },
+        })),
+      },
+    },
   });
 
   const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
@@ -41,55 +65,40 @@ export async function POST(
     line_items.push({
       quantity: 1,
       price_data: {
-        currency: 'GBP',
+        currency: "GBP",
         product_data: {
           name: product.name,
         },
-        unit_amount: product.ourPrice.toNumber() * 100
-      }
+        unit_amount: product.ourPrice.toNumber() * 100,
+      },
     });
   });
-
-
-  const order = await prismadb.order.create({
-    data: {
-      storeId: params.storeId,
-      isPaid: false,
-      orderItems: {
-        create: productIds.map((productId: string) => ({
-          product: {
-            connect: {
-              id: productId
-            }
-          }
-        }))
-      }
-    }
-  });
-  
+  console.log(`order at checkout order_${order.id}`);
 
   const session = await stripe.checkout.sessions.create({
     line_items,
-    mode: 'payment',
-    billing_address_collection: 'required',
+    mode: "payment",
+    billing_address_collection: "required",
     phone_number_collection: {
       enabled: true,
     },
     shipping_address_collection: {
-      allowed_countries: ['US', 'CA', 'GB', 'AU', 'IT'], // Adjust country list as needed
+      allowed_countries: ["US", "CA", "GB", "AU", "IT"],
     },
     shipping_options: [
-      { shipping_rate: 'shr_1Oor5xBvscKKdpTG4Z2tIKyI' }, // Add your shipping rate IDs
+      { shipping_rate: "shr_1Oor5xBvscKKdpTG4Z2tIKyI" },
       // Add more shipping rates as needed
     ],
     allow_promotion_codes: true,
     success_url: `${process.env.FRONTEND_STORE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.FRONTEND_STORE_URL}/cart?canceled=1`,
     metadata: {
-      orderId: order.id
+      orderId: order.id,
+    },
+    payment_intent_data: {
+    transfer_group: `order_${order.id}`,
     },
   });
 
-
   return NextResponse.json({ url: session.url }, { status: 200 });
-};
+}

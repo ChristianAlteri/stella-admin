@@ -23,7 +23,7 @@ export const TopSellerGraph: React.FC<TopSellerGraphProps> = ({ data }) => {
     };
 
     topSellers.forEach((seller, index) => {
-      monthData[`seller${index + 1}Name`] = seller.name;
+      monthData[`seller${index + 1}Name`] = seller.firstName;
       monthData[`seller${index + 1}Total`] = seller.totalItemsSold;
     });
 

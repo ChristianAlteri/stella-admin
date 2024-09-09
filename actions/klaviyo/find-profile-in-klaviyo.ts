@@ -20,7 +20,6 @@ export async function findProfileInKlaviyo(email: string) {
 
   try {
     const response = await axios(options);
-    console.log("FOUND USER IN KLAVIYO", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching user from Klaviyo", error);

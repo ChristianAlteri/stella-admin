@@ -1,7 +1,7 @@
 import prismadb from "@/lib/prismadb";
 
 interface SellerData {
-  name: string;
+  firstName: string;
   totalItemsSold: number; // Track total items sold per seller per month
 }
 
@@ -44,12 +44,11 @@ export const getGraphTopSeller = async (storeId: string): Promise<GraphData[]> =
   // Accumulate sales per seller per month
   for (const seller of sellersSoldItems) {
     for (const product of seller.products) {
-      const sellerName = seller.name;
       const month = new Date(product.createdAt).getMonth(); // Ensure date is correct
-      if (!itemsSold[sellerName]) {
-        itemsSold[sellerName] = {};
+      if (!itemsSold[seller.firstName!]) {
+        itemsSold[seller.firstName!] = {};
       }
-      itemsSold[sellerName][month] = (itemsSold[sellerName][month] || 0) + 1;
+      itemsSold[seller.firstName!][month] = (itemsSold[seller.firstName!][month] || 0) + 1;
     }
   }
 
@@ -69,11 +68,11 @@ export const getGraphTopSeller = async (storeId: string): Promise<GraphData[]> =
       // Ensure month index is within range
       if (monthIndex >= 0 && monthIndex < months.length) {
         // Create or update SellerData for the month
-        let sellerEntry = graphData[monthIndex].sellers.find(seller => seller.name === sellerName);
+        let sellerEntry = graphData[monthIndex].sellers.find(seller => seller.firstName === sellerName);
         if (sellerEntry) {
           sellerEntry.totalItemsSold += totalItemsSold; // Update existing
         } else {
-          graphData[monthIndex].sellers.push({ name: sellerName, totalItemsSold: totalItemsSold }); // Add new
+          graphData[monthIndex].sellers.push({ firstName: sellerName, totalItemsSold: totalItemsSold }); // Add new
         }
       }
     }

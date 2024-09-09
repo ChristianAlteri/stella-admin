@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@clerk/nextjs/server";
 
 import prismadb from "@/lib/prismadb";
 
@@ -14,7 +14,7 @@ export async function GET(
 
     const seller = await prismadb.seller.findUnique({
       where: {
-        id: params.sellerId
+        id: params.sellerId,
       },
       include: {
         billboard: true,
@@ -27,20 +27,20 @@ export async function GET(
             size: true,
             color: true,
           },
-        }
-      }
+        },
+      },
     });
-  
+
     return NextResponse.json(seller);
   } catch (error) {
-    console.log('[seller_GET]', error);
+    console.log("[seller_GET]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
-};
+}
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { sellerId: string, storeId: string } }
+  { params }: { params: { sellerId: string; storeId: string } }
 ) {
   try {
     const { userId } = auth();
@@ -57,7 +57,7 @@ export async function DELETE(
       where: {
         id: params.storeId,
         userId,
-      }
+      },
     });
 
     if (!storeByUserId) {
@@ -67,39 +67,46 @@ export async function DELETE(
     const seller = await prismadb.seller.delete({
       where: {
         id: params.sellerId,
-      }
+      },
     });
-  
+
     return NextResponse.json(seller);
   } catch (error) {
-    console.log('[Seller_DELETE]', error);
+    console.log("[Seller_DELETE]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
-};
-
+}
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { sellerId: string, storeId: string } }
+  { params }: { params: { sellerId: string; storeId: string } }
 ) {
-  try {   
+  try {
     const { userId } = auth();
 
     const body = await req.json();
-    
-    const { name, billboardId, productId, designerId, categoryId, instagramHandle, charityName, charityUrl, shoeSizeEU, topSize, bottomSize } = body;
-    
-    console.log("BODY",body);
+
+    const {
+      billboardId,
+      firstName,
+      lastName,
+      email,
+      phoneNumber,
+      shippingAddress,
+      country,
+      instagramHandle,
+      charityName,
+      charityUrl,
+      shoeSizeEU,
+      topSize,
+      bottomSize,
+      connectedAccountId
+    } = body;
+
+    console.log("BODY", body);
+    console.log("INSIDE PATCH Seller Id", params.sellerId);
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 403 });
-    }
-
-    if (!billboardId) {
-      return new NextResponse("Billboard ID is required", { status: 400 });
-    }
-
-    if (!name) {
-      return new NextResponse("Name is required", { status: 400 });
     }
 
     if (!params.sellerId) {
@@ -110,7 +117,7 @@ export async function PATCH(
       where: {
         id: params.storeId,
         userId,
-      }
+      },
     });
 
     if (!storeByUserId) {
@@ -122,20 +129,27 @@ export async function PATCH(
         id: params.sellerId,
       },
       data: {
-        name,
         instagramHandle,
+        firstName,
+        lastName,
+        email,
+        phoneNumber,
+        shippingAddress,
+        country,
         billboardId,
         charityName,
         charityUrl,
         shoeSizeEU,
         topSize,
         bottomSize,
-      }
+        storeId: params.storeId,
+        stripe_connect_unique_id: connectedAccountId || "",
+      },
     });
     console.log("SELLER", seller);
     return NextResponse.json(seller);
   } catch (error) {
-    console.log('[SELLER_PATCH]', error);
+    console.log("[SELLER_PATCH]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
-};
+}

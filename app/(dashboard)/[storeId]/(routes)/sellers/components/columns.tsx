@@ -6,8 +6,13 @@ import { CellAction } from "./cell-action"
 
 export type SellerColumn = {
   id: string
-  name: string;
   instagramHandle: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  shippingAddress: string;
+  country: string;
   createdAt: string;
   productsUrl: string;
   storeId: string;

@@ -30,7 +30,12 @@ const SellerPage = async ({
   const formattedSellers: SellerColumn[] = sellers.map((item) => ({
     id: item.id,
     instagramHandle: item.instagramHandle,
-    name: item.name,
+    firstName: item.firstName ?? '', // Provide a default value of an empty string when firstName is null
+    lastName: item.lastName ?? '',
+    email: item.email ?? '',
+    phoneNumber: item.phoneNumber ?? '',
+    shippingAddress: item.shippingAddress ?? '',
+    country: item.country ?? '',
     createdAt: format(item.createdAt, 'MMMM do, yyyy'),
     storeId: item.storeId,
     billboardLabel: item.billboard?.label || '',

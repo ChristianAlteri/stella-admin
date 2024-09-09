@@ -47,29 +47,43 @@ model Billboard {
 }
 
 model Seller {
-  id              String   @id @default(uuid())
-  instagramHandle String   @unique
-  name            String   @unique
-  createdAt       DateTime @default(now())
-  soldCount       Int      @default(0)
-  storeId         String
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  storeId   String
 
-  charityName String? @default("")
-  charityUrl  String? @default("")
-  shoeSizeEU  String? @default("")
-  topSize     String? @default("")
-  bottomSize  String? @default("")
+  instagramHandle String  @default("https://www.instagram.com/anon.drobe")
+  firstName       String? @default("")
+  lastName        String? @default("")
+  email           String? @unique
+  phoneNumber     String? @unique
+  shippingAddress String? @default("")
+  country         String? @default("")
+
+  stripe_connect_unique_id String?  @default("")
+  payouts                  Payout[] // Relation to the Payout model
+
+  charityName String? @default("") //TODO: we dont need this once we start onbaording charities
+  charityUrl  String? @default("") //TODO: we dont need this once we start onbaording charities
+  soldCount   Int?    @default(0)
+
+  shoeSizeEU String? @default("")
+  topSize    String? @default("")
+  bottomSize String? @default("")
+
+  // TODO: Add a relation to a Charity model
 
   billboardId String? // Foreign Key to Billboard
   billboard   Billboard? @relation(fields: [billboardId], references: [id])
   store       Store      @relation("StoreToSeller", fields: [storeId], references: [id])
 
   // Items listed by the seller
-  products   Product[]  @relation("SellerToProduct")
+  products     Product[]   @relation("SellerToProduct")
   // Designers seller stocks
-  designers  Designer[] @relation("SellerToDesigner")
+  designers    Designer[]  @relation("SellerToDesigner")
   //Cateories sellers clothes are in
-  categories Category[] @relation("SellerToCategory")
+  categories   Category[]  @relation("SellerToCategory")
+  // Items sold by the seller
+  orderedItems OrderItem[]
 
   @@index([billboardId])
   @@index([storeId])
@@ -115,8 +129,8 @@ model Product {
   id            String      @id @default(uuid())
   name          String
   description   String
-  retailPrice   Decimal
-  ourPrice      Decimal
+  retailPrice   Decimal     @default(0.0)
+  ourPrice      Decimal     @default(0.0)
   measurements  String?
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
@@ -161,7 +175,6 @@ model Product {
   @@index([genderId])
   @@index([subcategoryId])
 }
-
 
 model Size {
   id        String    @id @default(uuid())
@@ -215,15 +228,16 @@ model Subcategory {
   @@index([storeId])
 }
 
-// model CountryOfOrigin {
-//   id        String    @id @default(uuid())
-//   storeId   String    // Foreign Key to Store
-//   store     Store     @relation("StoreToColor", fields: [storeId], references: [id])
+// TODO: Add a Charity model
+// model Charity {
+//   id         String     @id @default(uuid())
+//   storeId    String
+//   store      Store      @relation("StoreToCharity", fields: [storeId], references: [id])
 //   name      String
-//   value     String
-//   products  Product[] // Relation to Product model
-//   createdAt DateTime  @default(now())
-//   updatedAt DateTime  @updatedAt
+//   url   String
+//   sellers    Seller[]
+//   createdAt  DateTime   @default(now())
+//   updatedAt  DateTime   @updatedAt
 
 //   @@index([storeId])
 // }
@@ -315,9 +329,15 @@ model OrderItem {
   order     Order   @relation(fields: [orderId], references: [id])
   productId String // Foreign Key to Product
   product   Product @relation(fields: [productId], references: [id])
+  sellerId  String  @default("") // Foreign Key to Seller
+  seller    Seller  @relation(fields: [sellerId], references: [id])
+
+  productAmount            Decimal? @default(0.0)
+  stripe_connect_unique_id String?  @default("")
 
   @@index([orderId])
   @@index([productId])
+  @@index([sellerId])
 }
 
 model Order {
@@ -337,16 +357,21 @@ model Order {
   userId String? // Foreign Key to User
   user   User?   @relation("OrderToUser", fields: [userId], references: [id])
 
-  // TODO: Relation to seller so we can track sales/which user bought which seller
-  // sellerId String // Foreign Key to Seller
-  // seller   Seller @relation(fields: [sellerId], references: [id])
-  // TODO: Relation to category so we can track sales/which user bought which category
-  // categoryId String // Foreign Key to Category
-  // category   Category @relation(fields: [categoryId], references: [id])
-  // TODO: Relation to designer so we can track sales/which user bought which designer
-  // designerId String // Foreign Key to Designer
-  // designer   Designer @relation(fields: [designerId], references: [id])
-
   @@index([userId])
   @@index([storeId])
+}
+
+model Payout {
+  id       String @id @default(uuid())
+  sellerId String // Foreign Key to Seller
+  seller   Seller @relation(fields: [sellerId], references: [id])
+
+  amount           Decimal? @default(0.0)
+  transferGroupId  String?  @default("")
+  stripeTransferId String?  @default("")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sellerId])
 }

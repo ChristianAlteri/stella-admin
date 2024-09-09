@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import * as z from "zod"
-import axios from "axios"
-import { useState } from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { toast } from "react-hot-toast"
-import { Trash } from "lucide-react"
-import { Billboard, Category, Designer, Seller } from "@prisma/client"
-import { useParams, useRouter } from "next/navigation"
+import * as z from "zod";
+import axios from "axios";
+import { FormEventHandler, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import { Billboard, Category, Designer, Seller } from "@prisma/client";
+import { useParams, useRouter } from "next/navigation";
 
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Check, Trash } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -19,40 +19,109 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Separator } from "@/components/ui/separator"
-import { Heading } from "@/components/ui/heading"
-import { AlertModal } from "@/components/modals/alert-modal"
-import { TbFaceId, TbFaceIdError } from "react-icons/tb"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-
-const formSchema = z.object({
-  name: z.string().min(1),
-  instagramHandle: z.string().min(1),
-  billboardId: z.string().min(1),
-  charityName: z.string().optional(),
-  charityUrl: z.string().optional(),
-  shoeSizeEU: z.string().min(1),
-  topSize: z.string().min(1),
-  bottomSize: z.string().min(1),
-});
-
-type SellerFormValues = z.infer<typeof formSchema>
+  FormDescription,
+} from "@/components/ui/form";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import { Separator } from "@/components/ui/separator";
+import { Heading } from "@/components/ui/heading";
+import { AlertModal } from "@/components/modals/alert-modal";
+import { TbFaceId, TbFaceIdError } from "react-icons/tb";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { DescriptionInput } from "@/components/ui/descriptionInput";
+import StripeConnect from "../../../stripe-connect/components/stripe-connect";
+import { cn } from "@/lib/utils";
 
 interface SellerFormProps {
   initialData: Seller | null;
-  billboards: Billboard[] | null;  
-};
+  billboards: Billboard[] | null;
+}
 
 export const SellerForm: React.FC<SellerFormProps> = ({
   initialData,
-  billboards
+  billboards,
 }) => {
   const params = useParams();
   const router = useRouter();
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  // const [connectedAccountId, setConnectedAccountId] = useState("");
+  
+  const formSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+    instagramHandle: z.string().min(1, "Instagram handle is required"),
+    billboardId: z.string().min(1, "Billboard ID is required"),
+    charityName: z.string().optional(),
+    charityUrl: z.string().optional(),
+    shoeSizeEU: z.string().min(1, "Shoe size is required"),
+    topSize: z.string().min(1, "Top size is required"),
+    bottomSize: z.string().min(1, "Bottom size is required"),
+    firstName: z.string().min(1, "First name is required"),
+    lastName: z.string().min(1, "Last name is required"),
+    email: z
+      .string()
+      .min(1, "Email is required")
+      .email("Please enter a valid email address"),
+    phoneNumber: z
+      .string()
+      .min(1, "Phone number is required")
+      .regex(/^[0-9]+$/, "Phone number must contain only digits"),
+    country: z.string().min(1, "Country is required"),
+    shippingAddress: z.string().min(1, "Shipping Address is required"),
+  });
+
+  type SellerFormValues = z.infer<typeof formSchema>;
+  const form = useForm<SellerFormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: initialData
+      ? {
+          instagramHandle: initialData.instagramHandle || "",
+          billboardId: initialData.billboardId || "",
+          charityName: initialData.charityName || "",
+          charityUrl: initialData.charityUrl || "",
+          shoeSizeEU: initialData.shoeSizeEU || "",
+          topSize: initialData.topSize || "",
+          bottomSize: initialData.bottomSize || "",
+          firstName: initialData.firstName || "",
+          lastName: initialData.lastName || "",
+          email: initialData.email || "",
+          phoneNumber: initialData.phoneNumber || "",
+          country: initialData.country || "",
+          shippingAddress: initialData.shippingAddress || "",
+        }
+      : {
+          instagramHandle: "",
+          billboardId: "",
+          charityName: "",
+          charityUrl: "",
+          shoeSizeEU: "",
+          topSize: "",
+          bottomSize: "",
+          firstName: "",
+          lastName: "",
+          email: "",
+          phoneNumber: "",
+          country: "",
+          shippingAddress: "",
+        },
+  });
 
   // Custom Toast Error
   const toastError = (message: string) => {
@@ -75,37 +144,121 @@ export const SellerForm: React.FC<SellerFormProps> = ({
     });
   };
 
-  const title = initialData ? 'Edit a Seller' : 'Create a new Seller';
-  const description = initialData ? 'Edit a Seller.' : 'Create a new Seller';
-  const toastMessage = initialData ? 'Seller updated!' : 'Seller created!';
-  const action = initialData ? 'Save changes' : 'Create';
+  const title = initialData ? "Edit a Seller" : "Create a new Seller";
+  const description = initialData ? "Edit a Seller." : "Create a new Seller";
+  const toastMessage = initialData ? "Seller updated!" : "Seller created!";
+  const action = initialData ? "Save changes" : "Create new Seller";
 
-  const form = useForm<SellerFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: initialData ? {
-      name: initialData.name,
-      billboardId: initialData.billboardId || '',
-    } : {
-      name: '',
-      billboardId: '',
-    }
-  });
+  const countries = [
+    // "Australia",
+    // "Austria",
+    // "Belgium",
+    // "Brazil",
+    // "Bulgaria",
+    // "Canada",
+    // "Croatia",
+    // "Cyprus",
+    // "Czech Republic",
+    // "Denmark",
+    // "Estonia",
+    // "Finland",
+    // "France",
+    // "Germany",
+    // "Ghana",
+    // "Gibraltar",
+    // "Greece",
+    // "Hong Kong",
+    // "Hungary",
+    // "India",
+    // "Indonesia",
+    // "Ireland",
+    // "Italy",
+    // "Japan",
+    // "Kenya",
+    // "Latvia",
+    // "Liechtenstein",
+    // "Lithuania",
+    // "Luxembourg",
+    // "Malaysia",
+    // "Malta",
+    // "Mexico",
+    // "Netherlands",
+    // "New Zealand",
+    // "Nigeria",
+    // "Norway",
+    // "Poland",
+    // "Portugal",
+    // "Romania",
+    // "Singapore",
+    // "Slovakia",
+    // "Slovenia",
+    // "South Africa",
+    // "Spain",
+    // "Sweden",
+    // "Switzerland",
+    // "Thailand",
+    "United Kingdom",
+    // "United Arab Emirates",
+  ];
 
-  const onSubmit = async (data: SellerFormValues) => {
+  // const onSubmit = async (data: SellerFormValues) => {
+  //   try {
+  //     console.log("Button Clicked");
+  //     setLoading(true);
+  //     if (initialData) {
+  //       console.log("DATA = ", data);
+  //       await axios.patch(
+  //         `/api/${params.storeId}/sellers/${params.sellerId}`,
+  //         data
+  //       );
+  //     } else {
+  //       const payload = {
+  //         ...data,
+  //         connectedAccountId,
+  //       };
+  //       await axios.post(`/api/${params.storeId}/sellers`, payload);
+  //     }
+  //     router.refresh();
+  //     router.push(`/${params.storeId}/sellers`);
+  //     console.log("Seller", data);
+  //     toastSuccess(toastMessage);
+  //   } catch (error: any) {
+  //     toastError("Something went wrong.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  const onSubmit: FormEventHandler<HTMLFormElement> = async (event: any) => {
+    const data = form.getValues();
+    event.preventDefault();
     try {
+      console.log("Button Clicked");
       setLoading(true);
       if (initialData) {
-        console.log("DATA", data);
-        await axios.patch(`/api/${params.storeId}/sellers/${params.sellerId}`, data);
+        console.log("INITIAL DATA = ", data);
+        await axios.patch(
+          `/api/${params.storeId}/sellers/${params.sellerId}`,
+          data
+        );
       } else {
-        await axios.post(`/api/${params.storeId}/sellers`, data);
+        const payload = {
+          ...data,
+          // connectedAccountId,
+        };
+        console.log("DATA = ", data);
+        const seller = await axios.post(
+          `/api/${params.storeId}/sellers`,
+          payload
+        );
+        // TODO: Add a stripe connect page that takes the newly created sellers id and fetches the seller then patches the stripe_connect_unique_id
+        router.push(`/${params.storeId}/stripe-connect?sellerId=${seller.data.id}`);
+        console.log("Pushed to stripe connect page with seller id = ", seller.data.id);
       }
-      router.refresh();
-      router.push(`/${params.storeId}/sellers`);
-      console.log("Seller", data);
-      toastSuccess(toastMessage);
+      // router.refresh();
+      // router.push(`/${params.storeId}/sellers`);
+      // toastSuccess(toastMessage);
     } catch (error: any) {
-        toastError('Something went wrong.');
+      toastError("Something went wrong.");
     } finally {
       setLoading(false);
     }
@@ -117,25 +270,24 @@ export const SellerForm: React.FC<SellerFormProps> = ({
       await axios.delete(`/api/${params.storeId}/sellers/${params.sellerId}`);
       router.refresh();
       router.push(`/${params.storeId}/sellers`);
-      toastSuccess('Seller deleted.');
+      toastSuccess("Seller deleted.");
     } catch (error: any) {
-        toastError('Make sure you removed all products using this seller first.');
+      toastError("Make sure you removed all products using this seller first.");
     } finally {
       setLoading(false);
       setOpen(false);
     }
-  }
-
+  };
 
   return (
     <>
-    <AlertModal 
-      isOpen={open} 
-      onClose={() => setOpen(false)}
-      onConfirm={onDelete}
-      loading={loading}
-    />
-     <div className="flex items-center justify-between">
+      <AlertModal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        onConfirm={onDelete}
+        loading={loading}
+      />
+      <div className="flex items-center justify-between">
         <Heading title={title} description={description} />
         {initialData && (
           <Button
@@ -150,129 +302,307 @@ export const SellerForm: React.FC<SellerFormProps> = ({
       </div>
       <Separator />
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
-          <div className="md:grid md:grid-cols-3 gap-8">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input disabled={loading} placeholder="Seller Name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="instagramHandle"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Instagram Handle</FormLabel>
-                  <FormControl>
-                    <Input disabled={loading} placeholder="just name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        {/* <Form {...}> */}
+        <form
+          // onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={onSubmit}
+          className="flex flex-col w-full justify-center items-center"
+        >
+          <div className="flex flex-col items-center justify-center w-full h-full gap-2 p-4">
+            <div className="gap-2 w-2/3 flex flex-row">
+              <div className="flex flex-col w-full h-full">
+                <FormField
+                  control={form.control}
+                  name="instagramHandle"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Instagram Handle</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={loading}
+                          placeholder="just name"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>First Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={loading}
+                          placeholder="First Name"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Last Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={loading}
+                          placeholder="Last Name"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={loading}
+                          type="email"
+                          placeholder="Email Address"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="phoneNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={loading}
+                          placeholder="Phone Number"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="shippingAddress"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Shipping Address</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={loading}
+                          placeholder="Shipping Address"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="country"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel htmlFor="country">Country</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                "w-full justify-between",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value
+                                ? countries.find(
+                                    (country) => country === field.value
+                                  )
+                                : "Select Country"}
+                              <div className="ml-2 h-4 w-4 shrink-0 opacity-50">
+                                ^
+                              </div>
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full p-0 overflow-auto justify-center items-center">
+                          <Command>
+                            <CommandInput placeholder="Search Country..." />
+                            <CommandEmpty>No country found.</CommandEmpty>
+                            <CommandGroup>
+                              {countries.map((country) => (
+                                <CommandItem
+                                  value={country}
+                                  key={country}
+                                  onSelect={() => {
+                                    form.setValue("country", country);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      field.value === country
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {country}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <FormDescription>Select your country</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-            <FormField
-              control={form.control}
-              name="charityName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Charity Name</FormLabel>
-                  <FormControl>
-                    <Input disabled={loading} placeholder="Oxfam" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+              <div className="flex flex-col w-full h-full">
+                <FormField
+                  control={form.control}
+                  name="shoeSizeEU"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>EU Shoe Size</FormLabel>
+                      <FormControl>
+                        <Input disabled={loading} placeholder="39" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="topSize"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Top Size</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={loading}
+                          placeholder="small"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="bottomSize"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Bottom Size</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={loading}
+                          placeholder="medium"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="billboardId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Profile Picture</FormLabel>
+                      <Select
+                        disabled={loading}
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue
+                              defaultValue={field.value}
+                              placeholder="Select a billboard"
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {billboards?.map((billboard) => (
+                            <SelectItem key={billboard.id} value={billboard.id}>
+                              {billboard.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="charityName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Charity Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={loading}
+                          placeholder="Oxfam"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="charityUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Charity Url</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={loading}
+                          placeholder="www.oxfam.com"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {/* TODO: Add Charity selector */}
+              </div>
+            </div>
+
+            {/* <div className="flex flex-col w-full h-full justify-center items-center p-3">
+              {!initialData && (
+                <StripeConnect onAccountConnected={setConnectedAccountId} />
               )}
-            />
-            <FormField
-              control={form.control}
-              name="charityUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Charity URL</FormLabel>
-                  <FormControl>
-                    <Input disabled={loading} placeholder="www.oxfam.com" {...field} />
-                  </FormControl>
-                  <FormMessage>
-                   Make sure you include the https://
-                  </FormMessage>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="shoeSizeEU"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>EU Shoe Size</FormLabel>
-                  <FormControl>
-                    <Input disabled={loading} placeholder="39" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="topSize"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Top Size</FormLabel>
-                  <FormControl>
-                    <Input disabled={loading} placeholder="small" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="bottomSize"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Bottom Size</FormLabel>
-                  <FormControl>
-                    <Input disabled={loading} placeholder="medium" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="billboardId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Billboard</FormLabel>
-                  <Select disabled={loading} onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
-                    <FormControl> 
-                      <SelectTrigger>
-                        <SelectValue defaultValue={field.value} placeholder="Select a billboard" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent> 
-                      {billboards?.map((billboard) => (
-                        <SelectItem 
-                        key={billboard.id} 
-                        value={billboard.id} >
-                          {billboard.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            </div> */}
+            
           </div>
+
           <Button disabled={loading} className="ml-auto" type="submit">
             {action}
           </Button>
