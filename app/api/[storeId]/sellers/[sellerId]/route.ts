@@ -100,7 +100,10 @@ export async function PATCH(
       shoeSizeEU,
       topSize,
       bottomSize,
-      connectedAccountId
+      connectedAccountId,
+      sellerType,
+      storeName,
+      description,
     } = body;
 
     console.log("BODY", body);
@@ -144,6 +147,9 @@ export async function PATCH(
         bottomSize,
         storeId: params.storeId,
         stripe_connect_unique_id: connectedAccountId || "",
+        sellerType,
+        storeName,
+        description,
       },
     });
     console.log("SELLER", seller);

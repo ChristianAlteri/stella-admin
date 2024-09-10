@@ -10,6 +10,15 @@ import { Billboard, Category, Designer, Seller } from "@prisma/client";
 import { useParams, useRouter } from "next/navigation";
 
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Check, Trash } from "lucide-react";
 import {
@@ -37,15 +46,6 @@ import { Separator } from "@/components/ui/separator";
 import { Heading } from "@/components/ui/heading";
 import { AlertModal } from "@/components/modals/alert-modal";
 import { TbFaceId, TbFaceIdError } from "react-icons/tb";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { DescriptionInput } from "@/components/ui/descriptionInput";
-import StripeConnect from "../../../stripe-connect/components/stripe-connect";
 import { cn } from "@/lib/utils";
 
 interface SellerFormProps {
@@ -62,8 +62,8 @@ export const SellerForm: React.FC<SellerFormProps> = ({
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  // const [connectedAccountId, setConnectedAccountId] = useState("");
-  
+  const [sellerType, setSellerType] = useState<string>("influencer");
+
   const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
     instagramHandle: z.string().min(1, "Instagram handle is required"),
@@ -85,6 +85,8 @@ export const SellerForm: React.FC<SellerFormProps> = ({
       .regex(/^[0-9]+$/, "Phone number must contain only digits"),
     country: z.string().min(1, "Country is required"),
     shippingAddress: z.string().min(1, "Shipping Address is required"),
+    storeName: z.string().optional(),
+    description: z.string().optional(),
   });
 
   type SellerFormValues = z.infer<typeof formSchema>;
@@ -105,6 +107,8 @@ export const SellerForm: React.FC<SellerFormProps> = ({
           phoneNumber: initialData.phoneNumber || "",
           country: initialData.country || "",
           shippingAddress: initialData.shippingAddress || "",
+          storeName: initialData.storeName || "",
+          description: initialData.description || "",
         }
       : {
           instagramHandle: "",
@@ -120,6 +124,8 @@ export const SellerForm: React.FC<SellerFormProps> = ({
           phoneNumber: "",
           country: "",
           shippingAddress: "",
+          storeName: "",
+          description: "",
         },
   });
 
@@ -201,62 +207,34 @@ export const SellerForm: React.FC<SellerFormProps> = ({
     // "United Arab Emirates",
   ];
 
-  // const onSubmit = async (data: SellerFormValues) => {
-  //   try {
-  //     console.log("Button Clicked");
-  //     setLoading(true);
-  //     if (initialData) {
-  //       console.log("DATA = ", data);
-  //       await axios.patch(
-  //         `/api/${params.storeId}/sellers/${params.sellerId}`,
-  //         data
-  //       );
-  //     } else {
-  //       const payload = {
-  //         ...data,
-  //         connectedAccountId,
-  //       };
-  //       await axios.post(`/api/${params.storeId}/sellers`, payload);
-  //     }
-  //     router.refresh();
-  //     router.push(`/${params.storeId}/sellers`);
-  //     console.log("Seller", data);
-  //     toastSuccess(toastMessage);
-  //   } catch (error: any) {
-  //     toastError("Something went wrong.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
   const onSubmit: FormEventHandler<HTMLFormElement> = async (event: any) => {
     const data = form.getValues();
     event.preventDefault();
     try {
-      console.log("Button Clicked");
+      const payload = {
+        ...data,
+        sellerType,
+      };
       setLoading(true);
       if (initialData) {
-        console.log("INITIAL DATA = ", data);
+        console.log("INITIAL DATA = ", payload);
         await axios.patch(
           `/api/${params.storeId}/sellers/${params.sellerId}`,
-          data
+          payload
         );
       } else {
-        const payload = {
-          ...data,
-          // connectedAccountId,
-        };
-        console.log("DATA = ", data);
+        console.log("DATA = ", payload);
         const seller = await axios.post(
           `/api/${params.storeId}/sellers`,
           payload
         );
-        // TODO: Add a stripe connect page that takes the newly created sellers id and fetches the seller then patches the stripe_connect_unique_id
-        router.push(`/${params.storeId}/stripe-connect?sellerId=${seller.data.id}`);
-        console.log("Pushed to stripe connect page with seller id = ", seller.data.id);
+        router.push(
+          `/${params.storeId}/stripe-connect?sellerId=${seller.data.id}`
+        );
       }
-      // router.refresh();
-      // router.push(`/${params.storeId}/sellers`);
-      // toastSuccess(toastMessage);
+      router.refresh();
+      router.push(`/${params.storeId}/sellers`);
+      toastSuccess(toastMessage);
     } catch (error: any) {
       toastError("Something went wrong.");
     } finally {
@@ -301,33 +279,32 @@ export const SellerForm: React.FC<SellerFormProps> = ({
         )}
       </div>
       <Separator />
+
+      {/* Select component for seller type */}
+      <div className="flex items-center space-x-2 my-4">
+        <Select onValueChange={setSellerType} defaultValue="influencer">
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select Seller Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Seller Type</SelectLabel>
+              <SelectItem value="influencer">Influencer</SelectItem>
+              <SelectItem value="reseller">Re-seller</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+
       <Form {...form}>
-        {/* <Form {...}> */}
         <form
-          // onSubmit={form.handleSubmit(onSubmit)}
           onSubmit={onSubmit}
           className="flex flex-col w-full justify-center items-center"
         >
           <div className="flex flex-col items-center justify-center w-full h-full gap-2 p-4">
             <div className="gap-2 w-2/3 flex flex-row">
               <div className="flex flex-col w-full h-full">
-                <FormField
-                  control={form.control}
-                  name="instagramHandle"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Instagram Handle</FormLabel>
-                      <FormControl>
-                        <Input
-                          disabled={loading}
-                          placeholder="just name"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* Common fields */}
                 <FormField
                   control={form.control}
                   name="firstName"
@@ -355,6 +332,23 @@ export const SellerForm: React.FC<SellerFormProps> = ({
                         <Input
                           disabled={loading}
                           placeholder="Last Name"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="instagramHandle"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Instagram Handle</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={loading}
+                          placeholder="Instagram Handle"
                           {...field}
                         />
                       </FormControl>
@@ -480,53 +474,6 @@ export const SellerForm: React.FC<SellerFormProps> = ({
               <div className="flex flex-col w-full h-full">
                 <FormField
                   control={form.control}
-                  name="shoeSizeEU"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>EU Shoe Size</FormLabel>
-                      <FormControl>
-                        <Input disabled={loading} placeholder="39" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="topSize"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Top Size</FormLabel>
-                      <FormControl>
-                        <Input
-                          disabled={loading}
-                          placeholder="small"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="bottomSize"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Bottom Size</FormLabel>
-                      <FormControl>
-                        <Input
-                          disabled={loading}
-                          placeholder="medium"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
                   name="billboardId"
                   render={({ field }) => (
                     <FormItem>
@@ -592,15 +539,103 @@ export const SellerForm: React.FC<SellerFormProps> = ({
                   )}
                 />
                 {/* TODO: Add Charity selector */}
+
+                {/* Conditional form fields based on seller type */}
+                {sellerType === "reseller" ? (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="storeName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Store Name</FormLabel>
+                          <FormControl>
+                            <Input
+                              disabled={loading}
+                              placeholder="Store Name"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Description</FormLabel>
+                          <FormControl>
+                            <Input
+                              disabled={loading}
+                              placeholder="Description"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                ) : (
+                  <>
+                    {/* Influencer-specific fields */}
+                    <FormField
+                      control={form.control}
+                      name="shoeSizeEU"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>EU Shoe Size</FormLabel>
+                          <FormControl>
+                            <Input
+                              disabled={loading}
+                              placeholder="39"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="topSize"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Top Size</FormLabel>
+                          <FormControl>
+                            <Input
+                              disabled={loading}
+                              placeholder="small"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="bottomSize"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Bottom Size</FormLabel>
+                          <FormControl>
+                            <Input
+                              disabled={loading}
+                              placeholder="medium"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
               </div>
             </div>
-
-            {/* <div className="flex flex-col w-full h-full justify-center items-center p-3">
-              {!initialData && (
-                <StripeConnect onAccountConnected={setConnectedAccountId} />
-              )}
-            </div> */}
-            
           </div>
 
           <Button disabled={loading} className="ml-auto" type="submit">

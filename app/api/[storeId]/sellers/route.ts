@@ -14,7 +14,6 @@ export async function POST(
     const body = await req.json();
 
     const {
-
       instagramHandle,
       firstName,
       lastName,
@@ -29,8 +28,10 @@ export async function POST(
       charityName,
       charityUrl,
       connectedAccountId,
+      sellerType,
+      storeName,
+      description,
     } = body;
-    
 
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 403 });
@@ -68,6 +69,9 @@ export async function POST(
         bottomSize,
         storeId: params.storeId,
         stripe_connect_unique_id: connectedAccountId || "",
+        sellerType,
+        storeName,
+        description,
       },
     });
     console.log("[CREATE_SELLER]", seller);

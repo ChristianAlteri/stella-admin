@@ -20,24 +20,24 @@ export function MainNav({
       active: pathname === `/${params.storeId}`,
     },
     {
-      href: `/${params.storeId}/products`,
-      label: 'Products',
-      active: pathname === `/${params.storeId}/products`,
-    },
-    {
       href: `/${params.storeId}/orders`,
       label: 'Orders',
       active: pathname === `/${params.storeId}/orders`,
     },
     {
-      href: `/${params.storeId}/designers`,
-      label: 'Designers',
-      active: pathname === `/${params.storeId}/designers`,
+      href: `/${params.storeId}/products`,
+      label: 'Products',
+      active: pathname === `/${params.storeId}/products`,
     },
     {
       href: `/${params.storeId}/sellers`,
       label: 'Sellers',
       active: pathname === `/${params.storeId}/sellers`,
+    },
+    {
+      href: `/${params.storeId}/designers`,
+      label: 'Designers',
+      active: pathname === `/${params.storeId}/designers`,
     },
     {
       href: `/${params.storeId}/categories`,

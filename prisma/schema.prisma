@@ -50,6 +50,7 @@ model Seller {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   storeId   String
+  sellerType String? @default("")
 
   instagramHandle String  @default("https://www.instagram.com/anon.drobe")
   firstName       String? @default("")
@@ -58,23 +59,29 @@ model Seller {
   phoneNumber     String? @unique
   shippingAddress String? @default("")
   country         String? @default("")
+  soldCount   Int?    @default(0)
+  billboardId String? // Foreign Key to Billboard
+  billboard   Billboard? @relation(fields: [billboardId], references: [id])
+  store       Store      @relation("StoreToSeller", fields: [storeId], references: [id])
 
   stripe_connect_unique_id String?  @default("")
   payouts                  Payout[] // Relation to the Payout model
 
   charityName String? @default("") //TODO: we dont need this once we start onbaording charities
   charityUrl  String? @default("") //TODO: we dont need this once we start onbaording charities
-  soldCount   Int?    @default(0)
 
+  // Influencer specific fields
   shoeSizeEU String? @default("")
   topSize    String? @default("")
   bottomSize String? @default("")
 
+  // Re-seller specific fields
+  storeName String? @default("")
+  description String? @default("")
+
   // TODO: Add a relation to a Charity model
 
-  billboardId String? // Foreign Key to Billboard
-  billboard   Billboard? @relation(fields: [billboardId], references: [id])
-  store       Store      @relation("StoreToSeller", fields: [storeId], references: [id])
+
 
   // Items listed by the seller
   products     Product[]   @relation("SellerToProduct")
