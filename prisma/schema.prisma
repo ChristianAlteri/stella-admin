@@ -39,6 +39,12 @@ model Store {
   gender      Gender[]      @relation("StoreToStyle")
   subcategory Subcategory[] @relation("StoreToSubcategory")
   orders      Order[]       @relation("StoreToOrder")
+  // TODO: add all these relations
+  // charities   Charity[]     @relation("StoreToCharity")
+  // users       User[]        @relation("StoreToUser")
+  // accounts    Account[]     @relation("StoreToAccount")
+  // orderItems  OrderItem[]   @relation("StoreToOrderItem")
+  // payouts     Payout[]      @relation("StoreToPayout")
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 }

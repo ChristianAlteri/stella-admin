@@ -1,4 +1,3 @@
-import { getSellerOrders } from "@/actions/get-seller-orders";
 import prismadb from "@/lib/prismadb";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Decimal } from "decimal.js";
@@ -10,6 +9,7 @@ import {
   calculateTotalPayout,
   formatter,
   calculateMonthlyRevenue,
+  calculateSellerOrderConversionRate,
 } from "@/lib/utils";
 import PopularDesignerChart from "./components/popular-designer-chart";
 import PopularCategoryChart from "./components/popular-category-chart";
@@ -32,6 +32,7 @@ const SellerDetailsPage = async ({
         where: { sellerId: params.sellerId },
         orderBy: { createdAt: "desc" },
       },
+      orderedItems: { include: { order: true } },
       products: {
         include: {
           images: true,
@@ -45,7 +46,8 @@ const SellerDetailsPage = async ({
     },
   });
 
-  console.log("SELLERS: ", seller);
+  // console.log("SELLER: ", seller);
+
   const orders = await prismadb.orderItem.findMany({
     where: {
       sellerId: params.sellerId,
@@ -105,6 +107,10 @@ const SellerDetailsPage = async ({
   );
   const averageSalePrice = calculateAverageSalePrice(productsWithNumberPrices);
   const totalPayout = calculateTotalPayout(seller?.payouts || []);
+  const itemsSold = seller?.soldCount || 0;
+  const orderConversionRate = calculateSellerOrderConversionRate(totalClicks, itemsSold);
+  // const orderConversionRate = calculateSellerOrderConversionRate(seller, seller?.payouts || [], orders, seller?.products || []);
+  // console.log("orderConversionRate: ", orderConversionRate);
 
   return (
     <div className="flex-col">
@@ -206,6 +212,10 @@ const SellerDetailsPage = async ({
                 <div>
                   <div className="text-gray-500">Total Clicks</div>
                   <div>{totalClicks}</div>
+                </div>
+                <div>
+                  <div className="text-gray-500">Conversion Rate</div>
+                  <div>{orderConversionRate}%</div>
                 </div>
               </div>
             </CardContent>

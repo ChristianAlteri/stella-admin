@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx"
 import Decimal from "decimal.js";
 import { twMerge } from "tailwind-merge"
+import { format } from 'date-fns';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -81,35 +82,78 @@ export function calculateTotalPayout(payouts: { amount: Decimal | null }[] = [])
   return total.toFixed(2);
 }
 
-// Calculate Order Conversion Rate for products
-export function calculateOrderConversionRate(products: { clicks: number; orders: number }[]) {
-  return products.map((product) => {
-    const conversionRate = product.clicks > 0 ? (product.orders / product.clicks) * 100 : 0;
-    return {
-      ...product,
-      conversionRate: conversionRate.toFixed(2), // Return rate as a percentage
-    };
-  });
+// Calculate Order Conversion Rate for products sold by a seller
+export function calculateSellerOrderConversionRate(
+  totalClicks: number,
+  itemsSold: number
+): number {
+  if (totalClicks === 0) return 0; // Avoid division by zero
+  const conversionRate = (itemsSold / totalClicks) * 100;
+  return parseFloat(conversionRate.toFixed(2)); // Return conversion rate rounded to 2 decimal places
 }
 
-// Prepare data for Sales Performance by Product (Scatter Plot: likes vs orders or clicks vs orders)
-export function getSalesPerformanceData(products: { likes: number; clicks: number; orders: number }[]) {
-  return products.map((product) => ({
-    likes: product.likes,
-    clicks: product.clicks,
-    orders: product.orders,
-  }));
-}
 
-// Calculate Product Sell-Through Rate
-export function calculateSellThroughRate(products: { isArchived: boolean; createdAt: Date; soldCount: number; totalStock: number }[]) {
-  return products.map((product) => {
-    const daysOnSale = Math.floor((new Date().getTime() - new Date(product.createdAt).getTime()) / (1000 * 60 * 60 * 24)); // Days since listed
-    const sellThroughRate = product.totalStock > 0 ? (product.soldCount / product.totalStock) * 100 : 0;
+
+// Function to transform sellers data
+export function calculateTopSellersByMonth(sellers: any[]) {
+  // Group sellers by soldCount, then group soldCount by month
+  const sellerData = sellers.map((seller) => {
+    const monthlySales: Record<string, { count: number; payout: number }> = {};
+
+    seller.payouts.forEach((payout: { createdAt: string | number | Date; amount: any }) => {
+      const month = format(new Date(payout.createdAt), 'MMMM'); // Extract the month
+      if (!monthlySales[month]) {
+        monthlySales[month] = { count: 0, payout: 0 };
+      }
+      monthlySales[month].count += 1; // Add 1 to the sold count
+      monthlySales[month].payout += payout.amount; // Sum payout
+    });
+
     return {
-      ...product,
-      daysOnSale,
-      sellThroughRate: sellThroughRate.toFixed(2), // Return rate as a percentage
+      id: seller.id,
+      storeName: seller.storeName || seller.instagramHandle,
+      monthlySales,
     };
   });
+
+  // Sort sellers by total sold count
+  sellerData.sort((a, b) => {
+    const totalSalesA = Object.values(a.monthlySales).reduce(
+      (sum, monthData) => sum + monthData.count,
+      0
+    );
+    const totalSalesB = Object.values(b.monthlySales).reduce(
+      (sum, monthData) => sum + monthData.count,
+      0
+    );
+    return totalSalesB - totalSalesA;
+  });
+
+  // Limit to top 10 sellers
+  return sellerData.slice(0, 10);
 }
+
+export function convertDecimalsToNumbers(data: any): any {
+  if (Array.isArray(data)) {
+    return data.map(convertDecimalsToNumbers);
+  } else if (typeof data === 'object' && data !== null) {
+    return Object.keys(data).reduce((acc: Record<string, any>, key) => {
+      const value = data[key];
+
+      // Check if value is a Date and leave it as is
+      if (value instanceof Date) {
+        acc[key] = value;
+      }
+      // Check if value is a Prisma Decimal and convert it
+      else if (value && typeof value === 'object' && 'toNumber' in value) {
+        acc[key] = value.toNumber();
+      } else {
+        acc[key] = convertDecimalsToNumbers(value);
+      }
+      return acc;
+    }, {});
+  }
+  return data;
+}
+
+

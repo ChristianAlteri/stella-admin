@@ -33,6 +33,7 @@ const OrdersPage = async ({
     email: item.email,
     address: item.address,
     isPaid: item.isPaid,
+    hasBeenDispatched: item.hasBeenDispatched,
     products: item.orderItems.map((orderItem) => orderItem.product.name).join(', '),
     totalPrice: formatter.format(item.orderItems.reduce((total, item) => {
       return total + Number(item.product.ourPrice);
@@ -46,6 +47,7 @@ const OrdersPage = async ({
   return (
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
+        <div className="w-full h-full">Add somewhere we can create an order</div>
         <OrderClient data={formattedOrders} />
       </div>
     </div>

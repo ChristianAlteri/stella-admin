@@ -18,36 +18,86 @@ import { getStockCount } from "@/actions/get-stock-count";
 import { getoutStandingOrders } from "@/actions/get-outstanding-orders";
 import { getGraphTopSeller } from "@/actions/get-graph-top-sellers";
 import prismadb from "@/lib/prismadb";
-
+import TopSellersChart from "./components/top-sellers-card";
+import { calculateTopSellersByMonth, convertDecimalsToNumbers } from "@/lib/utils";
+import TopSellersCard from "./components/top-sellers-card";
+import MostPopularDesignerCard from "./components/top-designers-card";
+import MostPopularCategoryCard from "./components/top-categories-card";
+import StoreRevenueByMonthChart from "./components/store-revenue-by-month";
 
 interface DashboardPageProps {
   params: {
     storeId: string;
   };
-};
+}
 
-const DashboardPage: React.FC<DashboardPageProps> = async ({ 
-  params
-}) => {
+const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
   const totalRevenue = await getTotalRevenue(params.storeId);
   const graphRevenue = await getGraphRevenue(params.storeId);
   const salesCount = await getSalesCount(params.storeId);
   const stockCount = await getStockCount(params.storeId);
   const outstandingOrders = await getoutStandingOrders(params.storeId);
-  const topSellers = await getGraphTopSeller(params.storeId);
+  // const topSellers = await getGraphTopSeller(params.storeId);
 
   const products = await prismadb.product.findMany({
     where: {
-      id: params.storeId,
+      storeId: params.storeId,
     },
+    include: {
+      seller: { include: { payouts: true } },
+      designer: true,
+      category: true,
+    },
+    orderBy: { createdAt: "desc" },
   });
 
-  console.log("PRODUCTS: ", products);
+  const sellers = await prismadb.seller.findMany({
+    where: {
+      storeId: params.storeId,
+    },
+    include: {
+      payouts: {
+        // where: { sellerId: params.sellerId },
+        orderBy: { createdAt: "desc" },
+      },
+      products: {
+        include: {
+          images: true,
+          designer: true,
+          seller: true,
+          category: true,
+          size: true,
+          color: true,
+        },
+      },
+      orderedItems: { include: { order: true } },
+    },
 
-  // console.log(topSellers.map((seller) =>  seller.sellers));
+    orderBy: { createdAt: "desc" },
+  });
 
-    
+  const orders = await prismadb.order.findMany({
+    where: {
+      storeId: params.storeId,
+    },
+    include: { orderItems: true },
+    orderBy: { createdAt: "desc" },
+  });
 
+
+  // console.log("SELLERS: ", sellers);
+  // console.log("PRODUCTS: ", products);
+  // console.log("ORDERS: ", orders);
+
+  const plainOrders = convertDecimalsToNumbers(orders);
+  const plainProducts = convertDecimalsToNumbers(products);
+  const plainSellers = convertDecimalsToNumbers(sellers);
+  // console.log("plainOrders", plainOrders);
+
+  const topSellers = plainSellers
+    .filter((seller: any) => seller.soldCount)
+    .sort((a: any, b: any) => b.soldCount! - a.soldCount!)
+    .slice(0, 3);
 
   return (
     <div className="flex-col">
@@ -63,9 +113,7 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({
               £
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">
-                £ {totalRevenue}
-                </div>
+              <div className="text-2xl font-bold">£ {totalRevenue}</div>
             </CardContent>
           </Card>
           <Card>
@@ -79,51 +127,38 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Products In Stock</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Products In Stock
+              </CardTitle>
               <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stockCount}</div>
             </CardContent>
           </Card>
-                </div>
+        </div>
         <Separator />
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-2xl font-bold">Outstanding orders</CardTitle>
-            </CardHeader>
-            <CardContent className="overflow-auto">
-            {/* Order status */}
-                {outstandingOrders.map((order) => (
-                    <OrderStatus key={order.id} order={order} />
-                ))}
-            </CardContent>
-          </Card>
-          <div className="">
-            {/* Graph revenue by month */}
-          <Card className="col-span-2">
-            <CardHeader>
-              <CardTitle>Revenue by Month</CardTitle>
-            </CardHeader>
-            <CardContent className="pl-2">
-              <RevenueGraph data={graphRevenue} />
-            </CardContent>
-          </Card> 
-          <br />
-          <br />
-              {/* Graph top seller by month */}
-          <Card className="col-span-2">
-            <CardHeader>
-              <CardTitle>Top Sellers</CardTitle>
-            </CardHeader>
-            <CardContent className="pl-2">
-              <TopSellerGraph data={topSellers} />
-            </CardContent>
-          </Card>
+
+        <div className="flex flex-row">
+          <div className="flex flex-row w-2/3 gap-2 justify-between">
+            <TopSellersCard sellers={topSellers} />
+            <MostPopularDesignerCard products={plainProducts} />
+            <MostPopularCategoryCard products={plainProducts} />
           </div>
+          <div className="flex flex-row w-2/3 gap-2 justify-between">
+            <div className="flex w-full items-center justify-center text-center h-full">What can go here?</div>
+          </div>
+        </div>
+        <Separator />
+        <div className="flex flex-row w-1/2 gap-2 justify-between">
+          <StoreRevenueByMonthChart orders={plainOrders} />
+          {/* <StoreRevenueByMonthChart orders={orders} /> */}
+        </div>
       </div>
     </div>
   );
 };
 
 export default DashboardPage;
+
+{/* TODO: Move outstanding orders to the orders page */}
