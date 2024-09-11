@@ -17,6 +17,7 @@ import { getGraphRevenue } from "@/actions/get-graph-revenue";
 import { getStockCount } from "@/actions/get-stock-count";
 import { getoutStandingOrders } from "@/actions/get-outstanding-orders";
 import { getGraphTopSeller } from "@/actions/get-graph-top-sellers";
+import prismadb from "@/lib/prismadb";
 
 
 interface DashboardPageProps {
@@ -34,6 +35,14 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({
   const stockCount = await getStockCount(params.storeId);
   const outstandingOrders = await getoutStandingOrders(params.storeId);
   const topSellers = await getGraphTopSeller(params.storeId);
+
+  const products = await prismadb.product.findMany({
+    where: {
+      id: params.storeId,
+    },
+  });
+
+  console.log("PRODUCTS: ", products);
 
   // console.log(topSellers.map((seller) =>  seller.sellers));
 

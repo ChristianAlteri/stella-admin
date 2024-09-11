@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { ColumnDef } from "@tanstack/react-table"
+import { ColumnDef } from "@tanstack/react-table";
 
-import { CellAction } from "./cell-action"
+import { CellAction } from "./cell-action";
 
 export type SellerColumn = {
-  id: string
+  id: string;
   instagramHandle: string;
   firstName: string;
   lastName: string;
@@ -17,65 +17,86 @@ export type SellerColumn = {
   productsUrl: string;
   storeId: string;
   sellerId: string;
-  imageUrl: string | undefined; 
+  imageUrl: string | undefined;
   charityName: string;
   charityUrl: string;
   shoeSizeEU: string;
   topSize: string;
   bottomSize: string;
-}
+  sellerType: string;
+  description: string;
+  storeName: string;
+};
 
 export const columns: ColumnDef<SellerColumn>[] = [
-  {
-    accessorKey: "name",
-    header: "Name",
-  },
   {
     accessorKey: "instagramHandle",
     header: "Instagram",
   },
   {
-    accessorKey: "createdAt",
-    header: "Created At",
-  },
-  {
     accessorKey: "imageUrl",
-    header: "Billboard Image",
-    cell: ({ row }) => 
+    header: "Profile Image",
+    cell: ({ row }) => (
       <>
         <a className="hover:underline" href={row.original.imageUrl}>
-        <img src={row.original.imageUrl} alt="Image" style={{ width: '100px', height: 'auto' }}></img> 
+          <img
+            src={row.original.imageUrl}
+            alt="Image"
+            style={{ width: "100px", height: "auto", borderRadius: "10px" }}
+          ></img>
         </a>
-      </>,
+      </>
+    ),
   },
+  // {
+  //   accessorKey: "productsUrl",
+  //   header: "Products",
+  //   cell: ({ row }) => (
+  //     <a
+  //       className="hover:underline"
+  //       href={`/api/${row.original.storeId}/sellers/${row.original.sellerId}`} // TODO: re route to products page and make an api to this url
+  //     >
+  //       Link to Products
+  //     </a>
+  //   ),
+  // },
+  // {
+  //   accessorKey: "ordersUrl",
+  //   header: "Orders", // TODO: Make a generic orders page that gets all the orders for storeId but if a sellerId is passed in then it gets all the orders for that seller
+  //   cell: ({ row }) => (
+  //     <a className="hover:underline" href={row.original.productsUrl}>
+  //       Link to Orders
+  //     </a>
+  //   ),
+  // },
+  // {
+  //   accessorKey: "charityName",
+  //   header: "Charity Name",
+  // },
+  // {
+  //   accessorKey: "shoeSizeEU",
+  //   header: "Shoe Size EU",
+  // },
+  // {
+  //   accessorKey: "topSize",
+  //   header: "Top Size",
+  // },
+  // {
+  //   accessorKey: "bottomSize",
+  //   header: "Bottom Size",
+  // },
   {
-    accessorKey: "productsUrl", // This is the accessor key for the products URL
-    header: "Products", // Link to the products page
-    cell: ({ row }) => <a className="hover:underline" href={`/api/${row.original.storeId}/sellers/${row.original.sellerId}`}>Link to Products</a>
-  },
-  {
-    accessorKey: "ordersUrl", // This is the accessor key for the orders URL
-    header: "Orders", // Link to the orders page
-    cell: ({ row }) => <a className="hover:underline" href={row.original.productsUrl}>Link to Orders</a>
-  },
-  {
-    accessorKey: "charityName", 
-    header: "Charity Name", 
-  },
-  {
-    accessorKey: "shoeSizeEU", 
-    header: "Shoe Size EU", 
-  },
-  {
-    accessorKey: "topSize", 
-    header: "Top Size", 
-  },
-  {
-    accessorKey: "bottomSize", 
-    header: "Bottom Size", 
+    accessorKey: "details",
+    header: "Details", // TODO: Make a generic orders page that gets all the orders for storeId but if a sellerId is passed in then it gets all the orders for that seller
+    cell: ({ row }) => (
+      // <a className="hover:underline" href={`/api/${row.original.storeId}/sellers/${row.original.sellerId}`}>
+      <a className="hover:underline" href={`/${row.original.storeId}/sellers/${row.original.sellerId}/details`}>
+        Details
+      </a>
+    ),
   },
   {
     id: "actions",
-    cell: ({ row }) => <CellAction data={row.original} />
+    cell: ({ row }) => <CellAction data={row.original} />,
   },
 ];

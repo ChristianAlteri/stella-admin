@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 
 import prismadb from "@/lib/prismadb";
 
+
 export async function GET(
   req: Request,
   { params }: { params: { sellerId: string } }
@@ -18,6 +19,10 @@ export async function GET(
       },
       include: {
         billboard: true,
+        payouts: {
+          where: { sellerId: params.sellerId },
+          orderBy: { createdAt: 'desc' },
+        },
         products: {
           include: {
             images: true,
@@ -31,7 +36,18 @@ export async function GET(
       },
     });
 
-    return NextResponse.json(seller);
+    const orders = await prismadb.orderItem.findMany({
+      where: {
+        sellerId: params.sellerId,
+      },
+      distinct: ['orderId'], // Fetch distinct orders based on the orderId
+      include: {
+        order: true,
+        product: true,
+      },
+    });
+
+    return NextResponse.json({seller, orders});
   } catch (error) {
     console.log("[seller_GET]", error);
     return new NextResponse("Internal error", { status: 500 });

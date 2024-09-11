@@ -11,6 +11,18 @@ datasource db {
   relationMode = "prisma"
 }
 
+// TODO: use ENUMS
+//  enum SellerType {
+//   INFLUENCER
+//   RESELLER
+// }
+
+// enum GenderType {
+//   MALE
+//   FEMALE
+//   UNISEX
+// }
+
 model Store {
   id          String        @id @default(uuid())
   name        String

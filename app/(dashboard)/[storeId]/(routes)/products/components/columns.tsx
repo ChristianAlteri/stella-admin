@@ -8,6 +8,7 @@ import ReactPlayer from "react-player";
 
 export type ProductColumn = {
   id: string;
+  sellerId: string;
   name: string;
   description: string;
   ourPrice: string;

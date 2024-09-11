@@ -48,6 +48,9 @@ const SellerPage = async ({
     shoeSizeEU: item.shoeSizeEU || '',
     topSize: item.topSize || '',
     bottomSize: item.bottomSize || '',
+    sellerType: item.sellerType || '',
+    description: item.description || '',
+    storeName: item.storeName || '',
   }));
 
   return (

@@ -12,7 +12,7 @@ export function MainNav({
   const pathname = usePathname();
   const params = useParams();
 
-  // Define the routes for the main navigation. Add where necessary.
+  //TODO make a "store config" route that holds size, gender, condition, material, color, subcategory, billboard, settings  
   const routes = [
     {
       href: `/${params.storeId}`,
