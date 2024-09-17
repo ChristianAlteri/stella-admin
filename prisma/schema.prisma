@@ -307,7 +307,10 @@ model Image {
 model User {
   id             String   @id @default(uuid())
   email          String   @unique
-  // emailVerified  DateTime 
+  // TODO: Add reltion to store, we only want the user to have an account with one store. stock is in one store
+  //storeId           String // Foreign Key to Store
+  //store             Store       @relation("StoreToOrder", fields: [storeId], references: [id])
+
   name           String   @unique
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

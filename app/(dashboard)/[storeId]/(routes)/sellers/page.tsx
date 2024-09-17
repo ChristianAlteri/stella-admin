@@ -19,13 +19,14 @@ const SellerPage = async ({
       categories: true,
       products: true,
       billboard: true,
+      payouts: true
     },
     orderBy: {
       createdAt: 'desc'
     }
   });
 
-  // console.log("Sellers FRONT END", sellers);
+  console.log("Sellers", sellers);
 
   const formattedSellers: SellerColumn[] = sellers.map((item) => ({
     id: item.id,

@@ -9,6 +9,14 @@ import { useParams, useRouter, useSearchParams } from "next/navigation"; // Use 
 import { DataTable } from "@/components/ui/data-table";
 import { ApiList } from "@/components/ui/api-list";
 import { TbReload } from "react-icons/tb";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useState } from "react";
 
 interface ProductClientProps {
   data: ProductColumn[];
@@ -18,6 +26,7 @@ export const ProductClient: React.FC<ProductClientProps> = ({ data }) => {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [value, setValue] = useState("");
 
   const sellerId = searchParams.get("sellerId");
 
@@ -42,14 +51,29 @@ export const ProductClient: React.FC<ProductClientProps> = ({ data }) => {
             onClick={() => router.push(`/${params.storeId}/products/new`)}
             size="sm"
           >
-            <PlusCircle className="mr-2 w-4"/>
+            <PlusCircle className="mr-2 w-4" />
             Add New
           </Button>
         </div>
 
+        <div>
+          <div className="w-[200px]">
+            <Select onValueChange={setValue} value={value}>
+              <SelectTrigger id="toggle">
+                <SelectValue placeholder="Select Seller" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="make these sellers">make these sellers</SelectItem>
+                <SelectItem value="put the id in the params">put the id in the params</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="mt-1 text-sm text-gray-500">TODO: seller id in params</p>
+          </div>
+        </div>
+
         {sellerId && (
           <Button onClick={handleClearFilter} className="mt-4" size="sm">
-            <TbReload size={18}/>
+            <TbReload size={18} />
           </Button>
         )}
       </div>
@@ -57,13 +81,19 @@ export const ProductClient: React.FC<ProductClientProps> = ({ data }) => {
       <Separator />
 
       {/* Live Products DataTable */}
-      <Heading title={`Live Products (${liveProducts.length})`} description="Manage live stock"/>
+      <Heading
+        title={`Live Products (${liveProducts.length})`}
+        description="Manage live stock"
+      />
       <DataTable columns={columns} data={liveProducts} searchKey="name" />
 
       <Separator />
 
       {/* Archived Products DataTable */}
-      <Heading title={`Archived Products (${archivedProducts.length})`} description="See archived stock"/>
+      <Heading
+        title={`Archived Products (${archivedProducts.length})`}
+        description="See archived stock"
+      />
       <DataTable columns={columns} data={archivedProducts} searchKey="name" />
 
       <Separator />

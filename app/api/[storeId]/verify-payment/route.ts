@@ -189,6 +189,8 @@ export async function POST(request: Request) {
         products
       );
 
+      // TODO: Figure out how to get global context of a logged in user and update their orders. This may be something to pass in from the frontend.
+
       return NextResponse.json({ success: true, productIds, orderId });
     } else {
       return NextResponse.json(

@@ -156,4 +156,19 @@ export function convertDecimalsToNumbers(data: any): any {
   return data;
 }
 
-
+export const totalRevenue = (orders: any): number => {
+  return orders.reduce((acc: any, order: any) => {
+    return (
+      acc +
+      order.orderItems.reduce((itemAcc: any, item: any) => {
+        return (
+          itemAcc +
+          (typeof item.productAmount === "object" &&
+          "toNumber" in item.productAmount
+            ? item.productAmount.toNumber()
+            : parseFloat(item.productAmount as any) || 0)
+        );
+      }, 0)
+    );
+  }, 0);
+};

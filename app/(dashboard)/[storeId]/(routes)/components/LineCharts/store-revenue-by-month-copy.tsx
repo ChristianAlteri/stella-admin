@@ -60,14 +60,13 @@ const calculateRevenueByMonth = (orders: any): Record<string, number> => {
         revenueByMonth[monthYear] += productAmount;
       });
     });
-  
-    console.log("revenueByMonth:", revenueByMonth);
+
     return revenueByMonth;
   };
   
 
 
-const StoreRevenueByMonthChart = ({ orders }: { orders: Order[] }) => {
+const StoreRevenueByMonthChartOriginal = ({ orders }: { orders: Order[] }) => {
   if (!orders || orders.length === 0) {
     return (
       <Card className="w-2/3">
@@ -145,4 +144,4 @@ const StoreRevenueByMonthChart = ({ orders }: { orders: Order[] }) => {
   );
 };
 
-export default StoreRevenueByMonthChart;
+export default StoreRevenueByMonthChartOriginal;
