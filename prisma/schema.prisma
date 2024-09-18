@@ -27,6 +27,8 @@ model Store {
   id          String        @id @default(uuid())
   name        String
   userId      String
+  // TODO: Would be good have some config in here for exmple: currency - then all the pounds symbols would change and a conversion would happen to the price
+
   billboards  Billboard[]   @relation("StoreToBillboard")
   categories  Category[]    @relation("StoreToCategory")
   designers   Designer[]    @relation("StoreToDesigner")
@@ -362,6 +364,7 @@ model OrderItem {
 
   productAmount            Decimal? @default(0.0)
   stripe_connect_unique_id String?  @default("")
+  // TODO: would be good to have Payuot relation here
 
   @@index([orderId])
   @@index([productId])

@@ -34,7 +34,7 @@ interface MaterialsClientProps {
         </Button>
       </div>
       <Separator />
-      <DataTable columns={columns} data={data} searchKey="name" />
+      <DataTable columns={columns} data={data}  />
       <Heading title="API" description="API call for material" />
       <Separator />
       <div>IS THIS NECCESARY</div>

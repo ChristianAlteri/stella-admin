@@ -35,7 +35,7 @@ interface BillboardClientProps {
         </Button>
       </div>
       <Separator />
-      <DataTable columns={columns} data={data} searchKey="label" />
+      <DataTable columns={columns} data={data}  />
       <Heading title="API" description="API call for Billboards" />
       <Separator />
       <div>IS THIS NECCESARY</div>

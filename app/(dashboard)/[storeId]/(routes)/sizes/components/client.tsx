@@ -34,7 +34,7 @@ interface SizesClientProps {
         </Button>
       </div>
       <Separator />
-      <DataTable columns={columns} data={data} searchKey="name" />
+      <DataTable columns={columns} data={data}  />
       <Heading title="API" description="API call for Sizes" />
       <Separator />
       <div>IS THIS NECCESARY</div>

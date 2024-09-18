@@ -35,7 +35,7 @@ interface CategoryClientProps {
         </Button>
       </div>
       <Separator />
-      <DataTable columns={columns} data={data} searchKey="name" />
+      <DataTable columns={columns} data={data}  />
       <Heading title="API" description="API call for Categories" />
       <Separator />
       <div>IS THIS NECCESARY</div>

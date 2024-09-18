@@ -37,7 +37,7 @@ export const ColorClient: React.FC<ColorClientProps> = ({
         </Button>
       </div>
       <Separator />
-      <DataTable searchKey="name" columns={columns} data={data} />
+      <DataTable  columns={columns} data={data} />
       <Heading title="Analytics" description="Top selling color" />
       <Separator />
       <br />

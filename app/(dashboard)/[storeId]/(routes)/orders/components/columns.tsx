@@ -1,11 +1,10 @@
-"use client"
+"use client";
 
-import { ColumnDef } from "@tanstack/react-table"
-
-
+import { ColumnDef } from "@tanstack/react-table";
+import OrderCard from "./order-card";
 
 export type OrderColumn = {
-  id: string
+  id: string;
   phone: string;
   email: string;
   address: string;
@@ -13,46 +12,23 @@ export type OrderColumn = {
   isPaid: boolean;
   totalPrice: string;
   totalRrpPrice: string;
-  products: string;
-  createdAt: string;
-}
+  createdAt: Date;
+  stripe_connect_unique_id: string[];
+  products: string[];
+  productIds: string[];
+  productImageUrls: string[];
+  sellers: string[];
+  sellerIds: string[];
+};
 
 export const columns: ColumnDef<OrderColumn>[] = [
   {
-    accessorKey: "products",
-    header: "Products",
-  },
-  {
-    accessorKey: "phone",
-    header: "Phone",
-  },
-  {
-    accessorKey: "email",
-    header: "Email",
+    accessorKey: "id",
+    header: "Orders",
     cell: ({ row }) => (
-      <a href = {`mailto:${row.original.email}`} className="text-blue-500 hover:underline hover:cursor-pointer">
-        {row.original.email}
-      </a>
-    )
+      <div className="flex flex-row justify-start w-full">
+        <OrderCard row={row.original} />,
+      </div>
+    ),
   },
-  {
-    accessorKey: "address",
-    header: "Address",
-  },
-  {
-    accessorKey: "totalPrice",
-    header: "Total Price",
-  },
-  {
-    accessorKey: "totalRrpPrice",
-    header: "Total RRP",
-  },
-  {
-    accessorKey: "isPaid",
-    header: "Paid",
-  },
-  {
-    accessorKey: "createdAt",
-    header: "Date",
-  }
 ];

@@ -1,15 +1,6 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
-import { useRouter } from "next/navigation";
 import SellerCard from "./seller-card";
 
 export type SellerColumn = {

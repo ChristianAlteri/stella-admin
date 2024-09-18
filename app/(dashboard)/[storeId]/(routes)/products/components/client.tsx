@@ -85,7 +85,7 @@ export const ProductClient: React.FC<ProductClientProps> = ({ data }) => {
         title={`Live Products (${liveProducts.length})`}
         description="Manage live stock"
       />
-      <DataTable columns={columns} data={liveProducts} searchKey="name" />
+      <DataTable columns={columns} data={liveProducts}  />
 
       <Separator />
 
@@ -94,7 +94,7 @@ export const ProductClient: React.FC<ProductClientProps> = ({ data }) => {
         title={`Archived Products (${archivedProducts.length})`}
         description="See archived stock"
       />
-      <DataTable columns={columns} data={archivedProducts} searchKey="name" />
+      <DataTable columns={columns} data={archivedProducts}  />
 
       <Separator />
 

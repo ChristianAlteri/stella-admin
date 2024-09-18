@@ -4,7 +4,7 @@ import prismadb from "@/lib/prismadb";
 
 import { ColorColumn } from "./components/columns"
 import { ColorClient } from "./components/client";
-import { getTopSellingColorCount } from "@/actions/get-top-selling-color";
+import { getTopSellingColorCount } from "@/actions/TopSelling/get-top-selling-attribute";
 
 const ColorsPage = async ({
   params
