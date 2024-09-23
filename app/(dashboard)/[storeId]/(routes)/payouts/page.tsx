@@ -1,6 +1,8 @@
 import { format } from "date-fns";
 import prismadb from "@/lib/prismadb";
 import { formatter } from "@/lib/utils";
+import { PayoutColumn } from "./components/columns";
+import { PayoutClient } from "./components/client";
 
 const PayoutsPage = async ({
   params
@@ -12,25 +14,35 @@ const PayoutsPage = async ({
       // storeId: params.storeId
       // TODO: Add storeId to the payout table
     },
+    include: {
+      seller: true,
+    },
     orderBy: {
       createdAt: 'desc'
     }
   });
 
+  const formattedPayouts: PayoutColumn[] = payouts.map((item) => {
+    return {
+      id: item.id,
+      sellerId: item.sellerId,
+      sellerHandle: item.seller.instagramHandle ?? '',
+      sellerEmail: item.seller.email ?? '',
+      sellerStripConnect: item.seller.stripe_connect_unique_id ?? 'No Stripe ID',
+      amount: Number(item.amount).toFixed(2),
+      transferGroupId: item.transferGroupId ?? '',
+      stripeTransferId: item.stripeTransferId ?? '',
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+    };
+  });
+
+
   return (
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
         <div className="w-full h-full">
-          <div>transferGroupId</div>
-          {payouts.map((payout) => (
-            <div key={payout.id}>
-              <p>Amount: {formatter.format(Number(payout.amount) || 0)}</p>
-              <p>Created At: {format(new Date(payout.createdAt), 'MM/dd/yyyy')}</p>
-              <p>Transfer Group ID: {payout.transferGroupId}</p>
-              <a className="hover:underline" href={`sellers/${payout.sellerId}/details`}>Seller ID: {payout.sellerId}</a>
-              <br />
-            </div>
-          ))}
+          <PayoutClient data={formattedPayouts} />
         </div>
       </div>
     </div>

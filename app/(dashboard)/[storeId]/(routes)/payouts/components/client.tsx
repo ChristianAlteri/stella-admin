@@ -1,43 +1,121 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
-import { columns, OrderColumn } from "./columns";
+import { columns, PayoutColumn } from "./columns";
 import { DataTable } from "@/components/ui/data-table";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DollarSign, Users, ArrowUpDown, Calendar } from "lucide-react";
 
-interface OrderClientProps {
-  data: OrderColumn[];
+interface PayoutClientProps {
+  data: PayoutColumn[];
 }
 
-export const OrderClient: React.FC<OrderClientProps> = ({ data }) => {
-  const [showDispatched, setShowDispatched] = useState<boolean>(true);
+export const PayoutClient: React.FC<PayoutClientProps> = ({ data }) => {
+  const [analytics, setAnalytics] = useState({
+    totalPayouts: 0,
+    payoutCount: 0,
+    averagePayout: 0,
+    latestPayout: new Date(),
+  });
 
-  // Filter the data based on dispatched/not dispatched
-  const filteredData = data.filter(order =>
-    showDispatched ? order.hasBeenDispatched : !order.hasBeenDispatched
-  );
+  useEffect(() => {
+    const totalPayouts = data.reduce((sum, payout) => sum + Number(payout.amount), 0);
+    const averagePayout = totalPayouts / data.length;
+    const latestPayout = new Date(Math.max(...data.map(payout => new Date(payout.createdAt).getTime())));
+
+    setAnalytics({
+      totalPayouts,
+      payoutCount: data.length,
+      averagePayout,
+      latestPayout,
+    });
+  }, [data]);
 
   return (
     <>
       <Heading
-        title={`Orders (${filteredData.length})`}
-        description="Manage your orders"
+        title={`Payouts (${data.length})`}
+        description="Manage your payouts and view analytics"
       />
-      <Separator />
+      <Separator className="my-4" />
       
-      {/* Toggle between dispatched/not dispatched orders */}
-      <div className="flex justify-end items-center">
-        <Button onClick={() => setShowDispatched(prev => !prev)}>
-          {showDispatched ? "Not Dispatched Orders" : "Dispatched Orders"}
-        </Button>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Payouts</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">${analytics.totalPayouts.toFixed(2)}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Average Payout</CardTitle>
+            <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">${analytics.averagePayout.toFixed(2)}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Latest Payout</CardTitle>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            {/* <div className="text-2xl font-bold">{analytics.latestPayout.toLocaleDateString()}</div> */}
+            <div className="text-2xl font-bold">{new Date(analytics.latestPayout).toLocaleString("en-GB", {
+                year: "2-digit",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}</div>
+          </CardContent>
+        </Card>
       </div>
       
-      <Separator />
-      
-      <DataTable columns={columns} data={filteredData}  />
-      <Separator />
+      <DataTable columns={columns} data={data} />
+      <Separator className="my-4" />
     </>
   );
 };
+
+
+// "use client";
+
+// import { useState } from "react";
+// import { Heading } from "@/components/ui/heading";
+// import { Separator } from "@/components/ui/separator";
+// import { columns, PayoutColumn } from "./columns";
+// import { DataTable } from "@/components/ui/data-table";
+// import { Button } from "@/components/ui/button";
+
+// interface PayoutClientProps {
+//   data: PayoutColumn[];
+// }
+
+// export const PayoutClient: React.FC<PayoutClientProps> = ({ data }) => {
+
+//   return (
+//     <>
+//       <Heading
+//         title={`Payouts (${data.length})`}
+//         description="Manage your orders"
+//       />
+//       <Separator />
+      
+//       <div className="flex justify-end items-center">
+
+//       </div>
+      
+//       <Separator />
+      
+//       <DataTable columns={columns} data={data}  />
+//       <Separator />
+//     </>
+//   );
+// };

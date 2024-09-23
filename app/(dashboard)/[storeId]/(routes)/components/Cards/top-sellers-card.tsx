@@ -1,10 +1,12 @@
 'use client'
 
-import React from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Trophy } from 'lucide-react'
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Trophy } from 'lucide-react';
 import { useParams, useRouter } from "next/navigation";
+import { TbSwitchVertical } from "react-icons/tb";
+import { Button } from '@/components/ui/button';
 
 // Helper function to calculate total sales from payouts
 function calculateTotalSales(payouts: any[]) {
@@ -12,20 +14,32 @@ function calculateTotalSales(payouts: any[]) {
 }
 
 export default function TopSellersCard({ sellers }: any) {
+  const [showTopSellers, setShowTopSellers] = useState(true);
   const router = useRouter();
   const params = useParams();
+
+  // Function to get either the top or bottom 5 sellers
+  const getSellers = (sellers: any[], isTop: boolean) => {
+    const sortedSellers = sellers.sort((a, b) => b.soldCount - a.soldCount);
+    return isTop ? sortedSellers.slice(0, 5) : sortedSellers.slice(-5).reverse();
+  };
+
+  const displayedSellers = getSellers(sellers, showTopSellers);
 
   return (
     <Card className="w-[350px]">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 w-full justify-between">
           <Trophy className="h-5 w-5 text-yellow-400" />
-          Top Sellers
+          {showTopSellers ? "Top Sellers" : "Bottom Sellers"}
+          <Button variant="outline" onClick={() => setShowTopSellers(!showTopSellers)} className="flex items-center">
+            <TbSwitchVertical className="h-4 w-4" />
+          </Button>
         </CardTitle>
       </CardHeader>
       <CardContent>
         <ul className="space-y-4">
-          {sellers.map((seller: { id: string; instagramHandle: string; firstName: string; lastName: string; soldCount: number; payouts: any[] }, index: number) => {
+          {displayedSellers.map((seller: { id: string; instagramHandle: string; firstName: string; lastName: string; soldCount: number; payouts: any[] }, index: number) => {
             const totalSales = calculateTotalSales(seller.payouts); // Calculate total sales from payouts
             return (
               <li key={seller.id} className="flex items-center gap-3">

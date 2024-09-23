@@ -97,6 +97,7 @@ const SellerDetailsPage = async ({
     sellerType: seller?.sellerType ?? "",
     description: seller?.description ?? "",
     storeName: seller?.storeName ?? "",
+    stripe_connect_unique_id: seller?.stripe_connect_unique_id ?? "No Stripe ID",
   };
 
   const archivedProducts = seller?.products.filter(
@@ -185,6 +186,10 @@ const SellerDetailsPage = async ({
                   {new Date(seller?.createdAt ?? "").toLocaleDateString()}
                 </span>
               </div>
+                <span>
+                  Stripe Id:{" "}
+                  {seller?.stripe_connect_unique_id}
+                </span>
             </div>
           </div>
         </CardContent>

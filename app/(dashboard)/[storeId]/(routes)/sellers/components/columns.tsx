@@ -25,6 +25,7 @@ export type SellerColumn = {
   sellerType: string;
   description: string;
   storeName: string;
+  stripe_connect_unique_id: string;
 };
 
 export const columns: ColumnDef<SellerColumn>[] = [

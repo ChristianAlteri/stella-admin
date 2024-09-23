@@ -1,13 +1,17 @@
 'use client'
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Award } from 'lucide-react';
+import { TbSwitchVertical } from "react-icons/tb";
+import { Button } from '@/components/ui/button';
 
 export default function MostPopularDesignerCard({ products }: any) {
-  // Function to calculate top 5 designers with archived products
-  const getTopDesigners = (products: any[]) => {
+  const [showTopDesigners, setShowTopDesigners] = useState(true);
+
+  // Function to calculate top or bottom 5 designers with archived products
+  const getDesigners = (products: any[], isTop: boolean) => {
     const archivedProducts = products.filter(product => product.isArchived);
     const designerCounts: { [key: string]: number } = archivedProducts.reduce((acc, product) => {
       const designerName = product.designer.name;
@@ -15,27 +19,29 @@ export default function MostPopularDesignerCard({ products }: any) {
       return acc;
     }, {});
 
-    // Convert object to array, sort by count, and take top 5
-    const topDesigners = Object.entries(designerCounts)
-      .sort((a, b) => b[1] - a[1]) // Sort by the count (descending)
-      .slice(0, 5); // Get the top 5
+    // Convert object to array, sort by count
+    const sortedDesigners = Object.entries(designerCounts).sort((a, b) => b[1] - a[1]);
 
-    return topDesigners;
+    // Get the top 5 or bottom 5 designers based on the toggle
+    return isTop ? sortedDesigners.slice(0, 5) : sortedDesigners.slice(-5).reverse();
   };
 
-  const topDesigners = getTopDesigners(products);
+  const designers = getDesigners(products, showTopDesigners);
 
   return (
     <Card className="w-[350px]">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 w-full justify-between">
           <Award className="h-5 w-5 text-blue-400" />
-          Top Designers
+          {showTopDesigners ? "Top Designers" : "Bottom Designers"}
+          <Button variant="outline" onClick={() => setShowTopDesigners(!showTopDesigners)}>
+            <TbSwitchVertical className="h-4 w-4" />
+          </Button>
         </CardTitle>
       </CardHeader>
       <CardContent>
         <ul className="space-y-4">
-          {topDesigners.map(([designerName, count], index) => (
+          {designers.map(([designerName, count], index) => (
             <li key={designerName} className="flex items-center gap-3">
               <span className="font-bold text-lg text-muted-foreground">{index + 1}</span>
               <div className="flex-1">

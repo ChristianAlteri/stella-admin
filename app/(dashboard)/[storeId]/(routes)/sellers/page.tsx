@@ -26,12 +26,11 @@ const SellerPage = async ({
     }
   });
 
-  console.log("Sellers", sellers);
 
   const formattedSellers: SellerColumn[] = sellers.map((item) => ({
     id: item.id,
     instagramHandle: item.instagramHandle,
-    firstName: item.firstName ?? '', // Provide a default value of an empty string when firstName is null
+    firstName: item.firstName ?? '', 
     lastName: item.lastName ?? '',
     email: item.email ?? '',
     phoneNumber: item.phoneNumber ?? '',
@@ -52,6 +51,7 @@ const SellerPage = async ({
     sellerType: item.sellerType || '',
     description: item.description || '',
     storeName: item.storeName || '',
+    stripe_connect_unique_id: item.stripe_connect_unique_id || 'No Stripe ID',
   }));
 
   return (

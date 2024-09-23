@@ -36,7 +36,7 @@ const ImageModal = ({
       className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="relative bg-white p-4 rounded-lg shadow-lg max-w-3xl w-full">
+      <div className="relative bg-white p-4 rounded-lg shadow-lg  w-full">
         <button
           className="absolute top-2 right-2 text-gray-500 hover:text-black"
           onClick={onClose}
@@ -75,7 +75,7 @@ export default function OrderCard({ row }: { row: OrderColumn }) {
   };
 
   return (
-    <Card className="w-full max-w-3xl mx-auto mb-4">
+    <Card className="w-full mx-auto mb-4">
       <CardHeader className="">
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-4">
@@ -89,9 +89,9 @@ export default function OrderCard({ row }: { row: OrderColumn }) {
             </p>
             <CardDescription>
               {new Date(row.createdAt).toLocaleString("en-GB", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
+                year: "2-digit",
+                month: "2-digit",
+                day: "2-digit",
                 hour: "2-digit",
                 minute: "2-digit",
               })}

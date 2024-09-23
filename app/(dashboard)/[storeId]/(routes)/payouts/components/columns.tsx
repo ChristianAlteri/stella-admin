@@ -1,58 +1,30 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
+import PayoutCard from "./payout-card";
+import { Seller } from "@prisma/client";
 
-
-
-export type OrderColumn = {
+export type PayoutColumn = {
   id: string
-  phone: string;
-  email: string;
-  address: string;
-  hasBeenDispatched: boolean;
-  isPaid: boolean;
-  totalPrice: string;
-  totalRrpPrice: string;
-  products: string;
-  createdAt: string;
+  sellerId: string;
+  sellerHandle: string;
+  sellerEmail: string;
+  sellerStripConnect: string;
+  amount: string;
+  transferGroupId: string;
+  stripeTransferId: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export const columns: ColumnDef<OrderColumn>[] = [
+export const columns: ColumnDef<PayoutColumn>[] = [
   {
-    accessorKey: "products",
-    header: "Products",
-  },
-  {
-    accessorKey: "phone",
-    header: "Phone",
-  },
-  {
-    accessorKey: "email",
-    header: "Email",
+    accessorKey: "id",
+    header: "Payouts",
     cell: ({ row }) => (
-      <a href = {`mailto:${row.original.email}`} className="text-blue-500 hover:underline hover:cursor-pointer">
-        {row.original.email}
-      </a>
-    )
+      <div className="flex flex-row justify-start w-full">
+        <PayoutCard row={row.original} />,
+      </div>
+    ),
   },
-  {
-    accessorKey: "address",
-    header: "Address",
-  },
-  {
-    accessorKey: "totalPrice",
-    header: "Total Price",
-  },
-  {
-    accessorKey: "totalRrpPrice",
-    header: "Total RRP",
-  },
-  {
-    accessorKey: "isPaid",
-    header: "Paid",
-  },
-  {
-    accessorKey: "createdAt",
-    header: "Date",
-  }
 ];

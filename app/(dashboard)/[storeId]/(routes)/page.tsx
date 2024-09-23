@@ -80,7 +80,7 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
 
   // console.log("SELLERS: ", sellers);
   // console.log("USERS: ", users);
-  console.log("PRODUCTS: ", products);
+  // console.log("PRODUCTS: ", products);
   // console.log("ORDERS: ", orders);
   
   // Cleaning up the data

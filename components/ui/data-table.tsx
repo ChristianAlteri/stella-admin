@@ -64,14 +64,14 @@ export function DataTable<TData, TValue>({
           className="max-w-sm"
         /> */}
       </div>
-      <div className="rounded-md border">
+      <div className="">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow className="flex" key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead className="w-full" key={header.id}>
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -87,7 +87,7 @@ export function DataTable<TData, TValue>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
+                <TableRow className="w-full"
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                 >
@@ -99,7 +99,7 @@ export function DataTable<TData, TValue>({
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow className="w-full">
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   No results.
                 </TableCell>

@@ -6,8 +6,8 @@ import { ProductClient } from "./components/client";
 
 import { formatter } from "@/lib/utils";
 
-const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
 
+const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
   const products = await prismadb.product.findMany({
     where: { storeId: params.storeId },
     include: {
@@ -26,6 +26,18 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
       createdAt: "desc",
     },
   });
+  const sellers = await prismadb.seller.findMany({
+    select: {
+      id: true,
+      instagramHandle: true,
+    },
+  });
+  const categories = await prismadb.category.findMany({
+    select: {
+      id: true,
+      name: true,
+    },
+  });
 
   const formattedProducts: ProductColumn[] = products.map((item) => ({
     id: item.id,
@@ -36,7 +48,7 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
     isOnSale: item.isOnSale,
     isCharity: item.isCharity,
     isHidden: item.isHidden,
-    ourPrice: formatter.format(item.ourPrice.toNumber()),
+    ourPrice: formatter.format(item.ourPrice.toNumber()), 
     retailPrice: formatter.format(item.retailPrice.toNumber()),
     likes: item.likes,
     clicks: item.clicks,
@@ -44,7 +56,7 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
     designer: item.designer.name,
     sellerHandle: item.seller.instagramHandle,
     size: item.size.name,
-    color: item.color.value,
+    color: item.color.name,
     condition: item.condition.value,
     material: item.material.value,
     gender: item.gender.value,
@@ -60,11 +72,14 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
   return (
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
-        <ProductClient data={formattedProducts} />
+        <ProductClient
+          data={formattedProducts}
+          sellers={sellers}
+          categories={categories}
+        />
       </div>
     </div>
   );
 };
 
 export default ProductsPage;
-
