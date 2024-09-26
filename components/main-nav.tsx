@@ -28,6 +28,11 @@ export function MainNav({
       active: pathname === `/${params.storeId}`,
     },
     {
+      href: `/${params.storeId}/point-of-sale`,
+      label: 'POS',
+      active: pathname === `/${params.storeId}/point-of-sale`,
+    },
+    {
       href: `/${params.storeId}/orders`,
       label: 'Orders',
       active: pathname === `/${params.storeId}/orders`,
