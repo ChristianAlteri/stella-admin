@@ -63,7 +63,9 @@ export default function OrderCard({ row }: { row: OrderColumn }) {
   //   return setClientCreatedAt(row.createdAt)
   // }, [row.createdAt])
 
-  const parsedAddress = JSON.parse(row.address);
+  const parsedAddress = typeof row.address === 'string' 
+    ? JSON.parse(row.address || '{}') 
+    : row.address || {};
 
   const handleImageClick = (imageUrl: string) => {
     setModalImageUrl(imageUrl);

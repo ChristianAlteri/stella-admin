@@ -12,17 +12,28 @@ export type ConditionColumn = {
 }
 
 export const columns: ColumnDef<ConditionColumn>[] = [
+  // {
+  //   accessorKey: "name",
+  //   header: "Name",
+  // },
+  // {
+  //   accessorKey: "value",
+  //   header: "Value",
+  // },
+  // {
+  //   accessorKey: "createdAt",
+  //   header: "Date",
+  // },
   {
-    accessorKey: "name",
-    header: "Name",
-  },
-  {
-    accessorKey: "value",
-    header: "Value",
-  },
-  {
-    accessorKey: "createdAt",
-    header: "Date",
+    id: "combined",
+    header: "Details",
+    cell: ({ row }) => (
+      <div>
+        <div className="text-black "><strong>Name:</strong> {row.original.name}</div>
+        <div className="text-sm text-gray-400">Value: {row.original.value}</div>
+        <div className="text-sm text-gray-400">Date: {row.original.createdAt}</div>
+      </div>
+    )
   },
   {
     id: "actions",

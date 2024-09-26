@@ -80,9 +80,13 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 405 });
     }
 
-    const seller = await prismadb.seller.delete({
+    // Perform soft-delete by setting isDeleted to true
+    const seller = await prismadb.seller.update({
       where: {
         id: params.sellerId,
+      },
+      data: {
+        isArchived: true,
       },
     });
 

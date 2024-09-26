@@ -77,11 +77,6 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
     include: { orders: true },
     orderBy: { name: "desc" },
   });
-
-  // console.log("SELLERS: ", sellers);
-  // console.log("USERS: ", users);
-  // console.log("PRODUCTS: ", products);
-  // console.log("ORDERS: ", orders);
   
   // Cleaning up the data
   const plainOrders = convertDecimalsToNumbers(orders);
@@ -91,7 +86,8 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
   const averagePrice = calculateAveragePrice(plainProducts);
 
   const revenue = totalRevenue(plainOrders);
-  const ouRevenue = totalRevenue(plainOrders) * 0.3;
+  const ouRevenue = revenue * 0.3;
+  const payouts = revenue - ouRevenue
 
   const soldStock = products.filter(
     (product: any) => product.isArchived === true
@@ -105,7 +101,6 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
     .sort((a: any, b: any) => b.soldCount! - a.soldCount!)
     .slice(0, 3);
 
-  // const topSellingColors = await getTopSellingColorCount(params.storeId) as { name: string; count: bigint; }[];
   const topSellingColors = await getTopSellingColorCount(params.storeId);
   const topSellingSize = await getTopSellingSizeCount(params.storeId);
   const topSellingMaterial = await getTopSellingMaterialCount(params.storeId);
@@ -119,21 +114,29 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
       <div className="flex-1 space-y-4 p-8 pt-6">
         <Heading title="Dashboard" description="Overview of your store" />
         <Separator />
-        <div className="grid gap-4 grid-cols-3">
+        <div className="flex flex-row w-full gap-4 justify-between">
+          <StoreRevenueVsOrderAreaChart orders={plainOrders} />
+          <StoreClicksAndLikesChart products={plainProducts} />
+        </div>
 
+        <div className="grid gap-4 grid-cols-3">
           <Card className="">
             <CardHeader className="flex flex-row items-center justify-between pb-4">
-              <CardTitle className="text-2xl font-semibold text-gray-700">
-                Store Revenue vs Our Revenue
+              <CardTitle className="text-2xl font-semibold text-black">
+                Revenue 
               </CardTitle>
               <BadgeDollarSign className="h-6 w-6 text-pink-600" />
             </CardHeader>
-            <CardContent className="space-y-2">£{revenue} vs £{ouRevenue}</CardContent>
+            <div className="flex flex-col items-starts gap-2 text-gray-700 pl-6">
+              <span className="">Total Sales £{revenue.toLocaleString()}</span>
+              <span className="">Our Revenue £{ouRevenue.toLocaleString()}</span>
+              <span className="">Total Payouts £{payouts.toLocaleString()}</span>
+            </div>
           </Card>
 
           <Card className="">
             <CardHeader className="flex flex-row items-center justify-between pb-4">
-              <CardTitle className="text-2xl font-semibold text-gray-700">
+              <CardTitle className="text-2xl font-semibold text-black">
                 Stock
               </CardTitle>
               <Package className="h-6 w-6 text-amber-600" />
@@ -147,8 +150,8 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
               </div>
             </CardContent>
             <CardContent className="">
-              <div className="text-md font-bold text-black">
-                Average price point: £{averagePrice}
+              <div className="text-md font-bold text-gray-700">
+                Average price point: £{averagePrice.toLocaleString()}
               </div>
             </CardContent>
           </Card>
@@ -166,7 +169,6 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
           </Card>
         </div>
 
-
         <div className="flex flex-row gap-4">
           <div className="flex flex-row w-2/3 gap-4 justify-between">
             <TopSellersCard sellers={topSellers} />
@@ -178,12 +180,7 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
           </div>
         </div>
 
-
-        <div className="flex flex-row w-full gap-4 justify-between">
-          <StoreRevenueVsOrderAreaChart orders={plainOrders} />
-          {/* <StoreRevenueByMonthChartOriginal orders={plainOrders} /> */}
-          <StoreClicksAndLikesChart products={plainProducts} />
-        </div>
+        
 
         <div className="flex flex-row w-full gap-4 justify-between">
           <TopColorBarChart topSellingData={topSellingColors} attribute="Color"/>

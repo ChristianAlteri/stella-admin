@@ -232,9 +232,9 @@ export const SellerForm: React.FC<SellerFormProps> = ({
           `/${params.storeId}/stripe-connect?sellerId=${seller.data.id}`
         );
       }
-      router.refresh();
-      router.push(`/${params.storeId}/sellers`);
-      toastSuccess(toastMessage);
+      // router.refresh();
+      // router.push(`/${params.storeId}/sellers`);
+      // toastSuccess(toastMessage);
     } catch (error: any) {
       toastError("Something went wrong.");
     } finally {
@@ -248,9 +248,10 @@ export const SellerForm: React.FC<SellerFormProps> = ({
       await axios.delete(`/api/${params.storeId}/sellers/${params.sellerId}`);
       router.refresh();
       router.push(`/${params.storeId}/sellers`);
-      toastSuccess("Seller deleted.");
+      toastSuccess("Seller archived.");
     } catch (error: any) {
-      toastError("Make sure you removed all products using this seller first.");
+      console.log("[FRONT_END_ARCHIVE_SELLER_ERROR]", error.response);
+      toastError("There was an error archiving the seller.");
     } finally {
       setLoading(false);
       setOpen(false);

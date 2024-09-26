@@ -11,23 +11,28 @@ datasource db {
   relationMode = "prisma"
 }
 
-// TODO: use ENUMS
-//  enum SellerType {
-//   INFLUENCER
-//   RESELLER
-// }
-
-// enum GenderType {
-//   MALE
-//   FEMALE
-//   UNISEX
-// }
-
 model Store {
-  id          String        @id @default(uuid())
-  name        String
-  userId      String
-  // TODO: Would be good have some config in here for exmple: currency - then all the pounds symbols would change and a conversion would happen to the price
+  id     String @id @default(uuid())
+  name   String
+  userId String // Clerk js user id
+  // TODO: Would be good have some config in here for exmple: 
+  // currency - then all the pounds symbols would change, all the stripe processing would auto fill to "GBP"
+  // We need bank account to set up stripe account that all the stripe connect will be connected to
+  // address we need an address for stripe terminal and tax purposes. this is stripes object {
+  //   "id": "",
+  //   "object": "terminal.location",
+  //   "address": {
+  //     "city": "San Francisco",
+  //     "country": "US",
+  //     "line1": "1234 Main Street",
+  //     "line2": "",
+  //     "postal_code": "94111",
+  //     "state": "CA"
+  //   },
+  //   "display_name": name,
+  //   "livemode": false,
+  //   "metadata": {}
+  // }
 
   billboards  Billboard[]   @relation("StoreToBillboard")
   categories  Category[]    @relation("StoreToCategory")
@@ -42,14 +47,48 @@ model Store {
   subcategory Subcategory[] @relation("StoreToSubcategory")
   orders      Order[]       @relation("StoreToOrder")
   // TODO: add all these relations
-  // charities   Charity[]     @relation("StoreToCharity")
-  // users       User[]        @relation("StoreToUser")
-  // accounts    Account[]     @relation("StoreToAccount")
+  // // Bank account relation //DO we need this?
+  // bankAccount BankAccount? @relation(fields: [bankAccountId], references: [id])
+  // bankAccountId String?
+
+  // // Address relation
+  // address StoreAddress @relation(fields: [addressId], references: [id])
+  // addressId String
+
   // orderItems  OrderItem[]   @relation("StoreToOrderItem")
   // payouts     Payout[]      @relation("StoreToPayout")
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+
+  // users       User[]        @relation("StoreToUser")
+  // accounts    Account[]     @relation("StoreToAccount")
+  // charities   Charity[]     @relation("StoreToCharity")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
+
+
+// model StoreAddress {
+//   id         String @id @default(uuid())
+//   city       String
+//   country    String
+//   line1      String
+//   line2      String?
+//   postalCode String
+//   state      String
+// }
+
+// model BankAccount {
+//   id                String  @id @default(uuid())
+//   accountHolderName String
+//   accountNumber     String
+//   routingNumber     String
+//   bankName          String
+//   currency          String  // Example: "USD", "EUR", "GBP"
+//   country           String  // Example: "US", "GB", "DE"
+//   accountType       String  // "personal" or "business"
+//   swiftCode         String? // Optional for international transfers
+//   bankBranch        String? // Optional in some cases
+// }
 
 model Billboard {
   id         String     @id @default(uuid())
@@ -67,25 +106,26 @@ model Billboard {
 }
 
 model Seller {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  storeId   String
-  sellerType String? @default("")
+  id         String   @id @default(uuid())
+  createdAt  DateTime @default(now())
+  storeId    String
+  sellerType String?  @default("")
 
-  instagramHandle String  @default("https://www.instagram.com/anon.drobe")
-  firstName       String? @default("")
-  lastName        String? @default("")
-  email           String? @unique
-  phoneNumber     String? @unique
-  shippingAddress String? @default("")
-  country         String? @default("")
-  soldCount   Int?    @default(0)
-  billboardId String? // Foreign Key to Billboard
-  billboard   Billboard? @relation(fields: [billboardId], references: [id])
-  store       Store      @relation("StoreToSeller", fields: [storeId], references: [id])
+  instagramHandle String     @default("https://www.instagram.com/anon.drobe")
+  firstName       String?    @default("")
+  lastName        String?    @default("")
+  email           String?    @unique
+  phoneNumber     String?    @unique
+  shippingAddress String?    @default("")
+  country         String?    @default("")
+  soldCount       Int?       @default(0)
+  billboardId     String? // Foreign Key to Billboard
+  billboard       Billboard? @relation(fields: [billboardId], references: [id])
+  store           Store      @relation("StoreToSeller", fields: [storeId], references: [id])
+  isArchived      Boolean    @default(false)
 
   stripe_connect_unique_id String?  @default("")
-  payouts                  Payout[] // Relation to the Payout model
+  payouts                  Payout[] 
 
   charityName String? @default("") //TODO: we dont need this once we start onbaording charities
   charityUrl  String? @default("") //TODO: we dont need this once we start onbaording charities
@@ -96,12 +136,16 @@ model Seller {
   bottomSize String? @default("")
 
   // Re-seller specific fields
-  storeName String? @default("")
+  storeName   String? @default("")
   description String? @default("")
 
   // TODO: Add a relation to a Charity model
 
-
+  //   likeList  // array of product ids
+  //   clickList // array of product ids
+  //   orderHistory // array of order ids
+  //   purchaseHistory // array of product ids
+  //    followingSeller // array of seller ids
 
   // Items listed by the seller
   products     Product[]   @relation("SellerToProduct")
@@ -168,6 +212,7 @@ model Product {
   isArchived    Boolean     @default(false)
   isCharity     Boolean     @default(false)
   isHidden      Boolean     @default(false)
+  //TODO: MAke some of these fields optional
   images        Image[] // Relation to Image model
   orderItems    OrderItem[] // Relation to Order model
   storeId       String // Foreign Key to Store
@@ -307,8 +352,8 @@ model Image {
 }
 
 model User {
-  id             String   @id @default(uuid())
-  email          String   @unique
+  id    String @id @default(uuid())
+  email String @unique
   // TODO: Add reltion to store, we only want the user to have an account with one store. stock is in one store
   //storeId           String // Foreign Key to Store
   //store             Store       @relation("StoreToOrder", fields: [storeId], references: [id])
@@ -325,9 +370,10 @@ model User {
   //   clickList // array of product ids
   //   orderHistory // array of order ids
   //   purchaseHistory // array of product ids
-  //  followingSeller // array of seller ids
+  //    followingSeller // array of seller ids
 }
 
+// This is google account ect
 model Account {
   id                String  @id @default(uuid())
   userId            String? @unique // Foreign Key to User

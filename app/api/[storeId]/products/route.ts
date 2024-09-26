@@ -300,7 +300,12 @@ export async function GET(
     const maxPrice = searchParams.get("maxPrice")
       ? parseFloat(searchParams.get("maxPrice")!)
       : undefined;
+
+    // const isArchived = searchParams.get("isArchived") === "true" ? true : undefined;
+    const isArchived = searchParams.get("isArchived") === "true" ? true : false;
+
     console.log("searchParams", searchParams);
+
 
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
@@ -341,7 +346,8 @@ export async function GET(
         isOnSale,
         isCharity,
         isHidden,
-        isArchived: false,
+        isArchived: isArchived,
+        // isArchived: isArchived ?? false,
         ourPrice: {
           gte: minPrice,
           lte: maxPrice,

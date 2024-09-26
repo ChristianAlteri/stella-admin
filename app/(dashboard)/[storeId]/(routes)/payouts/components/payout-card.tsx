@@ -45,14 +45,10 @@ export default function PayoutCard({ row }: { row: PayoutColumn }) {
             href={`sellers/${row.sellerId}/details`}
             className="text-center"
           >
-            <span className="font-semibold hover:underline">
+            <span className="font-semibold hover:underline font-bold">
               Name: {row.sellerHandle}
             </span>
           </Link>
-          {/* <p className="font-semibold">Name: {row.sellerHandle}</p> */}
-          <p className="font-semibold">
-            Stripe Connect: {row.sellerStripConnect}
-          </p>
           <p>
             <a
               href={`mailto:${row.sellerEmail}`}
@@ -63,12 +59,31 @@ export default function PayoutCard({ row }: { row: PayoutColumn }) {
           </p>
         </div>
         <Separator />
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold">Payout Details</h3>
-          <p className="text-sm">Payout ID: {row.id}</p>
-          <p className="text-sm">Transfer Group ID: {row.transferGroupId}</p>
-          <p className="text-sm">Stripe Transfer ID: {row.stripeTransferId}</p>
-        </div>
+
+        {/* Toggle button */}
+        <Button variant="ghost" onClick={toggleExpand}>
+          {isExpanded ? (
+            <>
+              Hide Details <ChevronUpIcon className="ml-2" />
+            </>
+          ) : (
+            <>
+              Show Details <ChevronDownIcon className="ml-2" />
+            </>
+          )}
+        </Button>
+
+        {isExpanded && (
+          <div className="space-y-2">
+            <p className="font-semibold">
+              Stripe Connect: {row.sellerStripConnect}
+            </p>
+            <h3 className="text-lg font-semibold">Payout Details</h3>
+            <p className="text-sm">Payout ID: {row.id}</p>
+            <p className="text-sm">Transfer Group ID: {row.transferGroupId}</p>
+            <p className="text-sm">Stripe Transfer ID: {row.stripeTransferId}</p>
+          </div>
+        )}
         <Separator />
       </CardContent>
     </Card>

@@ -80,9 +80,9 @@ export async function GET(
           gte: minPrice,
           lte: maxPrice,
         },
-        likes: {
-          gt: 0, // Greater than 0
-        },
+        // likes: {
+        //   gt: 0, // Greater than 0
+        // },
       },
       include: {
         images: true,

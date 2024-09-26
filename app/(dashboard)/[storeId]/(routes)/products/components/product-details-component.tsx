@@ -84,6 +84,7 @@ export default function ProductDetailsComponent({
           <div>
             <CardTitle className="text-2xl font-bold">{data.name}</CardTitle>
             <p className="text-muted-foreground">{data.designer}</p>
+            <p className="text-muted-foreground">{data.id}</p>
             <div className="flex items-center">
                 <Tag className="mr-2 h-4 w-4" />
                 <span>{data.category}</span>

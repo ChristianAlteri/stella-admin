@@ -66,7 +66,7 @@ export async function POST(
     line_items.push({
       quantity: 1,
       price_data: {
-        currency: "GBP",
+        currency: "GBP", //TODO: This needs to be dynamic based on the stores currency
         product_data: {
           name: product.name,
         },

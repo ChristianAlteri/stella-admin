@@ -68,7 +68,8 @@ export async function POST(
         topSize,
         bottomSize,
         storeId: params.storeId,
-        stripe_connect_unique_id: connectedAccountId || "",
+        stripe_connect_unique_id: connectedAccountId,
+        // stripe_connect_unique_id: connectedAccountId || "",
         sellerType,
         storeName,
         description,
@@ -96,6 +97,7 @@ export async function GET(
     const sellers = await prismadb.seller.findMany({
       where: {
         storeId: params.storeId,
+        isArchived: false,
         instagramHandle: {
           contains: name,
           mode: "insensitive",

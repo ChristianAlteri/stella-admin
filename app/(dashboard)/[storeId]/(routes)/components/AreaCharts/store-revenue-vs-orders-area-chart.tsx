@@ -122,8 +122,8 @@ export function StoreRevenueVsOrderAreaChart({ orders }: { orders: any }) {
         <CardTitle>Revenue vs Orders</CardTitle>
         <CardDescription>
           <span className="flex flex-row w-full justify-between ">
-            £{revenue.toFixed(2)} vs {orders.length} orders (Avg: £
-            {orders.length > 0 ? (revenue / orders.length).toFixed(2) : "0.00"})
+            £{revenue.toLocaleString()} vs {orders.length} orders (Avg: £
+            {orders.length > 0 ? (revenue / orders.length).toLocaleString() : "0.00"})
             <span className="flex flex-row text-black items-center text-center">
               <span
                 className="hover:cursor-pointer hover:underline "
