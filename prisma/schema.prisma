@@ -15,12 +15,14 @@ model Store {
   id     String @id @default(uuid())
   name   String
   userId String // Clerk js user id
+  // email  String 
 
   // TODO: Would be good have some config in here for exmple:
   //Config 
   consignmentRate Int        @default(50)
   currency       String      @default("GBP")
-  // We need bank account to set up stripe account that all the stripe connect will be connected to
+  // countryCode String      @default("GB")
+
   // Address relation
   address StoreAddress? @relation(fields: [addressId], references: [id])
   addressId String?
@@ -38,10 +40,10 @@ model Store {
   gender      Gender[]      @relation("StoreToStyle")
   subcategory Subcategory[] @relation("StoreToSubcategory")
   orders      Order[]       @relation("StoreToOrder")
-  // TODO: add all these relations
-  // // Bank account relation //DO we need this?
-  // bankAccount BankAccount? @relation(fields: [bankAccountId], references: [id])
-  // bankAccountId String?
+
+  // TODO: add stripe connect unique id so we can payout to the store, then seller then us the 2%
+  // stripe_connect_unique_id String?  @default("")
+  // payouts                  Payout[] 
 
 
   // orderItems  OrderItem[]   @relation("StoreToOrderItem")
@@ -206,7 +208,8 @@ model Product {
   isCharity     Boolean     @default(false)
   isHidden      Boolean     @default(false)
   //TODO:  isRental     Boolean     @default(false)
-  //TODO: MAke some of these fields optional
+  //TODO: Make some of these fields optional
+  // TODO: make seller optional so we can support stores making sales
   images        Image[] // Relation to Image model
   orderItems    OrderItem[] // Relation to Order model
   storeId       String // Foreign Key to Store

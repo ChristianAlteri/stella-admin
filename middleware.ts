@@ -15,6 +15,22 @@ export const config = {
   debug: true,
 };
 
-// include middleware for login and register
-// i want the middleware to only protect the login and register page
-// for now, console.log("HEllOO")
+
+// export function middleware(req: NextRequest) {
+//   // Check if the request is for the webhook route
+//   if (req.nextUrl.pathname === "/api/webhook") {
+//     // Allow raw body (don't parse it)
+//     req.headers.set("Content-Type", "application/json");
+//     return NextResponse.next({
+//       request: {
+//         body: req.body,
+//       },
+//     });
+//   }
+
+//   return NextResponse.next();
+// }
+
+// export const config = {
+//   matcher: "/api/webhook", // Apply middleware only to the /api/webhook route
+// };

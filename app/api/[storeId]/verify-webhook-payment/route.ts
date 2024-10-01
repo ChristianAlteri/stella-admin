@@ -3,55 +3,66 @@ import prismadb from "@/lib/prismadb";
 import { Prisma, Product } from "@prisma/client";
 import { stripe } from "@/lib/stripe";
 
-export async function POST(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const storeId = searchParams.get("store_id");
-  const body = await request.json();
-  const { selectedProducts } = body; // Array of product objects sent from the frontend
+interface Metadata {
+  storeId: string;
+  urlFrom: string;
+  [key: string]: string; 
+}
 
-  if (!storeId || typeof storeId !== "string") {
+export async function POST(request: Request) {
+  const body = await request.json();
+  const { metadata } = body; // Array of product objects sent from the frontend
+
+  if (!metadata.storeId || typeof metadata.storeId !== "string") {
     return NextResponse.json(
       { success: false, message: "Invalid store ID" },
       { status: 400 }
     );
   }
 
-  if (!selectedProducts || selectedProducts.length === 0) {
+  if (!metadata || Object.keys(metadata).length === 0) {
     return NextResponse.json(
-      { success: false, message: "No products provided" },
+      { success: false, message: "No metadata provided" },
       { status: 400 }
     );
   }
 
+  // Extract product IDs by filtering keys that start with 'productId_'
+  
+
   try {
     const store = await prismadb.store.findFirst({
-      where: { id: storeId },
+      where: { id: metadata.storeId },
       include: { address: true },
     });
+    const productIds = Object.keys(metadata)
+    .filter((key) => key.startsWith("productId_"))
+    .map((key) => metadata[key]);
 
-    const productIds = selectedProducts.map((product: any) => product.id);
+    // const productIds = selectedProducts.map((product: any) => product.id);
     const products = await prismadb.product.findMany({
       where: { id: { in: productIds } },
       include: { seller: true },
     });
-
+    console.log("[Products] ", products);
     // Create a new Order
     const newOrder = await prismadb.order.create({
       data: {
-        storeId: storeId,
+        storeId: metadata.storeId,
         isPaid: true,
       },
     });
 
     // Create Order Items (split products into order items)
-    await prismadb.orderItem.createMany({
+    const orderItems = await prismadb.orderItem.createMany({
       data: products.map((product: any) => ({
         orderId: newOrder.id,
         productId: product.id,
-        sellerId: product.seller.id,
+        sellerId: product.seller.id || "",
         productAmount: new Prisma.Decimal(product.ourPrice),
       })),
     });
+    console.log("orderItems", orderItems);
     console.log("newOrder", newOrder);
 
     const sellerIds = products.map((product: any) => product.seller.id);
@@ -135,8 +146,8 @@ export async function POST(request: Request) {
         );
       }
     }
-
-    return NextResponse.json({ success: true, newOrder, productIds });
+    // console.log("[VERIFY_WEBHOOK_PAYMENT] ", store);
+    return NextResponse.json({ status: 200 });
   } catch (error) {
     console.error("Error verifying terminal payment:", error);
 

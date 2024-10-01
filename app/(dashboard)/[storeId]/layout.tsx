@@ -25,7 +25,7 @@ export default async function DashboardLayout({
       address: true,
     },
   });
-  console.log("store", store);
+  // console.log("store", store);
 
   if (!store) {
     redirect("/");

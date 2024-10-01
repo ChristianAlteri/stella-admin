@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       capabilities: {
         transfers: { requested: true },
       },
-      country: "GB",
+      country: "GB", //TODO: change to the stores country code
     });
 
     // console.log("STRIPE ACCOUNT CREATION", account);

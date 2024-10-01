@@ -6,7 +6,7 @@ import Stripe from "stripe";  // Import Stripe types
 export async function POST(req: NextRequest) {
   if (req.method === "POST") {
     try {
-      const { amount, readerId, storeId } = await req.json();
+      const { amount, readerId, storeId, productIds, urlFrom } = await req.json();
 
       if (!amount || !readerId || !storeId) {
         return NextResponse.json(
@@ -27,15 +27,26 @@ export async function POST(req: NextRequest) {
         );
       }
 
+
       // Use store currency or default to GBP
       const currency = store.currency?.toLowerCase() || "gbp";
+      // setup the productIds metadata
+      const productIdMetadata = productIds.reduce((acc: any, id: string, index: number) => {
+        acc[`productId_${index + 1}`] = id;
+        return acc;
+      }, {});
 
       // Create a payment intent for card_present payments
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amount,
-        currency: currency,  // Set the store-specific currency
+        currency: currency,  
         payment_method_types: ["card_present"],
         capture_method: "automatic",
+        metadata: {
+          ...productIdMetadata, 
+          storeId: storeId,
+          urlFrom: urlFrom,
+        }
       });
 
       // Process payment intent with the reader

@@ -5,6 +5,7 @@ import prismadb from "@/lib/prismadb";
 import SettingsForm from "./components/SettingsForm";
 import axios from "axios";
 import ReadersSettings from "../manage-readers/components/readers-settings";
+import ManageStoreConnect from "./components/manage-store-connect-account";
 
 // import { SettingsForm } from "./components/settings-form";
 
@@ -34,7 +35,7 @@ const SettingsPage = async ({
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
         <SettingsForm initialData={store} />
-        {/* <ReadersSettings /> */}
+        <ManageStoreConnect initialData={store} />
       </div>
     </div>
   );

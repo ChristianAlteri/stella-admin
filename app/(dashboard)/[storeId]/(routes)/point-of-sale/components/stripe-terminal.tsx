@@ -23,6 +23,18 @@ import {
 import { Product } from "@prisma/client";
 import { toast } from "react-hot-toast"; // Import toast
 import { TbFaceIdError, TbFaceId } from "react-icons/tb";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Skeleton } from "@/components/ui/skeleton";
+import { ProductForm } from "../../products/[productId]/components/product-form";
+
 // Custom Toast Error
 const toastError = (message: string) => {
   toast.error(message, {
@@ -69,6 +81,12 @@ interface Reader {
 
 export default function StripeTerminalComponent() {
   const router = useRouter();
+  const [urlFrom, setUrlFrom] = useState<string | null>(null);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setUrlFrom(window.location.href);
+    }
+  }, []);
   const { storeId } = useParams();
   const useProductSearch = () => {
     const URL = `/api/${storeId}/mega-search`;
@@ -86,7 +104,6 @@ export default function StripeTerminalComponent() {
           const response = await axios.get(`${URL}`, {
             params: { productName: inputRef.current?.value || "" },
           });
-          console.log("Search results:", response.data);
           setSearchResults(response.data);
         } catch (error) {
           console.error("Error fetching search results:", error);
@@ -117,6 +134,7 @@ export default function StripeTerminalComponent() {
   const [isSelected, setIsSelected] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   const handleSelect = (product: Product) => {
     // Check if the product is already selected
@@ -175,19 +193,27 @@ export default function StripeTerminalComponent() {
     }
     const amountInCents = Math.round(parseFloat(amount) * 100);
     try {
-      const { data } = await axios.post(
+      const { data, status } = await axios.post(
         `/api/${storeId}/stripe/create_payment_intent`,
         {
+          //Send metadata to the back end so we can process the payments and payouts after a terminal triggers a webhook
           amount: amountInCents,
           readerId: selectedReader,
-          storeId: storeId,  // Pass the storeId in the request body
+          storeId: storeId,
+          productIds: selectedProducts.map((product) => product.id),
+          urlFrom: urlFrom,
         }
       );
-      setPaymentIntentId(data.paymentIntent?.id);
+      setPaymentIntentId(data?.paymentIntent?.id);
       toastSuccess("Payment intent created.");
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.data?.errorCode === "currency_mismatch") {
-        toastError("Currency mismatch. Please check your store's currency settings.");
+      if (
+        axios.isAxiosError(error) &&
+        error.response?.data?.errorCode === "currency_mismatch"
+      ) {
+        toastError(
+          "Currency mismatch. Please check your store's currency settings."
+        );
         router.push(`/${storeId}/settings`);
       } else {
         console.error("Error creating payment intent:", error);
@@ -195,88 +221,64 @@ export default function StripeTerminalComponent() {
       }
     }
   };
-  
-  
 
-  const simulatePayment = async () => {
-    if (!selectedReader) {
-      toastError("Please select a reader.");
-      return;
-    }
+  // const simulatePayment = async () => {
+  //   if (!selectedReader) {
+  //     toastError("Please select a reader.");
+  //     return;
+  //   }
 
-    try {
-      const { data } = await axios.post(
-        `/api/${storeId}/stripe/simulate_payment`,
-        {
-          readerId: selectedReader,
-        }
-      );
+  //   try {
+  //     const { data } = await axios.post(
+  //       `/api/${storeId}/stripe/simulate_payment`,
+  //       {
+  //         readerId: selectedReader,
+  //       }
+  //     );
 
-      if (data.reader?.action?.failure_code) {
-        // Capture and set error message
-        setAmount("");
-        setPaymentIntentId(null);
-        setIsPaymentCaptured(false);
-        toastError(data.reader.action.failure_message);
-      } else {
-        // Successful payment
-        setPaymentIntentId(
-          data.reader?.action?.process_payment_intent?.payment_intent
-        );
-        if (
-          data?.reader?.action?.status === "succeeded" &&
-          selectedProducts.length > 0
-        ) {
-          const verifyResponse = await axios.post(
-            `/api/${storeId}/verify-terminal-payment?store_id=${storeId}`,
-            { selectedProducts }, // Pass selectedProducts to verify-terminal-payment
-            {
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
-
-          if (
-            !verifyResponse.data.success &&
-            verifyResponse.data.errorCode === "balance_insufficient"
-          ) {
-            toastError(
-              "Wrong currency or insufficient funds in Stripe account"
-            );
-          } else {
-            toastSuccess("Payment successfully processed!");
-            setIsPaymentCaptured(true);
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Error simulating payment:", error);
-      toastError("Error simulating payment.");
-    }
-  };
-
-  // I think this is redundant, we look at the status codes from simulate payment to determine if the payment was successful or not.
-  //   const capturePayment = async () => {
-  //     if (!paymentIntentId) {
-  //       return;
-  //     }
-
-  //     try {
-  //       const { data } = await axios.post(
-  //         `/api/${storeId}/stripe/capture_payment_intent`,
-  //         {
-  //           payment_intent_id: paymentIntentId,
-  //         }
+  //     if (data.reader?.action?.failure_code) {
+  //       // Capture and set error message
+  //       setAmount("");
+  //       setPaymentIntentId(null);
+  //       setIsPaymentCaptured(false);
+  //       toastError(data.reader.action.failure_message);
+  //     } else {
+  //       // Successful payment
+  //       setPaymentIntentId(
+  //         data.reader?.action?.process_payment_intent?.payment_intent
   //       );
-  //       // Payment captured, show the print receipt option
-  //       setIsPaymentCaptured(true);
-  //       toastSuccess("Payment captured.");
-  //     } catch (error) {
-  //       console.error("Error simulating payment:", error);
-  //       toastError("Error simulating payment.");
+  //       if (
+  //         data?.reader?.action?.status === "succeeded" &&
+  //         selectedProducts.length > 0
+  //       ) {
+  //         const verifyResponse = await axios.post(
+  //           `/api/${storeId}/verify-terminal-payment?store_id=${storeId}`,
+  //           { selectedProducts }, // Pass selectedProducts to verify-terminal-payment
+  //           {
+  //             headers: {
+  //               "Content-Type": "application/json",
+  //             },
+  //           }
+  //         );
+
+  //         if (
+  //           !verifyResponse.data.success &&
+  //           verifyResponse.data.errorCode === "balance_insufficient"
+  //         ) {
+  //           toastError(
+  //             "Wrong currency or insufficient funds in Stripe account"
+  //           );
+  //         } else {
+  //           toastSuccess("Payment successfully processed!");
+  //           setIsPaymentCaptured(true);
+  //         }
+  //       }
   //     }
-  //   };
+  //   } catch (error) {
+  //     console.error("Error simulating payment:", error);
+  //     toastError("Error simulating payment.");
+  //   }
+  // };
 
   const cancelPayment = async () => {
     if (!selectedReader) {
@@ -292,7 +294,6 @@ export default function StripeTerminalComponent() {
         }
       );
       toastSuccess("Payment cancelled.");
-      console.log("Payment cancellation response:", data);
       window.location.reload();
     } catch (error) {
       console.error("Error cancelling payment:", error);
@@ -300,10 +301,6 @@ export default function StripeTerminalComponent() {
   };
 
   const resetComponent = () => {
-    // setSelectedReader("");
-    // setAmount("");
-    // setPaymentIntentId(null);
-    // setIsPaymentCaptured(false);
     window.location.reload();
   };
 
@@ -357,14 +354,20 @@ export default function StripeTerminalComponent() {
   ];
 
   return (
-    <div className="flex  w-full items-center justify-center">
-      <div className="flex flex-row gap-2 items-center p-4 w-2/3 justify-between">
+    <div className="flex h-full w-full items-center justify-center">
+      <div className="flex flex-row gap-2 items-center p-4 w-full h-full ">
         {/* <h1 className="text-2xl font-bold mb-4">Stripe Terminal Integration</h1> */}
         {loadingReaders ? (
-          <></>
+          <>
+            <Skeleton className="w-full h-full" />
+            <Skeleton className="w-full h-12" />
+            <Skeleton className="w-1/2 h-12" />
+            <Skeleton className="w-1/2 h-12" />
+          </>
         ) : (
           <Card className="w-full justify-start items-start ">
             <CardContent className="p-4">
+              <div className="flex flex-row gap-2">
               <Input
                 type="text"
                 ref={inputRef}
@@ -372,6 +375,15 @@ export default function StripeTerminalComponent() {
                 onChange={handleSearch}
                 className="w-full mb-4"
               />
+              <Button className="mb-4" onClick={handleSearch}>Search</Button>
+              </div>
+                <Button
+                  variant="outline"
+                  className="opacity-40 hover:opacity-100"
+                  onClick={() => setIsDialogOpen(true)}
+                >
+                  Can&apos;t find what you&apos;re looking for? Create a product!
+                </Button>
               {searchResults.length > 0 && (
                 <div className="space-y-4">
                   {searchResults.map((result: any) => (
@@ -410,12 +422,33 @@ export default function StripeTerminalComponent() {
                   ))}
                 </div>
               )}
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create New Product</DialogTitle>
+                    <DialogDescription>
+                      Enter the details for the new product.
+                    </DialogDescription>
+                  </DialogHeader>
+
+                    {/* <ProductForm initialData={}} /> */}
+                  <DialogFooter>
+                    <Button onClick={() => {console.log("CREATE PRODUCT LOGIC")}}>
+                      Create Product
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </CardContent>
           </Card>
         )}
+
         <div className="flex flex-col w-full">
           {loadingReaders ? (
-            <p>Loading readers...</p>
+            <div className="flex flex-col">
+              <Skeleton className="w-full h-full" />
+              <Skeleton className="w-full h-full" />
+            </div>
           ) : (
             <Card className="w-full max-w-md mx-auto">
               <CardHeader>
@@ -465,34 +498,41 @@ export default function StripeTerminalComponent() {
               <CardFooter className="flex flex-col gap-2">
                 {!isPaymentCaptured ? (
                   <>
-                    <Button
-                      onClick={createPendingPayment}
-                      disabled={!selectedReader || !amount}
-                      className="w-full"
-                    >
-                      Create Payment (£{amount})
-                    </Button>
-                    <Button
-                      onClick={simulatePayment}
-                      disabled={!selectedReader}
-                      className="w-full"
-                    >
-                      Simulate Payment
-                    </Button>
-                    {/* <Button
-                      onClick={capturePayment}
-                      disabled={!paymentIntentId}
-                      className="w-full"
-                    >
-                      Capture Payment
-                    </Button> */}
-                    <Button
-                      onClick={cancelPayment}
-                      disabled={!selectedReader}
-                      className="w-full"
-                    >
-                      Reset Payment
-                    </Button>
+                    {!paymentIntentId ? (
+                      <>
+                        <Button
+                          onClick={createPendingPayment}
+                          disabled={!selectedReader || !amount}
+                          className="w-full"
+                        >
+                          Create Payment (£{amount})
+                        </Button>
+                        {/* <Button
+                        onClick={simulatePayment}
+                        disabled={!selectedReader}
+                        className="w-full"
+                      >
+                        Simulate Payment
+                      </Button> */}
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          onClick={cancelPayment}
+                          disabled={!selectedReader}
+                          className="w-full"
+                        >
+                          Cancel Payment
+                        </Button>
+                        <Button
+                          onClick={() => setIsPaymentCaptured(true)}
+                          disabled={!selectedReader}
+                          className="w-full"
+                        >
+                          Approve Card Payment
+                        </Button>
+                      </>
+                    )}
                   </>
                 ) : (
                   <>
