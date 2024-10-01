@@ -15,7 +15,23 @@ export async function POST(req: NextRequest) {
 
       const reader =
         await stripe.testHelpers.terminal.readers.presentPaymentMethod(
-          readerId
+          readerId,
+          // { card_present: { number: "4242424242424242" } }
+          // {
+          //   card_present: { number: "4000000000000002" },
+          //   type: 'card_present',
+          // // card declined
+          // }
+          // {
+          //   card_present: { number: "4000000000009995" },
+          //   type: 'card_present',
+          // // insufficient funds
+          // }
+          // {
+          //   card_present: { number: "4000000000009979" },
+          //   type: 'card_present',
+          // // stolen card
+          // }
         );
 
       console.log("[SIMULATED PAYMENT]", { reader: reader });

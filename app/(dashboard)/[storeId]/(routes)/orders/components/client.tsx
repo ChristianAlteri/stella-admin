@@ -17,7 +17,7 @@ interface OrderClientProps {
 export const OrderClient: React.FC<OrderClientProps> = ({ data }) => {
   const [showDispatched, setShowDispatched] = useState<boolean>(false)
   const [searchTerm, setSearchTerm] = useState<string>("")
-  const [sortAscending, setSortAscending] = useState<boolean>(true)
+  const [sortAscending, setSortAscending] = useState<boolean>(false)
   const [isHydrated, setIsHydrated] = useState(false)
 
   useEffect(() => {
@@ -103,7 +103,7 @@ export const OrderClient: React.FC<OrderClientProps> = ({ data }) => {
               className="flex items-center"
             >
               <ArrowUpDown className="mr-2 h-4 w-4" />
-              Sort by Date: {sortAscending ? "Oldest First" : "Newest First"}
+              Sort by Date: {sortAscending ? "Latest" : "Oldest"}
             </Button>
           </div>
         </div>

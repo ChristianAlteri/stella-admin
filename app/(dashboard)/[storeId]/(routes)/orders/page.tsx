@@ -34,7 +34,7 @@ const OrdersPage = async ({
       }
     },
     orderBy: {
-      createdAt: 'desc'
+      createdAt: 'asc'
     }
   });
 
@@ -48,7 +48,7 @@ const OrdersPage = async ({
       new Set(item.orderItems.map((orderItem) => orderItem.seller?.id))
     );
     const uniqueStripeConnectIds = Array.from(
-      new Set(item.orderItems.map((orderItem) => orderItem.stripe_connect_unique_id || 'No Stripe ID'))
+      new Set(item.orderItems.map((orderItem) => orderItem.seller.stripe_connect_unique_id || 'No Stripe ID'))
     );
     return {
       id: item.id,
@@ -81,7 +81,7 @@ const OrdersPage = async ({
   return (
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
-        <div className="w-full h-full">Add somewhere we can create an order</div>
+        <div className="w-full h-full"></div>
         <OrderClient data={formattedOrders} />
       </div>
     </div>

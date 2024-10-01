@@ -102,8 +102,13 @@ export function MainNav({
     },
     {
       href: `/${params.storeId}/settings`,
-      label: 'Settings',
+      label: 'Store Settings',
       active: pathname === `/${params.storeId}/settings`,
+    },
+    {
+      href: `/${params.storeId}/manage-readers`,
+      label: 'Manage Readers',
+      active: pathname === `/${params.storeId}/manage-readers`,
     },
   ]
 

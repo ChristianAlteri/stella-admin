@@ -15,24 +15,16 @@ model Store {
   id     String @id @default(uuid())
   name   String
   userId String // Clerk js user id
-  // TODO: Would be good have some config in here for exmple: 
-  // currency - then all the pounds symbols would change, all the stripe processing would auto fill to "GBP"
+
+  // TODO: Would be good have some config in here for exmple:
+  //Config 
+  consignmentRate Int        @default(50)
+  currency       String      @default("GBP")
   // We need bank account to set up stripe account that all the stripe connect will be connected to
-  // address we need an address for stripe terminal and tax purposes. this is stripes object {
-  //   "id": "",
-  //   "object": "terminal.location",
-  //   "address": {
-  //     "city": "San Francisco",
-  //     "country": "US",
-  //     "line1": "1234 Main Street",
-  //     "line2": "",
-  //     "postal_code": "94111",
-  //     "state": "CA"
-  //   },
-  //   "display_name": name,
-  //   "livemode": false,
-  //   "metadata": {}
-  // }
+  // Address relation
+  address StoreAddress? @relation(fields: [addressId], references: [id])
+  addressId String?
+
 
   billboards  Billboard[]   @relation("StoreToBillboard")
   categories  Category[]    @relation("StoreToCategory")
@@ -51,9 +43,6 @@ model Store {
   // bankAccount BankAccount? @relation(fields: [bankAccountId], references: [id])
   // bankAccountId String?
 
-  // // Address relation
-  // address StoreAddress @relation(fields: [addressId], references: [id])
-  // addressId String
 
   // orderItems  OrderItem[]   @relation("StoreToOrderItem")
   // payouts     Payout[]      @relation("StoreToPayout")
@@ -64,18 +53,22 @@ model Store {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([addressId])
 }
 
 
-// model StoreAddress {
-//   id         String @id @default(uuid())
-//   city       String
-//   country    String
-//   line1      String
-//   line2      String?
-//   postalCode String
-//   state      String
-// }
+model StoreAddress {
+  id         String @id @default(uuid())
+  city       String?
+  country    String?
+  line1      String?
+  line2      String?
+  postalCode String?
+  state      String?
+
+  Store Store[]
+}
 
 // model BankAccount {
 //   id                String  @id @default(uuid())
@@ -109,7 +102,7 @@ model Seller {
   id         String   @id @default(uuid())
   createdAt  DateTime @default(now())
   storeId    String
-  sellerType String?  @default("")
+  sellerType String?  @default("re-seller")
 
   instagramHandle String     @default("https://www.instagram.com/anon.drobe")
   firstName       String?    @default("")
@@ -212,6 +205,7 @@ model Product {
   isArchived    Boolean     @default(false)
   isCharity     Boolean     @default(false)
   isHidden      Boolean     @default(false)
+  //TODO:  isRental     Boolean     @default(false)
   //TODO: MAke some of these fields optional
   images        Image[] // Relation to Image model
   orderItems    OrderItem[] // Relation to Order model

@@ -21,6 +21,9 @@ export default async function DashboardLayout({
       id: params.storeId,
       userId,
     },
+    include: {
+      address: true,
+    },
   });
   console.log("store", store);
 

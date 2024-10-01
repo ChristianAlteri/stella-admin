@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Store" ADD COLUMN     "consignmentRate" INT4 NOT NULL DEFAULT 50;
+ALTER TABLE "Store" ADD COLUMN     "currency" STRING NOT NULL DEFAULT 'GBP';

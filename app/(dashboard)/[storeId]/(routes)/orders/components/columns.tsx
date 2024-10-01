@@ -23,7 +23,7 @@ export type OrderColumn = {
 
 export const columns: ColumnDef<OrderColumn>[] = [
   {
-    accessorKey: "id",
+    accessorKey: "createdAt",
     header: "Orders",
     cell: ({ row }) => (
       <div className="flex flex-row justify-start w-full">

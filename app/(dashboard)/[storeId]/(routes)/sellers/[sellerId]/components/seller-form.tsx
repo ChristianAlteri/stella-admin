@@ -62,7 +62,7 @@ export const SellerForm: React.FC<SellerFormProps> = ({
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [sellerType, setSellerType] = useState<string>("influencer");
+  const [sellerType, setSellerType] = useState<string>("re-seller");
 
   const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
@@ -213,7 +213,7 @@ export const SellerForm: React.FC<SellerFormProps> = ({
     try {
       const payload = {
         ...data,
-        sellerType,
+        // sellerType,
       };
       setLoading(true);
       if (initialData) {
@@ -282,7 +282,7 @@ export const SellerForm: React.FC<SellerFormProps> = ({
       <Separator />
 
       {/* Select component for seller type */}
-      <div className="flex items-center space-x-2 my-4">
+      {/* <div className="flex items-center space-x-2 my-4">
         <Select onValueChange={setSellerType} defaultValue="influencer">
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Select Seller Type" />
@@ -291,11 +291,11 @@ export const SellerForm: React.FC<SellerFormProps> = ({
             <SelectGroup>
               <SelectLabel>Seller Type</SelectLabel>
               <SelectItem value="influencer">Influencer</SelectItem>
-              <SelectItem value="reseller">Re-seller</SelectItem>
+              <SelectItem value="re-seller">Re-seller</SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
-      </div>
+      </div> */}
 
       <Form {...form}>
         <form

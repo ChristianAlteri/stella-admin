@@ -81,6 +81,15 @@ export default function OrderCard({ row }: { row: OrderColumn }) {
       <CardHeader className="">
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-4">
+              <CardDescription>
+                {new Date(row.createdAt).toLocaleString("en-GB", {
+                  year: "2-digit",
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </CardDescription>
             <p>
               <a
                 href={`mailto:${row.email}`}
@@ -89,15 +98,6 @@ export default function OrderCard({ row }: { row: OrderColumn }) {
                 {row.email}
               </a>
             </p>
-            <CardDescription>
-              {new Date(row.createdAt).toLocaleString("en-GB", {
-                year: "2-digit",
-                month: "2-digit",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </CardDescription>
           </div>
           <div className="flex items-center gap-2">
             <Badge variant={row.isPaid ? "default" : "destructive"}>

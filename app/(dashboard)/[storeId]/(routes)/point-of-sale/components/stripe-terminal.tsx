@@ -1,9 +1,8 @@
-// TODO: verify-payment route? update the product to isArchived = true once tha payment has been captured then payout sellers flow.
-
+// // TODO: verify-payment route? update the product to isArchived = true once tha payment has been captured then payout sellers flow.
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +21,29 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Product } from "@prisma/client";
+import { toast } from "react-hot-toast"; // Import toast
+import { TbFaceIdError, TbFaceId } from "react-icons/tb";
+// Custom Toast Error
+const toastError = (message: string) => {
+  toast.error(message, {
+    style: {
+      background: "white",
+      color: "black",
+    },
+    icon: <TbFaceIdError size={30} />,
+  });
+};
+
+// Custom Toast Success
+const toastSuccess = (message: string) => {
+  toast.success(message, {
+    style: {
+      background: "white",
+      color: "green",
+    },
+    icon: <TbFaceId size={30} />,
+  });
+};
 
 interface Reader {
   id: string;
@@ -46,6 +68,7 @@ interface Reader {
 }
 
 export default function StripeTerminalComponent() {
+  const router = useRouter();
   const { storeId } = useParams();
   const useProductSearch = () => {
     const URL = `/api/${storeId}/mega-search`;
@@ -53,7 +76,6 @@ export default function StripeTerminalComponent() {
     const [debounceTimeout, setDebounceTimeout] = useState<ReturnType<
       typeof setTimeout
     > | null>(null);
-
     const handleSearch = useCallback(() => {
       if (debounceTimeout) {
         clearTimeout(debounceTimeout);
@@ -131,6 +153,7 @@ export default function StripeTerminalComponent() {
       setToken(data.secret);
     } catch (error) {
       console.error("Error fetching connection token:", error);
+      toastError("Failed to fetch connection token.");
     }
   };
 
@@ -140,34 +163,44 @@ export default function StripeTerminalComponent() {
       setReaders(data?.readers || []);
     } catch (error) {
       console.error("Error fetching readers:", error);
+      toastError("Failed to fetch readers.");
     } finally {
       setLoadingReaders(false);
     }
   };
 
   const createPendingPayment = async () => {
-    if (!selectedReader || !amount) {
+    if (!selectedReader || !amount || !storeId) {
       return;
     }
-
     const amountInCents = Math.round(parseFloat(amount) * 100);
-
     try {
       const { data } = await axios.post(
         `/api/${storeId}/stripe/create_payment_intent`,
         {
           amount: amountInCents,
           readerId: selectedReader,
+          storeId: storeId,  // Pass the storeId in the request body
         }
       );
       setPaymentIntentId(data.paymentIntent?.id);
+      toastSuccess("Payment intent created.");
     } catch (error) {
-      console.error("Error processing payment:", error);
+      if (axios.isAxiosError(error) && error.response?.data?.errorCode === "currency_mismatch") {
+        toastError("Currency mismatch. Please check your store's currency settings.");
+        router.push(`/${storeId}/settings`);
+      } else {
+        console.error("Error creating payment intent:", error);
+        toastError("Error creating payment intent");
+      }
     }
   };
+  
+  
 
   const simulatePayment = async () => {
     if (!selectedReader) {
+      toastError("Please select a reader.");
       return;
     }
 
@@ -178,32 +211,72 @@ export default function StripeTerminalComponent() {
           readerId: selectedReader,
         }
       );
-      setPaymentIntentId(
-        data.reader?.action?.process_payment_intent?.payment_intent
-      );
+
+      if (data.reader?.action?.failure_code) {
+        // Capture and set error message
+        setAmount("");
+        setPaymentIntentId(null);
+        setIsPaymentCaptured(false);
+        toastError(data.reader.action.failure_message);
+      } else {
+        // Successful payment
+        setPaymentIntentId(
+          data.reader?.action?.process_payment_intent?.payment_intent
+        );
+        if (
+          data?.reader?.action?.status === "succeeded" &&
+          selectedProducts.length > 0
+        ) {
+          const verifyResponse = await axios.post(
+            `/api/${storeId}/verify-terminal-payment?store_id=${storeId}`,
+            { selectedProducts }, // Pass selectedProducts to verify-terminal-payment
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (
+            !verifyResponse.data.success &&
+            verifyResponse.data.errorCode === "balance_insufficient"
+          ) {
+            toastError(
+              "Wrong currency or insufficient funds in Stripe account"
+            );
+          } else {
+            toastSuccess("Payment successfully processed!");
+            setIsPaymentCaptured(true);
+          }
+        }
+      }
     } catch (error) {
       console.error("Error simulating payment:", error);
+      toastError("Error simulating payment.");
     }
   };
 
-  const capturePayment = async () => {
-    if (!paymentIntentId) {
-      return;
-    }
+  // I think this is redundant, we look at the status codes from simulate payment to determine if the payment was successful or not.
+  //   const capturePayment = async () => {
+  //     if (!paymentIntentId) {
+  //       return;
+  //     }
 
-    try {
-      const { data } = await axios.post(
-        `/api/${storeId}/stripe/capture_payment_intent`,
-        {
-          payment_intent_id: paymentIntentId,
-        }
-      );
-      // Payment captured, show the print receipt option
-      setIsPaymentCaptured(true);
-    } catch (error) {
-      console.error("Error capturing payment:", error);
-    }
-  };
+  //     try {
+  //       const { data } = await axios.post(
+  //         `/api/${storeId}/stripe/capture_payment_intent`,
+  //         {
+  //           payment_intent_id: paymentIntentId,
+  //         }
+  //       );
+  //       // Payment captured, show the print receipt option
+  //       setIsPaymentCaptured(true);
+  //       toastSuccess("Payment captured.");
+  //     } catch (error) {
+  //       console.error("Error simulating payment:", error);
+  //       toastError("Error simulating payment.");
+  //     }
+  //   };
 
   const cancelPayment = async () => {
     if (!selectedReader) {
@@ -218,22 +291,24 @@ export default function StripeTerminalComponent() {
           readerId: selectedReader,
         }
       );
-
+      toastSuccess("Payment cancelled.");
       console.log("Payment cancellation response:", data);
+      window.location.reload();
     } catch (error) {
       console.error("Error cancelling payment:", error);
     }
   };
 
   const resetComponent = () => {
-    setSelectedReader("");
-    setAmount("");
-    setPaymentIntentId(null);
-    setIsPaymentCaptured(false);
+    // setSelectedReader("");
+    // setAmount("");
+    // setPaymentIntentId(null);
+    // setIsPaymentCaptured(false);
+    window.location.reload();
   };
 
   const printReceipt = () => {
-    // For now, we'll just open the browser's print dialog
+    // TODO: For now, we'll just open the browser's print dialog
     window.print();
   };
 
@@ -404,13 +479,13 @@ export default function StripeTerminalComponent() {
                     >
                       Simulate Payment
                     </Button>
-                    <Button
+                    {/* <Button
                       onClick={capturePayment}
                       disabled={!paymentIntentId}
                       className="w-full"
                     >
                       Capture Payment
-                    </Button>
+                    </Button> */}
                     <Button
                       onClick={cancelPayment}
                       disabled={!selectedReader}
@@ -437,162 +512,3 @@ export default function StripeTerminalComponent() {
     </div>
   );
 }
-
-// "use client";
-
-// import { useEffect, useState, useRef } from "react";
-// import { useParams } from "next/navigation";
-// import axios from "axios";
-
-// const StripeTerminalComponent = () => {
-//   const { storeId } = useParams();
-//   const [token, setToken] = useState<string | null>(null);
-//   const [readers, setReaders] = useState<any[]>([]);
-//   const [loadingReaders, setLoadingReaders] = useState<boolean>(true);
-//   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
-//   const hasFetchedToken = useRef(false);
-
-//   const fetchConnectionToken = async () => {
-//     try {
-//       console.log("Fetching connection token...");
-//       const { data } = await axios.get(`/api/${storeId}/stripe/connection_token`);
-//       setToken(data.secret);
-//       console.log("Token fetched successfully:", data.secret);
-//     } catch (error) {
-//       console.error("Error fetching connection token:", error);
-//     }
-//   };
-
-//   const fetchReaders = async () => {
-//     try {
-//       console.log("Fetching readers...");
-//       const { data } = await axios.get(`/api/${storeId}/stripe/readers`);
-//       setReaders(data?.readers || []);
-//       console.log("Readers fetched successfully:", data?.readers || []);
-//     } catch (error) {
-//       console.error("Error fetching readers:", error);
-//     } finally {
-//       setLoadingReaders(false);
-//     }
-//   };
-
-//   const createPendingPayment = async () => {
-//     if (readers.length === 0) {
-//       console.error("No readers available.");
-//       return;
-//     }
-
-//     const firstReaderId = readers[0].id; // Get the first reader's ID
-//     const amount = 10000;
-
-//     console.log("Processing payment with amount:", amount, "and readerId:", firstReaderId);
-
-//     try {
-//       const { data } = await axios.post(`/api/${storeId}/stripe/create_payment_intent`, {
-//         amount,
-//         readerId: firstReaderId,
-//       });
-
-//       console.log("Payment intent created successfully:", data);
-//       setPaymentIntentId(data.paymentIntent?.id); // Store the payment intent ID
-//     } catch (error) {
-//       console.error("Error processing payment:", error);
-//     }
-//   };
-
-//   const simulatePayment = async () => {
-//     if (readers.length === 0) {
-//       console.error("No readers available.");
-//       return;
-//     }
-
-//     const firstReaderId = readers[0].id; // Get the first reader's ID
-
-//     console.log("Simulating payment with readerId:", firstReaderId);
-
-//     try {
-//       const { data } = await axios.post(`/api/${storeId}/stripe/simulate_payment`, {
-//         readerId: firstReaderId,
-//       });
-
-//       console.log("Simulated payment response:", data);
-//       setPaymentIntentId(data.reader?.action?.process_payment_intent?.payment_intent); // Store the payment intent ID
-//     } catch (error) {
-//       console.error("Error simulating payment:", error);
-//     }
-//   };
-
-//   const capturePayment = async () => {
-//     if (!paymentIntentId) {
-//       console.error("No payment intent ID available to capture.");
-//       return;
-//     }
-
-//     console.log("Capturing payment with intent ID:", paymentIntentId);
-
-//     try {
-//       const { data } = await axios.post(`/api/${storeId}/stripe/capture_payment_intent`, {
-//         payment_intent_id: paymentIntentId,
-//       });
-
-//       console.log("Payment captured successfully:", data);
-//     } catch (error) {
-//       console.error("Error capturing payment:", error);
-//     }
-//   };
-
-//   useEffect(() => {
-//     if (!hasFetchedToken.current) {
-//       hasFetchedToken.current = true;
-//       fetchConnectionToken();
-//       fetchReaders();
-//     }
-//   }, []);
-
-//   return (
-//     <div className="container-fluid h-100">
-//       <div className="row h-100">
-//         <div className="col-sm-6 h-100">
-//           <h1>Stripe Terminal Integration</h1>
-//           {token ? (
-//             <div>
-//               <p>Token fetched successfully: {token}</p>
-//               {loadingReaders ? (
-//                 <p>Loading readers...</p>
-//               ) : readers.length > 0 ? (
-//                 <div>
-//                   <h2>Available Readers:</h2>
-//                   <ul>
-//                     {readers.map(({ id, label, device_type, ip_address, status, serial_number }) => (
-//                       <li key={id}>
-//                         <p>Label: {label}</p>
-//                         <p>Device Type: {device_type}</p>
-//                         <p>IP Address: {ip_address}</p>
-//                         <p>Status: {status}</p>
-//                         <p>Serial Number: {serial_number}</p>
-//                       </li>
-//                     ))}
-//                   </ul>
-//                 </div>
-//               ) : (
-//                 <p>No readers available.</p>
-//               )}
-//             </div>
-//           ) : (
-//             <p>Loading token...</p>
-//           )}
-//         </div>
-//       </div>
-//       <div className="flex flex-row gap-4">
-//         {/* Button to process payment */}
-//         <button onClick={createPendingPayment}>Create Payment</button>
-//         {/* Button to simulate payment */}
-//         <button onClick={simulatePayment}>Simulate Payment</button>
-//         {/* Button to capture payment */}
-//         <button onClick={capturePayment} disabled={!paymentIntentId}>Capture Payment</button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default StripeTerminalComponent;

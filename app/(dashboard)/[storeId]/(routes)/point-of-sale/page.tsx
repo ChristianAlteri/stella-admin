@@ -1,6 +1,5 @@
 import StripeTerminal from "./components/stripe-terminal";
 
-
 const PointOfSalePage = () => {
   return (
     <>
