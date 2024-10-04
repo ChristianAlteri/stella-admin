@@ -91,7 +91,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     defaultValues: initialData
       ? {
           ...initialData,
-          ourPrice: parseFloat(String(initialData?.ourPrice)),
+          ourPrice: parseFloat(String(initialData?.ourPrice)), // TODO: i think entering product amount bug and it being wrong is from here, the parseFloat
           retailPrice: parseFloat(String(initialData?.retailPrice)),
         }
       : {

@@ -16,6 +16,7 @@ const PayoutsPage = async ({
     },
     include: {
       seller: true,
+      store: true
     },
     orderBy: {
       createdAt: 'desc'
@@ -25,10 +26,11 @@ const PayoutsPage = async ({
   const formattedPayouts: PayoutColumn[] = payouts.map((item) => {
     return {
       id: item.id,
-      sellerId: item.sellerId,
-      sellerHandle: item.seller.instagramHandle ?? '',
-      sellerEmail: item.seller.email ?? '',
-      sellerStripConnect: item.seller.stripe_connect_unique_id ?? 'No Stripe ID',
+      sellerId: item.sellerId ?? 'No Seller ID',
+      storeStripeId: item.store?.stripe_connect_unique_id ?? 'No Store Stripe ID',
+      sellerHandle: item.seller?.instagramHandle ?? item.store?.name ?? 'No Name',
+      sellerEmail: item.seller?.email ?? 'No Email',
+      sellerStripConnect: item.seller?.stripe_connect_unique_id ?? item.store?.stripe_connect_unique_id ?? 'No Stripe ID',
       amount: Number(item.amount).toFixed(2),
       transferGroupId: item.transferGroupId ?? '',
       stripeTransferId: item.stripeTransferId ?? '',
@@ -36,7 +38,6 @@ const PayoutsPage = async ({
       updatedAt: item.updatedAt,
     };
   });
-
 
   return (
     <div className="flex-col">

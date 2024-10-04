@@ -109,6 +109,7 @@ export async function POST(request: Request) {
           const payout = await prismadb.payout.create({
             data: {
               sellerId: sellerWhoSoldId,
+              storeId: products[0].storeId,
               amount: new Prisma.Decimal(totalAmount * 0.7), // Our db is okay with * 0.7
               transferGroupId: `order_${orderId}`,
               stripeTransferId: stripeTransfer.id,

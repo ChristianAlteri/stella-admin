@@ -10,7 +10,7 @@ export async function PATCH(
     const { userId } = auth();
     const body = await req.json();
 
-    const { name, address, consignmentRate, currency } = body;
+    const { name, address, consignmentRate, currency, stripe_connect_unique_id } = body;
 
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 403 });
@@ -60,7 +60,9 @@ export async function PATCH(
     if (name) storeData.name = name;
     if (consignmentRate) storeData.consignmentRate = consignmentRate;
     if (currency) storeData.currency = currency;
+    if (stripe_connect_unique_id) storeData.stripe_connect_unique_id = stripe_connect_unique_id;
     if (addressId) storeData.addressId = addressId;
+    console.log("stripe_connect_unique_id", stripe_connect_unique_id);
 
     // Update the store with only the fields that were provided
     const store = await prismadb.store.update({
@@ -71,6 +73,7 @@ export async function PATCH(
       data: storeData,
     });
 
+    console.log("[STORE_PATCH]", store);
     return NextResponse.json(store);
   } catch (error) {
     console.log("[STORE_PATCH]", error);

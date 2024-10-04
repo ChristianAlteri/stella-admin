@@ -87,6 +87,7 @@ export const SellerForm: React.FC<SellerFormProps> = ({
     shippingAddress: z.string().min(1, "Shipping Address is required"),
     storeName: z.string().optional(),
     description: z.string().optional(),
+    consignmentRate: z.string().optional(),
   });
 
   type SellerFormValues = z.infer<typeof formSchema>;
@@ -109,6 +110,7 @@ export const SellerForm: React.FC<SellerFormProps> = ({
           shippingAddress: initialData.shippingAddress || "",
           storeName: initialData.storeName || "",
           description: initialData.description || "",
+          consignmentRate: initialData.consignmentRate?.toString() || "",
         }
       : {
           instagramHandle: "",
@@ -126,6 +128,7 @@ export const SellerForm: React.FC<SellerFormProps> = ({
           shippingAddress: "",
           storeName: "",
           description: "",
+          consignmentRate: "",
         },
   });
 
@@ -394,6 +397,29 @@ export const SellerForm: React.FC<SellerFormProps> = ({
                 />
                 <FormField
                   control={form.control}
+                  name="consignmentRate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Consignment Rate (%)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min={0}
+                          max={100}
+                          disabled={loading}
+                          placeholder="Consignment rate"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(e.target.valueAsNumber)
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
                   name="shippingAddress"
                   render={({ field }) => (
                     <FormItem>
@@ -505,7 +531,7 @@ export const SellerForm: React.FC<SellerFormProps> = ({
                     </FormItem>
                   )}
                 />
-                <FormField
+                {/* <FormField
                   control={form.control}
                   name="charityName"
                   render={({ field }) => (
@@ -538,11 +564,11 @@ export const SellerForm: React.FC<SellerFormProps> = ({
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
                 {/* TODO: Add Charity selector */}
 
                 {/* Conditional form fields based on seller type */}
-                {sellerType === "reseller" ? (
+                {sellerType === "re-seller" ? (
                   <>
                     <FormField
                       control={form.control}

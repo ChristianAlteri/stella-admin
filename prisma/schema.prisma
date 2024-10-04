@@ -19,14 +19,13 @@ model Store {
 
   // TODO: Would be good have some config in here for exmple:
   //Config 
-  consignmentRate Int        @default(50)
-  currency       String      @default("GBP")
-  // countryCode String      @default("GB")
+  consignmentRate Int    @default(50)
+  currency        String @default("GBP")
+  countryCode     String @default("GB")
 
   // Address relation
-  address StoreAddress? @relation(fields: [addressId], references: [id])
+  address   StoreAddress? @relation(fields: [addressId], references: [id])
   addressId String?
-
 
   billboards  Billboard[]   @relation("StoreToBillboard")
   categories  Category[]    @relation("StoreToCategory")
@@ -41,10 +40,8 @@ model Store {
   subcategory Subcategory[] @relation("StoreToSubcategory")
   orders      Order[]       @relation("StoreToOrder")
 
-  // TODO: add stripe connect unique id so we can payout to the store, then seller then us the 2%
-  // stripe_connect_unique_id String?  @default("")
-  // payouts                  Payout[] 
-
+  stripe_connect_unique_id String?  @default("")
+  payouts                  Payout[]
 
   // orderItems  OrderItem[]   @relation("StoreToOrderItem")
   // payouts     Payout[]      @relation("StoreToPayout")
@@ -59,9 +56,8 @@ model Store {
   @@index([addressId])
 }
 
-
 model StoreAddress {
-  id         String @id @default(uuid())
+  id         String  @id @default(uuid())
   city       String?
   country    String?
   line1      String?
@@ -120,7 +116,8 @@ model Seller {
   isArchived      Boolean    @default(false)
 
   stripe_connect_unique_id String?  @default("")
-  payouts                  Payout[] 
+  payouts                  Payout[]
+  consignmentRate          Int?
 
   charityName String? @default("") //TODO: we dont need this once we start onbaording charities
   charityUrl  String? @default("") //TODO: we dont need this once we start onbaording charities
@@ -436,9 +433,13 @@ model Order {
 }
 
 model Payout {
-  id       String @id @default(uuid())
-  sellerId String // Foreign Key to Seller
-  seller   Seller @relation(fields: [sellerId], references: [id])
+  id       String  @id @default(uuid())
+  sellerId String? // Foreign Key to Seller
+  seller   Seller? @relation(fields: [sellerId], references: [id])
+  storeId  String? // Foreign Key to Seller
+  store    Store?  @relation(fields: [storeId], references: [id])
+
+  // TODO: Add the products here and display them on the front end
 
   amount           Decimal? @default(0.0)
   transferGroupId  String?  @default("")
@@ -448,4 +449,5 @@ model Payout {
   updatedAt DateTime @updatedAt
 
   @@index([sellerId])
+  @@index([storeId])
 }

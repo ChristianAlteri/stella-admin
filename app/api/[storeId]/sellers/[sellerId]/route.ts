@@ -124,6 +124,7 @@ export async function PATCH(
       sellerType,
       storeName,
       description,
+      consignmentRate
     } = body;
 
     console.log("BODY", body);
@@ -166,10 +167,11 @@ export async function PATCH(
         topSize,
         bottomSize,
         storeId: params.storeId,
-        stripe_connect_unique_id: connectedAccountId || "",
+        stripe_connect_unique_id: connectedAccountId,
         sellerType,
         storeName,
         description,
+        consignmentRate,
       },
     });
     console.log("SELLER", seller);

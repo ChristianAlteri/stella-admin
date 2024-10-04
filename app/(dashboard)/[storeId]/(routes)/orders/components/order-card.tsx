@@ -33,7 +33,7 @@ const ImageModal = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 "
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="relative bg-white p-4 rounded-lg shadow-lg  w-full">
@@ -77,7 +77,9 @@ export default function OrderCard({ row }: { row: OrderColumn }) {
   };
 
   return (
-    <Card className="w-full mx-auto mb-4">
+    <Card className="w-full mx-auto mb-4 "
+    onClick={toggleExpand}
+    >
       <CardHeader className="">
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-4">

@@ -31,6 +31,7 @@ export async function POST(
       sellerType,
       storeName,
       description,
+      consignmentRate
     } = body;
 
     if (!userId) {
@@ -73,6 +74,7 @@ export async function POST(
         sellerType,
         storeName,
         description,
+        consignmentRate
       },
     });
     console.log("[CREATE_SELLER]", seller);

@@ -23,7 +23,7 @@ import {
   Info,
   ShoppingBag,
 } from "lucide-react";
-import { IoInformationOutline } from "react-icons/io5";
+import { TbPercentage } from "react-icons/tb";
 
 export type SellerColumn = {
   id: string;
@@ -47,6 +47,7 @@ export type SellerColumn = {
   sellerType: string;
   description: string;
   storeName: string;
+  consignmentRate: string;
 };
 
 export default function SellerCard({ row }: { row: SellerColumn }) {
@@ -110,6 +111,12 @@ export default function SellerCard({ row }: { row: SellerColumn }) {
           <Store className="w-4 h-4 mr-2" />
           <span>{row.storeName}</span>
         </div>
+        {row.consignmentRate ?? (
+          <div className="flex items-center">
+            <TbPercentage className="w-4 h-4 mr-2" />
+            <span>{row.consignmentRate}</span>
+          </div>
+        )}
         <div className="space-y-2">
           <h4 className="font-semibold">Sizes:</h4>
           <div className="flex gap-2">

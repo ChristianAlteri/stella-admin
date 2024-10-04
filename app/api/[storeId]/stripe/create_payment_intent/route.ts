@@ -42,6 +42,10 @@ export async function POST(req: NextRequest) {
         currency: currency,  
         payment_method_types: ["card_present"],
         capture_method: "automatic",
+        // transfer_data: {
+        //   destination: '{{CONNECTED_ACCOUNT_ID}}',
+        // },
+        // application_fee_amount: amount * 0.3,
         metadata: {
           ...productIdMetadata, 
           storeId: storeId,

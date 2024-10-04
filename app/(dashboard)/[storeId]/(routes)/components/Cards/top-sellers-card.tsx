@@ -25,9 +25,8 @@ export default function TopSellersCard({ sellers }: any) {
   };
 
   const displayedSellers = getSellers(sellers, showTopSellers);
-
   return (
-    <Card className="w-[350px]">
+    <Card className="w-full overflow-auto h-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 w-full justify-between">
           <Trophy className="h-5 w-5 text-yellow-400" />

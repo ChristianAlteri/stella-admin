@@ -2,9 +2,6 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 
-import Image from "next/image";
-import ReactPlayer from "react-player";
-
 import ProductDetailsComponent from "./product-details-component";
 
 export type ProductColumn = {

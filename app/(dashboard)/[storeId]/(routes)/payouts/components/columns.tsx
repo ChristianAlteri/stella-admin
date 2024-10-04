@@ -7,6 +7,7 @@ import { Seller } from "@prisma/client";
 export type PayoutColumn = {
   id: string
   sellerId: string;
+  storeStripeId: string;
   sellerHandle: string;
   sellerEmail: string;
   sellerStripConnect: string;

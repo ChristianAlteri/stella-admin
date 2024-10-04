@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
       country: "GB", //TODO: change to the stores country code
     });
 
-    // console.log("STRIPE ACCOUNT CREATION", account);
+    console.log("STRIPE ACCOUNT CREATION", account);
     return NextResponse.json({ success: true, account: account });
   } catch (error: any) {
     console.error(

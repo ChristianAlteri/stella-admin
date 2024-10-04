@@ -27,9 +27,10 @@ export default function MostPopularDesignerCard({ products }: any) {
   };
 
   const designers = getDesigners(products, showTopDesigners);
+  
 
   return (
-    <Card className="w-[350px]">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 w-full justify-between">
           <Award className="h-5 w-5 text-blue-400" />

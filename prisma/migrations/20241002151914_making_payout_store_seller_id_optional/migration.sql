@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Payout" ALTER COLUMN "sellerId" DROP NOT NULL;
+ALTER TABLE "Payout" ALTER COLUMN "storeId" DROP NOT NULL;

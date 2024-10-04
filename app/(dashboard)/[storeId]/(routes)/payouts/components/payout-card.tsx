@@ -45,7 +45,7 @@ export default function PayoutCard({ row }: { row: PayoutColumn }) {
             href={`sellers/${row.sellerId}/details`}
             className="text-center"
           >
-            <span className="font-semibold hover:underline font-bold">
+            <span className=" hover:underline font-bold">
               Name: {row.sellerHandle}
             </span>
           </Link>

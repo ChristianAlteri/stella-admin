@@ -48,7 +48,7 @@ export const PayoutClient: React.FC<PayoutClientProps> = ({ data }) => {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${analytics.totalPayouts.toFixed(2)}</div>
+            <div className="text-2xl font-bold">${analytics.totalPayouts.toLocaleString()}</div>
           </CardContent>
         </Card>
         <Card>
@@ -57,7 +57,7 @@ export const PayoutClient: React.FC<PayoutClientProps> = ({ data }) => {
             <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${analytics.averagePayout.toFixed(2)}</div>
+            <div className="text-2xl font-bold">${analytics.averagePayout.toLocaleString()}</div>
           </CardContent>
         </Card>
         <Card>

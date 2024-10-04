@@ -14,13 +14,14 @@ const StripeConnect = () => {
   const params = useParams(); // Use params to get storeId
   const searchParams = useSearchParams();
   const sellerId = searchParams.get("sellerId"); // Use searchParams to get sellerId
+  // const storeId = searchParams.get("storeId"); //can we also get storeId from searchParams?
   const [accountCreatePending, setAccountCreatePending] = useState(false);
   const [onboardingExited, setOnboardingExited] = useState(false);
   const [error, setError] = useState(false);
   const [connectedAccountId, setConnectedAccountId] = useState("");
   const stripeConnectInstance = useStripeConnect(connectedAccountId);
 
-  console.log("sellerId", sellerId);
+
   const handleCreateStripeAccount = async () => {
     setAccountCreatePending(true);
     setError(false);
