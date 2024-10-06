@@ -47,7 +47,7 @@ export type SellerColumn = {
   sellerType: string;
   description: string;
   storeName: string;
-  consignmentRate: string;
+  consignmentRate: number | undefined;
 };
 
 export default function SellerCard({ row }: { row: SellerColumn }) {

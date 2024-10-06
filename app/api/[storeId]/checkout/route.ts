@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { stripe } from "@/lib/stripe";
 import prismadb from "@/lib/prismadb";
+import { Prisma } from "@prisma/client";
 
 export async function OPTIONS(request: Request) {
   // Just return a simple OK response without setting any CORS headers.
@@ -39,7 +40,7 @@ export async function POST(
   const order = await prismadb.order.create({
     data: {
       storeId: params.storeId,
-
+      totalAmount: new Prisma.Decimal(products.map((product) => product.ourPrice.toNumber()).reduce((acc, price) => acc + price, 0)),
       isPaid: false,
       orderItems: {
         create: products.map((product) => ({

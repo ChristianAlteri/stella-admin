@@ -3,14 +3,24 @@ import { Package, BadgeDollarSign } from "lucide-react";
 
 import { Separator } from "@/components/ui/separator";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 
 import prismadb from "@/lib/prismadb";
-import { convertDecimalsToNumbers, totalRevenue } from "@/lib/utils";
+import {
+  convertDecimalsToNumbers,
+  filterLastMonthOrders,
+  filterThisMonthOrders,
+  totalRevenue,
+} from "@/lib/utils";
 import TopSellersCard from "./components/Cards/top-sellers-card";
-import MostPopularDesignerCard from "./components/Cards/top-designers-card";
-import MostPopularCategoryCard from "./components/Cards/top-categories-card";
+import TopDesignersCard from "./components/Cards/top-designers-card";
 import TopUsersCard from "./components/Cards/top-users-card";
 import { StoreRevenueVsOrderAreaChart } from "./components/AreaCharts/store-revenue-vs-orders-area-chart";
 import StoreClicksAndLikesChart from "./components/LineCharts/clicks-and-likes-by-month-line-chart";
@@ -23,6 +33,8 @@ import {
   getTopSellingSubcategoryCount,
   getTopSellingConditionCount,
 } from "@/actions/TopSelling/get-top-selling-attribute";
+import RevenueSplits from "./components/RadialCharts/revenue-splits";
+import TopCategoriesCard from "./components/Cards/top-categories-card";
 
 interface DashboardPageProps {
   params: {
@@ -95,8 +107,13 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
   const averagePrice = calculateAveragePrice(plainProducts);
 
   const revenue = totalRevenue(plainOrders);
-  const ouRevenue = revenue * 0.3;
-  const payouts = revenue - ouRevenue;
+  const ourRevenue = revenue * 0.3;
+  const payoutRevenue = revenue - ourRevenue; // TODO: Fetch all the payouts and calculate the total payouts. Our revenue is actually just totalRevenueForAllOrders - totalPayouts
+
+  const lastMonthOrders = filterLastMonthOrders(plainOrders);
+  const currentMonthOrders = filterThisMonthOrders(plainOrders);
+  const lastMonthRevenue = totalRevenue(lastMonthOrders);
+  const currentMonthRevenue = totalRevenue(currentMonthOrders);
 
   const soldStock = products.filter(
     (product: any) => product.isArchived === true
@@ -124,33 +141,18 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
       <div className="flex-1 space-y-4 p-8 pt-6">
         <Heading title="Dashboard" description="Overview of your store" />
         <Separator />
-        <div className="flex flex-row w-full gap-4 justify-between">
-          <StoreRevenueVsOrderAreaChart orders={plainOrders} />
-          <div className="flex flex-col w-1/3 h-full gap-4 justify-between">
-            <TopSellersCard sellers={topSellers} />
-            <MostPopularDesignerCard products={plainProducts} />
-            <MostPopularCategoryCard products={plainProducts} />
-          </div>
-        </div>
 
-        <div className="grid gap-4 grid-cols-3">
-          <Card className="">
-            <CardHeader className="flex flex-row items-center justify-between pb-4">
-              <CardTitle className="text-2xl font-semibold text-black">
-                Revenue
-              </CardTitle>
-              <BadgeDollarSign className="h-6 w-6 text-pink-600" />
-            </CardHeader>
-            <div className="flex flex-col items-starts gap-2 text-gray-700 pl-6">
-              <span className="">Total Sales £{revenue.toLocaleString()}</span>
-              <span className="">
-                Our Revenue £{ouRevenue.toLocaleString()}
-              </span>
-              <span className="">
-                Total Payouts £{payouts.toLocaleString()}
-              </span>
-            </div>
-          </Card>
+        <div className="grid gap-4 grid-cols-2">
+          <RevenueSplits
+            plainOrders={plainOrders}
+            revenue={revenue}
+            ourRevenue={ourRevenue}
+            payoutRevenue={payoutRevenue}
+            lastMonthOrders={lastMonthOrders}
+            lastMonthRevenue={lastMonthRevenue}
+            currentMonthRevenue={currentMonthRevenue}
+            currentMonthOrders={currentMonthOrders}
+          />
 
           <Card className="">
             <CardHeader className="flex flex-row items-center justify-between pb-4">
@@ -167,42 +169,69 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
                 Sold: {soldStock}
               </div>
             </CardContent>
-            <CardContent className="">
-              <div className="text-md font-bold text-gray-700">
-                Average price point: £{averagePrice.toLocaleString()}
+            <CardContent className="mb-4">
+              <div className="text-md font-bold text-gray-700 mb-4">
+                Average price point: £
+                {averagePrice.toLocaleString(undefined, {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                })}
               </div>
+              <CardContent className="flex flex-col items-start pb-4">
+                <Separator className="" />
+                <div className="text-md font-bold text-gray-700 mt-4">
+                  Live Stock Older Than 3 Months:
+                </div>
+                <div>
+                  {products
+                    .filter(
+                      (product: any) =>
+                        new Date(product.createdAt) <
+                          new Date(
+                            new Date().setMonth(new Date().getMonth() - 3)
+                          ) && !product.isArchived
+                    )
+                    .map((product: any) => (
+                      <div key={product.id} className="text-gray-700">
+                        {product.name} - Created on:{" "}
+                        {new Date(product.createdAt).toLocaleDateString()}
+                      </div>
+                    ))}
+                </div>
+              </CardContent>
             </CardContent>
           </Card>
 
-          <Card className="overflow-y-auto">
+          {/* <Card className="overflow-y-auto">
             <CardHeader className="flex flex-row items-center justify-between pb-4">
               <CardTitle className="text-2xl font-semibold text-gray-700">
-                Old Stock
+                What goes here?
               </CardTitle>
-              <Package className="h-6 w-6 text-amber-600" />
             </CardHeader>
-            <CardContent className="flex flex-col items-start">
-              <div className="text-md font-bold text-gray-700">
-                Live Stock Older Than 3 Months:
-              </div>
-              <div>
-                {products
-                  .filter(
-                    (product: any) =>
-                      new Date(product.createdAt) <
-                        new Date(
-                          new Date().setMonth(new Date().getMonth() - 3)
-                        ) && !product.isArchived
-                  )
-                  .map((product: any) => (
-                    <div key={product.id} className="text-gray-700">
-                      {product.name} - Created on:{" "}
-                      {new Date(product.createdAt).toLocaleDateString()}
-                    </div>
-                  ))}
-              </div>
+          </Card> */}
+        </div>
+
+        <div className="flex flex-row w-full gap-4 justify-between">
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle>Payouts and Orders</CardTitle>
+              <CardDescription>
+                Put a live orders and payouts here like in stripe
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div>like stripe</div>
             </CardContent>
           </Card>
+        </div>
+
+        <div className="flex flex-row w-full gap-4 justify-between">
+          <StoreRevenueVsOrderAreaChart orders={plainOrders} />
+          <div className="flex flex-col w-1/3 h-full gap-4 justify-between">
+            <TopSellersCard sellers={topSellers} />
+            <TopDesignersCard products={plainProducts} />
+            <TopCategoriesCard products={plainProducts} />
+          </div>
         </div>
 
         <div className="flex flex-row w-full gap-4 justify-between">

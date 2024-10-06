@@ -110,7 +110,7 @@ export async function GET(
     const productName = searchParams.get("productName") || undefined;
     const designerName = searchParams.get("designerName") || undefined;
 
-    console.log("searchParams", searchParams);
+    // console.log("searchParams", searchParams);
 
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
@@ -259,7 +259,7 @@ export async function GET(
       },
     });
 
-    console.log(products);
+    // console.log(products);
     return NextResponse.json(products);
   } catch (error) {
     console.log("[PRODUCTS_GET]", error);

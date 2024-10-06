@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from "@clerk/nextjs/server"
 
 import prismadb from '@/lib/prismadb';
+import { convertDecimalFields } from '@/lib/utils';
 
 // export async function POST(
 //   req: Request,
@@ -108,6 +109,10 @@ export async function GET(req: Request) {
         address: true,
       },
     });
+    // console.log("store", store);
+    // // Convert Decimal fields to numbers
+    // const storeWithConvertedDecimals = convertDecimalFields(store);
+    // console.log("storeWithConvertedDecimals", storeWithConvertedDecimals);
 
     return NextResponse.json(store);
   } catch (error) {

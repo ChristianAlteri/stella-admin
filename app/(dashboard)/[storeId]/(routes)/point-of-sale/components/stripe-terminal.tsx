@@ -1,4 +1,3 @@
-// // TODO: verify-payment route? update the product to isArchived = true once tha payment has been captured then payout sellers flow.
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";

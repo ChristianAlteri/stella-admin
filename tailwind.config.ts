@@ -17,6 +17,8 @@ module.exports = {
     },
     extend: {
       colors: {
+        barChart1: "hsl(210, 100%, 60%)", 
+        barChart2: "hsl(50, 100%, 50%)",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

@@ -108,7 +108,7 @@ export function StoreRevenueVsOrderAreaChart({ orders }: { orders: any }) {
   const chartConfig = {
     revenue: {
       label: "Revenue",
-      color: "hsl(var(--destructive))",
+      color: "hsl(var(--accent))",
     },
     orders: {
       label: "Orders",
@@ -122,8 +122,11 @@ export function StoreRevenueVsOrderAreaChart({ orders }: { orders: any }) {
         <CardTitle>Revenue vs Orders</CardTitle>
         <CardDescription>
           <span className="flex flex-row w-full justify-between ">
-            £{revenue.toLocaleString()} vs {orders.length} orders (Avg: £
-            {orders.length > 0 ? (revenue / orders.length).toLocaleString() : "0.00"})
+            £{revenue.toLocaleString()}:  {orders.length} orders (Avg order: £
+            {orders.length > 0 ? (revenue / orders.length).toLocaleString(undefined, {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              }) : "0.00"}) add a button for revenue growth that changes when the chart range changes
             <span className="flex flex-row text-black items-center text-center">
               <span
                 className="hover:cursor-pointer hover:underline "

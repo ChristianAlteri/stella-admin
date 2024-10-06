@@ -87,7 +87,7 @@ export const SellerForm: React.FC<SellerFormProps> = ({
     shippingAddress: z.string().min(1, "Shipping Address is required"),
     storeName: z.string().optional(),
     description: z.string().optional(),
-    consignmentRate: z.string().optional(),
+    consignmentRate: z.number().optional(),
   });
 
   type SellerFormValues = z.infer<typeof formSchema>;
@@ -110,7 +110,7 @@ export const SellerForm: React.FC<SellerFormProps> = ({
           shippingAddress: initialData.shippingAddress || "",
           storeName: initialData.storeName || "",
           description: initialData.description || "",
-          consignmentRate: initialData.consignmentRate?.toString() || "",
+          consignmentRate: initialData.consignmentRate || undefined,
         }
       : {
           instagramHandle: "",
@@ -128,7 +128,7 @@ export const SellerForm: React.FC<SellerFormProps> = ({
           shippingAddress: "",
           storeName: "",
           description: "",
-          consignmentRate: "",
+          consignmentRate: undefined,
         },
   });
 

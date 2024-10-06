@@ -98,6 +98,7 @@ const SellerDetailsPage = async ({
     description: seller?.description ?? "",
     storeName: seller?.storeName ?? "",
     stripe_connect_unique_id: seller?.stripe_connect_unique_id ?? "No Stripe ID",
+    consignmentRate: seller?.consignmentRate ?? undefined,
   };
 
   const archivedProducts = seller?.products.filter(

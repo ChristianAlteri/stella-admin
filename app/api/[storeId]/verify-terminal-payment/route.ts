@@ -35,11 +35,26 @@ export async function POST(request: Request) {
       include: { seller: true },
     });
 
+    // Calculate the total amount of the order (all products combined)
+    const totalSales = products.reduce(
+      (acc, product) => acc + product.ourPrice.toNumber(),
+      0
+    );
+
+    const STRIPE_FEE_PERCENTAGE = 0.03;
+    const OUR_PLATFORM_FEE = store?.our_platform_fee
+      ? store.our_platform_fee.toNumber()
+      : 0.05;
+
+    const totalFees = totalSales * (STRIPE_FEE_PERCENTAGE + OUR_PLATFORM_FEE);
+    const totalSalesAfterFees = totalSales - totalFees;
+
     // Create a new Order
     const newOrder = await prismadb.order.create({
       data: {
         storeId: storeId,
         isPaid: true,
+        totalAmount: new Prisma.Decimal(totalSalesAfterFees),
       },
     });
 

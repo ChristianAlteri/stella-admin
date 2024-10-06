@@ -43,13 +43,28 @@ export async function POST(request: Request) {
       where: { id: { in: productIds } },
       include: { seller: true },
     });
-    console.log("[Products] ", products);
+    // console.log("[Products] ", products);
+
+    // Calculate the total amount of the order (all products combined)
+    const totalSales = products.reduce(
+      (acc, product) => acc + product.ourPrice.toNumber(),
+      0
+    );
+
+    const STRIPE_FEE_PERCENTAGE = 0.03;
+    const OUR_PLATFORM_FEE = store?.our_platform_fee
+      ? store.our_platform_fee.toNumber()
+      : 0.05;
+
+    const totalFees = totalSales * (STRIPE_FEE_PERCENTAGE + OUR_PLATFORM_FEE);
+    const totalSalesAfterFees = totalSales - totalFees;
 
     // Create a new Order
     const newOrder = await prismadb.order.create({
       data: {
         storeId: metadata.storeId,
         isPaid: true,
+        totalAmount: new Prisma.Decimal(totalSalesAfterFees),
       },
     });
 
@@ -79,22 +94,12 @@ export async function POST(request: Request) {
       data: { soldCount: { increment: 1 } },
     });
 
-    // Calculate the total amount of the order (all products combined)
-    const totalSales = products.reduce(
-      (acc, product) => acc + product.ourPrice.toNumber(),
-      0
-    );
-
-    const STRIPE_FEE_PERCENTAGE = 0.03;
-    const OUR_PLATFORM_FEE = 0.05;
-
-    const totalFees = totalSales * (STRIPE_FEE_PERCENTAGE + OUR_PLATFORM_FEE);
-    const totalSalesAfterFees = totalSales - totalFees;
-    const storeCut = totalSalesAfterFees * (consignmentRate / 100);
+    // let storeCut = totalSalesAfterFees * (consignmentRate / 100);
+    let storeCut = 0;
 
     console.log("TOTAL SALES", totalSales);
     console.log("totalSales after fees", totalSalesAfterFees);
-    console.log("storeCut", storeCut);
+    // console.log("storeCut", storeCut);
 
     // PAYOUT SELLERS
     const sellerPayouts = products.reduce<{ [key: string]: number }>(
@@ -112,13 +117,19 @@ export async function POST(request: Request) {
         if (!acc[product.seller.stripe_connect_unique_id!]) {
           acc[product.seller.stripe_connect_unique_id!] = 0;
         }
+        // Calculate the store's additional cut from the seller's consignment rate difference
+        const storeAdditionalCut =
+          payoutAfterFees * ((100 - consignmentRateToUse) / 100);
+        storeCut += storeAdditionalCut;
+        console.log("consignmentRateToUse", consignmentRateToUse);
+        console.log("storeCut", storeCut);
 
         acc[product.seller.stripe_connect_unique_id!] += sellerPayout;
         return acc;
       },
       {}
     );
-    console.log("sellerPayouts", sellerPayouts);
+    // console.log("sellerPayouts", sellerPayouts);
 
     for (const [stripe_connect_unique_id, sellerNetPayout] of Object.entries(
       sellerPayouts
@@ -200,8 +211,8 @@ export async function POST(request: Request) {
       });
       const storePayoutRecord = await prismadb.payout.create({
         data: {
-          sellerId: store?.id || "",
-          storeId: store?.id || "",
+          sellerId: metadata.storeId || "",
+          storeId: metadata.storeId || "",
           amount: new Prisma.Decimal(storeCut), // Amount after fees
           transferGroupId: `order_${newOrder.id}`,
           stripeTransferId: stripeTransferForStore.id,
@@ -237,6 +248,7 @@ export async function POST(request: Request) {
     );
   }
 }
+
 // import { NextResponse } from "next/server";
 // import prismadb from "@/lib/prismadb";
 // import { Prisma, Product } from "@prisma/client";

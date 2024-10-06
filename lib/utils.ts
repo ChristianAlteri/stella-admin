@@ -2,6 +2,7 @@ import { type ClassValue, clsx } from "clsx"
 import Decimal from "decimal.js";
 import { twMerge } from "tailwind-merge"
 import { format } from 'date-fns';
+import { Order } from "@prisma/client";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -11,6 +12,27 @@ export const formatter = new Intl.NumberFormat('en-GB', {
   style: 'currency',
   currency: 'GBP',
 });
+
+
+// Utility function to convert Decimal fields to numbers
+export function convertDecimalFields(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(convertDecimalFields);
+  } else if (obj && typeof obj === 'object') {
+    return Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => {
+        if (value instanceof Decimal) {
+          return [key, value.toNumber()];
+        } else if (typeof value === 'object' && value !== null) {
+          return [key, convertDecimalFields(value)];
+        }
+        return [key, value];
+      })
+    );
+  }
+  return obj;
+}
+
 
 // Calculate seller's monthly revenue for all 12 months
 export function calculateMonthlyRevenue(payouts: { amount: Decimal | null, createdAt: Date }[]): Record<string, string> {
@@ -156,19 +178,86 @@ export function convertDecimalsToNumbers(data: any): any {
   return data;
 }
 
-export const totalRevenue = (orders: any): number => {
-  return orders.reduce((acc: any, order: any) => {
-    return (
-      acc +
-      order.orderItems.reduce((itemAcc: any, item: any) => {
-        return (
-          itemAcc +
-          (typeof item.productAmount === "object" &&
-          "toNumber" in item.productAmount
-            ? item.productAmount.toNumber()
-            : parseFloat(item.productAmount as any) || 0)
-        );
-      }, 0)
-    );
+// export const totalRevenue = (orders: any): number => {
+//   return orders.reduce((acc: any, order: any) => {
+//     return (
+//       acc +
+//       order.orderItems.reduce((itemAcc: any, item: any) => {
+//         return (
+//           itemAcc +
+//           (typeof item.productAmount === "object" &&
+//           "toNumber" in item.productAmount
+//             ? item.productAmount.toNumber()
+//             : parseFloat(item.productAmount as any) || 0)
+//         );
+//       }, 0)
+//     );
+//   }, 0);
+// };
+export const totalRevenue = (orders: Order[]): number => {
+  return orders.reduce((acc, order) => {
+    const orderAmount = typeof order.totalAmount === 'object' && 'toNumber' in order.totalAmount
+      ? order.totalAmount.toNumber()
+      : parseFloat(order.totalAmount as any) || 0;
+    
+    return acc + orderAmount;
   }, 0);
 };
+
+// export const filterLastMonthOrders = (orders: Order[]) => {
+//   const currentDate = new Date();
+//   const lastMonth = new Date(
+//     currentDate.getFullYear(),
+//     currentDate.getMonth() - 1, // Subtract 1 month
+//     currentDate.getDate(),
+//     currentDate.getHours(),
+//     currentDate.getMinutes(),
+//     currentDate.getSeconds()
+//   );
+//   return orders.filter((order) => {
+//     const createdAt = new Date(order.createdAt); 
+//     return createdAt >= lastMonth && createdAt < currentDate;
+//   });
+// };
+export const filterLastMonthOrders = (orders: Order[]) => {
+  const currentDate = new Date();
+  
+  // Get the date for the same day last month
+  const sameDayLastMonth = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth() - 1, // One month back
+    currentDate.getDate(), // Same day of the month as today
+    23, 59, 59 // End of the day
+  );
+  console.log("sameDayLastMonth", sameDayLastMonth);
+
+  // Start from the beginning of last month
+  const startOfLastMonth = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth() - 1, // One month back
+    1, // First day of the last month
+    0, 0, 0 // Beginning of the day
+  );
+  console.log("startOfLastMonth", startOfLastMonth);
+
+  return orders.filter((order) => {
+    const createdAt = new Date(order.createdAt);
+    return createdAt >= startOfLastMonth && createdAt <= sameDayLastMonth;
+  });
+};
+
+
+export const filterThisMonthOrders = (orders: Order[]) => {
+  const currentDate = new Date();
+  const startOfMonth = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(), // Current month (no subtraction)
+    1, // First day of the current month
+    0, 0, 0 // Set time to the beginning of the day
+  );
+  return orders.filter((order) => {
+    const createdAt = new Date(order.createdAt); 
+    return createdAt >= startOfMonth && createdAt <= currentDate;
+  });
+};
+
