@@ -19,7 +19,8 @@ model Store {
   consignmentRate  Int     @default(50)
   currency         String  @default("GBP")
   countryCode      String  @default("GB")
-  our_platform_fee Decimal @default(0.05) // just incase we wana offer the servce at a discount rat
+  // our_platform_fee Decimal @default(0.05) 
+  our_platform_fee Int     @default(5) // just incase we wana offer the servce at a discount rat
   email            String?
 
   // Address relation
