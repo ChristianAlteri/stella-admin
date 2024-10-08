@@ -138,7 +138,8 @@ function ProductAnalytics({ product }: { product: any }) {
         <CardContent>
           <div className="text-2xl font-bold">{daysListed} days</div>
           <div className="text-xs text-muted-foreground">
-            Listed on {new Date(product.createdAt).toLocaleDateString()}
+            Listed on{" "}
+            {new Date(product.createdAt).toLocaleDateString('en-GB')}
           </div>
         </CardContent>
       </Card>
@@ -247,7 +248,13 @@ function ProductBadge({
   );
 }
 
-function PriceInfo({ product, params }: { product: any; params: { storeId: string; productId: string } }) {
+function PriceInfo({
+  product,
+  params,
+}: {
+  product: any;
+  params: { storeId: string; productId: string };
+}) {
   return (
     <div className="space-y-2 w-1/2 mt-3">
       <div className="flex items-center">

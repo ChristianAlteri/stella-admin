@@ -1,7 +1,25 @@
 import NavBar from "@/components/NavBar";
 import prismadb from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
+import Decimal from "decimal.js";
 import { redirect } from "next/navigation";
+
+// // Utility function to convert Decimals to numbers
+// function convertDecimals(obj: any): any {
+//   if (obj === null || obj === undefined) {
+//     return obj;
+//   }
+//   if (typeof obj === "object") {
+//     for (const key in obj) {
+//       if (obj[key] instanceof Decimal) {
+//         obj[key] = obj[key].toNumber();
+//       } else if (typeof obj[key] === "object") {
+//         obj[key] = convertDecimals(obj[key]);
+//       }
+//     }
+//   }
+//   return obj;
+// }
 
 export default async function DashboardLayout({
   children,
@@ -16,7 +34,7 @@ export default async function DashboardLayout({
     redirect("/sign-in");
   }
 
-  const store = await prismadb.store.findFirst({
+  let store = await prismadb.store.findFirst({
     where: {
       id: params.storeId,
       userId,
@@ -25,7 +43,10 @@ export default async function DashboardLayout({
       address: true,
     },
   });
-  // console.log("store", store);
+
+  // TODO: Fix this decimal shit. Maybe just make the type INT in schema than multiply to a Decimal
+  // store = convertDecimals(store);
+
 
   if (!store) {
     redirect("/");

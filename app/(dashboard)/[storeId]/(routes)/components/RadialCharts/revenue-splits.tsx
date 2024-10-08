@@ -1,23 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  BadgeDollarSign,
-  LucideBadgeCheck,
-} from "lucide-react";
 import { Label, PolarRadiusAxis, RadialBar, RadialBarChart } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
 } from "@/components/ui/chart";
 import { totalRevenue } from "@/lib/utils";
 import { Order } from "@prisma/client";
 import { MdTrendingUp, MdTrendingDown } from "react-icons/md";
+import { BiCoinStack } from "react-icons/bi";
 
 export default function RevenueSplits({
   plainOrders,
@@ -48,6 +40,8 @@ export default function RevenueSplits({
       ? 0
       : ((currentMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100;
 
+
+      
   const chartData = [
     {
       sellerPayouts: payoutRevenue.toFixed(),
@@ -69,7 +63,7 @@ export default function RevenueSplits({
     <Card className="w-full">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-2xl font-semibold">Revenue</CardTitle>
-        <BadgeDollarSign className="h-6 w-6 text-green-500" />
+        <BiCoinStack className="h-6 w-6 text-green-500" />
       </CardHeader>
         <div className="ml-6 flex items-center justify-start text-sm">
           <span className="mr-2 text-muted-foreground">Overall growth:</span>

@@ -109,10 +109,10 @@ export async function GET(req: Request) {
         address: true,
       },
     });
-    // console.log("store", store);
-    // // Convert Decimal fields to numbers
-    // const storeWithConvertedDecimals = convertDecimalFields(store);
-    // console.log("storeWithConvertedDecimals", storeWithConvertedDecimals);
+    console.log("store", store);
+    // Convert Decimal fields to numbers
+    const storeWithConvertedDecimals = convertDecimalFields(store);
+    console.log("storeWithConvertedDecimals", storeWithConvertedDecimals);
 
     return NextResponse.json(store);
   } catch (error) {
