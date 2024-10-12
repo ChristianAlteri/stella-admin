@@ -1,19 +1,14 @@
 "use client";
 
 import { Package } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Product, Designer, Seller, Category } from "@prisma/client";
 import { RiErrorWarningLine } from "react-icons/ri";
 import { useParams, useRouter } from "next/navigation";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useState } from "react"; 
-import { Button } from "@/components/ui/button"; 
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 type ProductWithRelations = Product & {
   designer?: Designer;
@@ -72,9 +67,7 @@ export default function StockCard({
             <span className="text-sm font-medium text-muted-foreground">
               Sold
             </span>
-            <span className="text-2xl font-bold text-red-600">
-              {soldStock}
-            </span>
+            <span className="text-2xl font-bold text-red-600">{soldStock}</span>
           </div>
           <div className="col-span-2">
             <span className="text-sm font-medium text-muted-foreground">
@@ -132,11 +125,25 @@ export default function StockCard({
                       }
                     >
                       <td className="px-4 py-2">{product.name}</td>
-                      <td className="px-4 py-2">{product.designer?.name ?? "N/A"}</td>
-                      <td className="px-4 py-2">{product.category?.name ?? "N/A"}</td>
-                      <td className="px-4 py-2">£{product.ourPrice.toString()}</td>
                       <td className="px-4 py-2">
+                        {product.designer?.name ?? "N/A"}
+                      </td>
+                      <td className="px-4 py-2">
+                        {product.category?.name ?? "N/A"}
+                      </td>
+                      <td className="px-4 py-2">
+                        £{product.ourPrice.toString()}
+                      </td>
+                      {/* <td className="px-4 py-2">
                         {new Date(product.createdAt).toLocaleDateString()}
+                      </td> */}
+                      <td className="px-4 py-2">
+                        {Math.floor(
+                          (Number(new Date()) -
+                            Number(new Date(product.createdAt))) /
+                            (1000 * 60 * 60 * 24)
+                        )}{" "}
+                        days ago
                       </td>
                     </tr>
                   ))}
@@ -149,7 +156,6 @@ export default function StockCard({
     </Card>
   );
 }
-
 
 // "use client";
 
@@ -165,8 +171,8 @@ export default function StockCard({
 // import { RiErrorWarningLine } from "react-icons/ri";
 // import { useParams, useRouter } from "next/navigation";
 // import { ScrollArea } from "@/components/ui/scroll-area";
-// import { useState } from "react"; 
-// import { Button } from "@/components/ui/button"; 
+// import { useState } from "react";
+// import { Button } from "@/components/ui/button";
 
 // type ProductWithRelations = Product & {
 //   designer?: Designer;
@@ -281,7 +287,7 @@ export default function StockCard({
 //                     <div className="flex justify-between items-center mt-1 w-full gap-2">
 //                       <div className="font-medium hover:underline w-full">
 //                         {product.name}:
-                        
+
 //                       </div>
 //                       <span className="text-xs justify-start items-start w-full">
 //                         {product.designer?.name}

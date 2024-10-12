@@ -1,105 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-
 import prismadb from "@/lib/prismadb";
 import { Prisma } from "@prisma/client";
-
-// export async function GET(
-//   req: Request,
-//   { params }: { params: { storeId: string } }
-// ) {
-//   try {
-//     const { searchParams } = new URL(req.url);
-//     const name = searchParams.get("name") || undefined;
-
-//     if (!params.storeId) {
-//       return new NextResponse("Store id is required", { status: 400 });
-//     }
-
-//     const [sellers, designers, categories] = await Promise.all([
-//       prismadb.seller.findMany({
-//         where: {
-//           storeId: params.storeId,
-//           instagramHandle: {
-//             contains: name,
-//             mode: "insensitive",
-//           },
-//         },
-//         include: {
-//           billboard: true,
-//           products: {
-//             where: {
-//               isArchived: false,
-//             },
-//             include: {
-//               images: true,
-//               designer: true,
-//               seller: true,
-//               category: true,
-//               size: true,
-//               color: true,
-//             },
-//           },
-//         },
-//       }),
-//       prismadb.designer.findMany({
-//         where: {
-//           storeId: params.storeId,
-//           name: {
-//             contains: name,
-//             mode: "insensitive",
-//           },
-//         },
-//         include: {
-//           billboard: true,
-//           products: {
-//             where: {
-//               isArchived: false,
-//             },
-//             include: {
-//               images: true,
-//               designer: true,
-//               seller: true,
-//               category: true,
-//               size: true,
-//               color: true,
-//             },
-//           },
-//         },
-//       }),
-//       prismadb.category.findMany({
-//         where: {
-//           storeId: params.storeId,
-//           name: {
-//             contains: name,
-//             mode: "insensitive",
-//           },
-//         },
-//         include: {
-//           billboard: true,
-//           products: {
-//             where: {
-//               isArchived: false,
-//             },
-//             include: {
-//               images: true,
-//               designer: true,
-//               seller: true,
-//               category: true,
-//               size: true,
-//               color: true,
-//             },
-//           },
-//         },
-//       }),
-//     ]);
-
-//     return NextResponse.json({ sellers, designers, categories });
-//   } catch (error) {
-//     console.log("[SEARCH_GET]", error);
-//     return new NextResponse("Internal error", { status: 500 });
-//   }
-// }
 
 export async function GET(
   req: Request,
@@ -108,50 +10,104 @@ export async function GET(
   try {
     const { searchParams } = new URL(req.url);
     const productName = searchParams.get("productName") || undefined;
-    const designerName = searchParams.get("designerName") || undefined;
-
-    // console.log("searchParams", searchParams);
+    const limit = parseInt(searchParams.get("limit") || "500", 10);
 
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
     }
 
-
     const sellers = await prismadb.seller.findMany({
       where: {
         storeId: params.storeId,
-        instagramHandle: {
-          contains: productName,
-          mode: "insensitive",
-        },
+        OR: [
+          {
+            id: {
+              contains: productName,
+              mode: "insensitive",
+            },
+          },
+          {
+            instagramHandle: {
+              contains: productName,
+              mode: "insensitive",
+            },
+          },
+          {
+            firstName: {
+              contains: productName,
+              mode: "insensitive",
+            },
+          },
+          {
+            lastName: {
+              contains: productName,
+              mode: "insensitive",
+            },
+          },
+          {
+            sellerType: {
+              contains: productName,
+              mode: "insensitive",
+            },
+          },
+          {
+            storeName: {
+              contains: productName,
+              mode: "insensitive",
+            },
+          },
+          {
+            stripe_connect_unique_id: {
+              contains: productName,
+              mode: "insensitive",
+            },
+          },
+        ],
       },
     });
-    const sellerIds = sellers.map(seller => seller.id);
-
+    const sellerIds = sellers.map((seller) => seller.id);
 
     const designers = await prismadb.designer.findMany({
       where: {
         storeId: params.storeId,
-        name: {
-          contains: productName,
-          mode: "insensitive",
-        },
+        OR: [
+          {
+            id: {
+              contains: productName,
+              mode: "insensitive",
+            },
+          },
+          {
+            name: {
+              contains: productName,
+              mode: "insensitive",
+            },
+          },
+        ],
       },
     });
-    const designerIds = designers.map(designer => designer.id);
-
+    const designerIds = designers.map((designer) => designer.id);
 
     const categories = await prismadb.category.findMany({
       where: {
         storeId: params.storeId,
-        name: {
-          contains: productName,
-          mode: "insensitive",
-        },
+        OR: [
+          {
+            id: {
+              contains: productName,
+              mode: "insensitive",
+            },
+          },
+          {
+            name: {
+              contains: productName,
+              mode: "insensitive",
+            },
+          },
+        ],
       },
     });
-    const categoryIds = categories.map(category => category.id);
-
+    const categoryIds = categories.map((category) => category.id);
 
     const materials = await prismadb.material.findMany({
       where: {
@@ -162,8 +118,7 @@ export async function GET(
         },
       },
     });
-    const materialIds = materials.map(material => material.id);
-
+    const materialIds = materials.map((material) => material.id);
 
     const subcategories = await prismadb.subcategory.findMany({
       where: {
@@ -174,8 +129,7 @@ export async function GET(
         },
       },
     });
-    const subcategoryIds = subcategories.map(subcategory => subcategory.id);
-
+    const subcategoryIds = subcategories.map((subcategory) => subcategory.id);
 
     const colors = await prismadb.color.findMany({
       where: {
@@ -186,8 +140,7 @@ export async function GET(
         },
       },
     });
-    const colorIds = colors.map(color => color.id);
-
+    const colorIds = colors.map((color) => color.id);
 
     const sizes = await prismadb.size.findMany({
       where: {
@@ -198,8 +151,7 @@ export async function GET(
         },
       },
     });
-    const sizeIds = sizes.map(size => size.id);
-
+    const sizeIds = sizes.map((size) => size.id);
 
     const conditions = await prismadb.condition.findMany({
       where: {
@@ -210,8 +162,7 @@ export async function GET(
         },
       },
     });
-    const conditionIds = conditions.map(condition => condition.id);
-
+    const conditionIds = conditions.map((condition) => condition.id);
 
     const genders = await prismadb.gender.findMany({
       where: {
@@ -222,7 +173,7 @@ export async function GET(
         },
       },
     });
-    const genderIds = genders.map(gender => gender.id);
+    const genderIds = genders.map((gender) => gender.id);
 
     // Get products
     const products = await prismadb.product.findMany({
@@ -230,6 +181,7 @@ export async function GET(
         storeId: params.storeId,
         isArchived: false,
         OR: [
+          { id: productName },
           { designerId: { in: designerIds } },
           { sellerId: { in: sellerIds } },
           { categoryId: { in: categoryIds } },
@@ -257,9 +209,10 @@ export async function GET(
       orderBy: {
         createdAt: "desc" as Prisma.SortOrder,
       },
+      take: limit,
     });
 
-    // console.log(products);
+    // console.log("PRODUCTS",products);
     return NextResponse.json(products);
   } catch (error) {
     console.log("[PRODUCTS_GET]", error);

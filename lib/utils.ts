@@ -284,3 +284,22 @@ export const filterThisMonthOrders = (orders: Order[]) => {
     return createdAt >= startOfMonth && createdAt <= currentDate;
   });
 };
+
+export const getPayoutSums = (payouts: any[], storeId: string) => {
+  let storePayoutSum = new Decimal(0);
+  let sellerPayoutSum = new Decimal(0);
+
+  payouts.forEach((payout) => {
+    const payoutAmount = new Decimal(payout.amount);
+    if (payout.sellerId === storeId) {
+      storePayoutSum = storePayoutSum.plus(payoutAmount);
+    } else {
+      sellerPayoutSum = sellerPayoutSum.plus(payoutAmount);
+    }
+  });
+
+  return {
+    storePayoutSum: storePayoutSum.toNumber(),  
+    sellerPayoutSum: sellerPayoutSum.toNumber(),  
+  };
+};

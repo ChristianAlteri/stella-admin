@@ -6,6 +6,7 @@ import {
   convertDecimalsToNumbers,
   filterLastMonthOrders,
   filterThisMonthOrders,
+  getPayoutSums,
   totalRevenue,
 } from "@/lib/utils";
 import TopSellersCard from "./components/Cards/top-sellers-card";
@@ -89,9 +90,17 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
       // storeId: params.storeId,
     },
     orderBy: { createdAt: "desc" },
-    include: {seller: true}
+    include: { seller: true },
   });
-  
+  const { storePayoutSum, sellerPayoutSum } = getPayoutSums(
+    payouts,
+    params.storeId
+  );
+
+  const revenue = storePayoutSum + sellerPayoutSum;
+  const ourRevenue = storePayoutSum;
+  const payoutRevenue = sellerPayoutSum;
+
   // Cleaning up the data
   const plainOrders = convertDecimalsToNumbers(orders);
   const plainPayouts = convertDecimalsToNumbers(payouts);
@@ -106,10 +115,6 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
           products.length
         ).toFixed(2)
       : 0;
-
-  const revenue = totalRevenue(plainOrders);
-  const ourRevenue = revenue * 0.3; // This is wrong.
-  const payoutRevenue = revenue - ourRevenue; // TODO: Fetch all the payouts and calculate the total payouts. Our revenue is actually just totalRevenueForAllOrders - totalPayouts
 
   const lastMonthOrders = filterLastMonthOrders(plainOrders);
   const currentMonthOrders = filterThisMonthOrders(plainOrders);
@@ -150,14 +155,11 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
 
         <div className="grid gap-4 grid-cols-2">
           <RevenueSplits
-            plainOrders={plainOrders}
             revenue={revenue}
             ourRevenue={ourRevenue}
             payoutRevenue={payoutRevenue}
-            lastMonthOrders={lastMonthOrders}
             lastMonthRevenue={lastMonthRevenue}
             currentMonthRevenue={currentMonthRevenue}
-            currentMonthOrders={currentMonthOrders}
           />
 
           <StockCard
@@ -177,10 +179,11 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
         </div>
 
         <div className="flex flex-row w-full gap-4 justify-between">
-          <PayoutsAndOrdersCard latestPayouts={latestPayouts} latestOrders={latestOrders} />
+          <PayoutsAndOrdersCard
+            latestPayouts={latestPayouts}
+            latestOrders={latestOrders}
+          />
         </div>
-
-
 
         <div className="flex flex-row w-full gap-4 justify-between">
           <StoreRevenueVsOrderAreaChart orders={plainOrders} />
