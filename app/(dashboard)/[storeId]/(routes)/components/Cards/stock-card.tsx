@@ -1,14 +1,16 @@
 "use client";
 
-import { Package } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Product, Designer, Seller, Category } from "@prisma/client";
+import { Product, Designer, Seller, Category, Order } from "@prisma/client";
 import { RiErrorWarningLine } from "react-icons/ri";
 import { useParams, useRouter } from "next/navigation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton"
+import { Badge, DollarSign, Package, ShoppingCart, TrendingUp } from "lucide-react"
+import { formatCurrency } from "@/lib/utils";
 
 type ProductWithRelations = Product & {
   designer?: Designer;
@@ -21,12 +23,14 @@ export default function StockCard({
   soldStock,
   averagePrice,
   products,
-  // TODO: pass in orders and calculate only todays revenue
-}: {
+  todaysOrders,
+}: // TODO: pass in orders and calculate only todays revenue
+{
   liveStock: number;
   soldStock: number;
   averagePrice: number;
   products: ProductWithRelations[];
+  todaysOrders: Order[];
 }) {
   const router = useRouter();
   const params = useParams();
@@ -36,7 +40,7 @@ export default function StockCard({
   const filteredProducts = products.filter(
     (product) =>
       new Date(product.createdAt) <
-        new Date(new Date().setMonth(new Date().getMonth() - 3)) &&
+        new Date(new Date().setMonth(new Date().getMonth() - 1)) &&
       !product.isArchived
   );
 
@@ -50,61 +54,113 @@ export default function StockCard({
 
   const totalStockWorth = products.reduce((total, product) => {
     if (!product.isArchived) {
-        return total + (Number(product.ourPrice) || 0);
+      return total + (Number(product.ourPrice) || 0);
     }
     return total;
-}, 0);
+  }, 0);
+
+  const todaysRevenue = todaysOrders.reduce((total, order) => {
+    return total + (Number(order.totalAmount) || 0);
+  }, 0);
 
   return (
     <Card className="h-full flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-2xl font-bold">Stock</CardTitle>
-        <Package className="h-6 w-6 text-primary" />
+        {/* <CardTitle className="text-2xl font-bold">Stock</CardTitle> */}
       </CardHeader>
       <CardContent className="flex-grow grid gap-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex flex-col">
-            <span className="text-sm font-medium text-muted-foreground">
-              Live
-            </span>
-            <span className="text-2xl font-bold text-green-600">
-              {liveStock}
-            </span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-medium text-muted-foreground">
-              Sold
-            </span>
-            <span className="text-2xl font-bold text-red-600">{soldStock}</span>
-          </div>
-          <div className="col-span-2">
-            <span className="text-sm font-medium text-muted-foreground">
-              Average price point
-            </span>
-            <span className="block text-2xl font-bold">
-              £
-              {averagePrice.toLocaleString(undefined, {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0,
-              })}
-            </span>
-            <span className="text-sm font-medium text-muted-foreground">
-              Total Stock Worth
-            </span>
-            <span className="block text-2xl font-bold">
-              £
-              {totalStockWorth.toLocaleString(undefined, {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0,
-              })}
-            </span>
-          </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card className="col-span-full">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle>Today's Overview</CardTitle>
+        <Package className="h-6 w-6 text-primary" />
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground">
+                    Revenue
+                  </div>
+                  <div className="text-2xl font-bold">
+                    {todaysRevenue > 0 ? (
+                      formatCurrency(todaysRevenue)
+                    ) : (
+                      <span className="flex text-xs text-muted-foreground">No sales today</span>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground">
+                    Orders
+                  </div>
+                  {todaysOrders.length > 0 ? (
+                    <div className="text-2xl font-bold">
+                      {todaysOrders.length}
+                    </div>
+                  ) : (
+                    <div className="flex text-xs text-muted-foreground">
+                      No orders yet today
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Live Stock</CardTitle>
+              <Package className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{liveStock}</div>
+              <p className="text-xs text-muted-foreground">Available items</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Sold Stock</CardTitle>
+              <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{soldStock}</div>
+              <p className="text-xs text-muted-foreground">Items sold</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Average Price
+              </CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {formatCurrency(averagePrice)}
+              </div>
+              <p className="text-xs text-muted-foreground">Per item</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total Stock Worth
+              </CardTitle>
+              <Badge className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {formatCurrency(totalStockWorth)}
+              </div>
+              <p className="text-xs text-muted-foreground">Total value</p>
+            </CardContent>
+          </Card>
+          
         </div>
         <Separator />
         <div className="flex-grow flex flex-col">
           <div className="flex items-center justify-between mb-2">
             <span className="text-md font-bold flex items-center gap-2">
-              Live Stock Older Than 3 Months:
+              Stock Older Than 4 weeks:
               <RiErrorWarningLine className="text-orange-300 h-5 w-5" />
             </span>
             <Button
@@ -178,14 +234,9 @@ export default function StockCard({
 // "use client";
 
 // import { Package } from "lucide-react";
-// import {
-//   Card,
-//   CardContent,
-//   CardHeader,
-//   CardTitle,
-// } from "@/components/ui/card";
+// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 // import { Separator } from "@/components/ui/separator";
-// import { Product, Designer, Seller, Category } from "@prisma/client";
+// import { Product, Designer, Seller, Category, Order } from "@prisma/client";
 // import { RiErrorWarningLine } from "react-icons/ri";
 // import { useParams, useRouter } from "next/navigation";
 // import { ScrollArea } from "@/components/ui/scroll-area";
@@ -203,11 +254,14 @@ export default function StockCard({
 //   soldStock,
 //   averagePrice,
 //   products,
+//   todaysOrders,
+//   // TODO: pass in orders and calculate only todays revenue
 // }: {
 //   liveStock: number;
 //   soldStock: number;
 //   averagePrice: number;
 //   products: ProductWithRelations[];
+//   todaysOrders: Order[];
 // }) {
 //   const router = useRouter();
 //   const params = useParams();
@@ -217,7 +271,7 @@ export default function StockCard({
 //   const filteredProducts = products.filter(
 //     (product) =>
 //       new Date(product.createdAt) <
-//         new Date(new Date().setMonth(new Date().getMonth() - 1)) &&
+//         new Date(new Date().setMonth(new Date().getMonth() - 3)) &&
 //       !product.isArchived
 //   );
 
@@ -228,6 +282,17 @@ export default function StockCard({
 //       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
 //     }
 //   });
+
+//   const totalStockWorth = products.reduce((total, product) => {
+//     if (!product.isArchived) {
+//         return total + (Number(product.ourPrice) || 0);
+//     }
+//     return total;
+// }, 0);
+
+// const todaysRevenue = todaysOrders.reduce((total, order) => {
+//   return total  + (Number(order.totalAmount) || 0);
+// }, 0);
 
 //   return (
 //     <Card className="h-full flex flex-col">
@@ -249,9 +314,7 @@ export default function StockCard({
 //             <span className="text-sm font-medium text-muted-foreground">
 //               Sold
 //             </span>
-//             <span className="text-2xl font-bold text-red-600">
-//               {soldStock}
-//             </span>
+//             <span className="text-2xl font-bold text-red-600">{soldStock}</span>
 //           </div>
 //           <div className="col-span-2">
 //             <span className="text-sm font-medium text-muted-foreground">
@@ -260,6 +323,21 @@ export default function StockCard({
 //             <span className="block text-2xl font-bold">
 //               £
 //               {averagePrice.toLocaleString(undefined, {
+//                 minimumFractionDigits: 0,
+//                 maximumFractionDigits: 0,
+//               })}
+//             </span>
+//             <div>
+//             <span className="text-sm font-medium text-muted-foreground">
+//               Total Stock Worth
+//             </span>
+//             <span className="text-sm font-medium text-muted-foreground">
+//               Todays sales {todaysRevenue}
+//             </span>
+//             </div>
+//             <span className="block text-2xl font-bold">
+//               £
+//               {totalStockWorth.toLocaleString(undefined, {
 //                 minimumFractionDigits: 0,
 //                 maximumFractionDigits: 0,
 //               })}
@@ -282,48 +360,57 @@ export default function StockCard({
 //             </Button>
 //           </div>
 //           <ScrollArea className="flex-grow w-full flex-col h-[200px]">
-//             {products.length === 0 ? (
-//               <div className="text-sm text-muted-foreground w-full">
-//                 No products found
-//               </div>
-//             ) : sortedProducts.length === 0 ? (
+//             {sortedProducts.length === 0 ? (
 //               <div className="text-sm text-muted-foreground w-full">
 //                 No products older than 3 months found
 //               </div>
 //             ) : (
-//               <div className="space-y-2 flex flex-col w-full">
-//                 {sortedProducts.map((product) => (
-//                   <div
-//                     key={product.id}
-//                     onClick={() =>
-//                       router.push(
-//                         `/${params.storeId}/products/${product.id}/details`
-//                       )
-//                     }
-//                     className="text-sm text-muted-foreground hover:bg-muted p-2 rounded-md transition-colors cursor-pointer w-full"
-//                   >
-//                     <div className="flex justify-between items-center mt-1 w-full gap-2">
-//                       <div className="font-medium hover:underline w-full">
-//                         {product.name}:
-
-//                       </div>
-//                       <span className="text-xs justify-start items-start w-full">
-//                         {product.designer?.name}
-//                       </span>
-//                       <span className="text-xs justify-start items-start w-full">
-//                         {product.category?.name}
-//                       </span>
-//                       <span className="text-xs justify-start items-start w-full">
+//               <table className="w-full text-sm text-left text-muted-foreground">
+//                 <thead className="text-xs uppercase bg-gray-50 sticky top-0 rounded-md">
+//                   <tr className="rounded-md">
+//                     <th className="px-4 py-2">Product Name</th>
+//                     <th className="px-4 py-2">Designer</th>
+//                     <th className="px-4 py-2">Category</th>
+//                     <th className="px-4 py-2">Price</th>
+//                     <th className="px-4 py-2">Date Created</th>
+//                   </tr>
+//                 </thead>
+//                 <tbody>
+//                   {sortedProducts.map((product) => (
+//                     <tr
+//                       key={product.id}
+//                       className="hover:bg-gray-100 rounded-md hover:cursor-pointer"
+//                       onClick={() =>
+//                         router.push(
+//                           `/${params.storeId}/products/${product.id}/details`
+//                         )
+//                       }
+//                     >
+//                       <td className="px-4 py-2">{product.name}</td>
+//                       <td className="px-4 py-2">
+//                         {product.designer?.name ?? "N/A"}
+//                       </td>
+//                       <td className="px-4 py-2">
+//                         {product.category?.name ?? "N/A"}
+//                       </td>
+//                       <td className="px-4 py-2">
 //                         £{product.ourPrice.toString()}
-//                       </span>
-//                       <span className="text-xs w-full text-right justify-end">
-//                         Created:{" "}
+//                       </td>
+//                       {/* <td className="px-4 py-2">
 //                         {new Date(product.createdAt).toLocaleDateString()}
-//                       </span>
-//                     </div>
-//                   </div>
-//                 ))}
-//               </div>
+//                       </td> */}
+//                       <td className="px-4 py-2">
+//                         {Math.floor(
+//                           (Number(new Date()) -
+//                             Number(new Date(product.createdAt))) /
+//                             (1000 * 60 * 60 * 24)
+//                         )}{" "}
+//                         days ago
+//                       </td>
+//                     </tr>
+//                   ))}
+//                 </tbody>
+//               </table>
 //             )}
 //           </ScrollArea>
 //         </div>

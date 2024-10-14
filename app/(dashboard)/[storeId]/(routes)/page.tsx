@@ -121,6 +121,16 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
   const lastMonthRevenue = totalRevenue(lastMonthOrders);
   const currentMonthRevenue = totalRevenue(currentMonthOrders);
 
+  const todaysOrders = plainOrders.filter((order: any) => {
+    const orderDate = new Date(order.createdAt);
+    const today = new Date();
+    return (
+      orderDate.getDate() === today.getDate() &&
+      orderDate.getMonth() === today.getMonth() &&
+      orderDate.getFullYear() === today.getFullYear()
+    );
+  });
+
   const soldStock = products.filter(
     (product: any) => product.isArchived === true
   ).length;
@@ -148,7 +158,7 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
   const topSellingCondition = await getTopSellingGenderCount(params.storeId);
   const topSellingGender = await getTopSellingConditionCount(params.storeId);
   return (
-    <div className="flex-col">
+    <div className="flex-col bg-slate-100">
       <div className="flex-1 space-y-4 p-8 pt-6">
         <Heading title="Dashboard" description="Overview of your store" />
         <Separator />
@@ -167,6 +177,7 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
             soldStock={soldStock}
             averagePrice={averagePrice}
             products={plainProducts}
+            todaysOrders={todaysOrders}
           />
 
           {/* <Card className="overflow-y-auto">

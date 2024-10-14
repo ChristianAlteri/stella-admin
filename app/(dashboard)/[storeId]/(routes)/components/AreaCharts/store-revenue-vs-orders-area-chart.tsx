@@ -59,35 +59,37 @@ const calculateRevenueAndOrdersByDate = (
   isMonthly: boolean,
   storeId: string | string[]
 ) => {
-  const intervalFunc = isMonthly ? eachMonthOfInterval : eachDayOfInterval
-  const dateFormat = isMonthly ? "MMM yyyy" : "dd-MM-yyyy"
+  const intervalFunc = isMonthly ? eachMonthOfInterval : eachDayOfInterval;
+  const dateFormat = isMonthly ? "MMM yyyy" : "dd-MM-yyyy";
 
-
-  const allDates = intervalFunc({ start: startDate, end: endDate })
-  const revenueByDate: Record<string, { revenue: number; orders: number; storeRevenue: number }> = {}
+  const allDates = intervalFunc({ start: startDate, end: endDate });
+  const revenueByDate: Record<
+    string,
+    { revenue: number; orders: number; storeRevenue: number }
+  > = {};
 
   allDates.forEach((date) => {
-    const dateKey = format(date, dateFormat)
-    revenueByDate[dateKey] = { revenue: 0, orders: 0, storeRevenue: 0 }
-  })
+    const dateKey = format(date, dateFormat);
+    revenueByDate[dateKey] = { revenue: 0, orders: 0, storeRevenue: 0 };
+  });
 
   orders.forEach((order: any) => {
-    const orderDate = new Date(order.createdAt)
-    if (orderDate < startDate || orderDate > endDate) return
+    const orderDate = new Date(order.createdAt);
+    if (orderDate < startDate || orderDate > endDate) return;
 
-    const dateKey = format(orderDate, dateFormat)
+    const dateKey = format(orderDate, dateFormat);
 
     if (!revenueByDate[dateKey]) {
-      revenueByDate[dateKey] = { revenue: 0, orders: 0, storeRevenue: 0 }
+      revenueByDate[dateKey] = { revenue: 0, orders: 0, storeRevenue: 0 };
     }
 
     const totalAmount =
       typeof order.totalAmount === "object" && "toNumber" in order.totalAmount
         ? order.totalAmount.toNumber()
-        : parseFloat(order.totalAmount as any) || 0
+        : parseFloat(order.totalAmount as any) || 0;
 
-    revenueByDate[dateKey].revenue += totalAmount
-    revenueByDate[dateKey].orders += 1
+    revenueByDate[dateKey].revenue += totalAmount;
+    revenueByDate[dateKey].orders += 1;
 
     // TODO: calculate the store cut by passing in Payouts and doing a similar check as below
     // order?.orderItems?.forEach((orderItem: { sellerId: string | string[]; }) => {
@@ -95,9 +97,9 @@ const calculateRevenueAndOrdersByDate = (
     //     revenueByDate[dateKey].storeRevenue += order.totalAmount;
     //     console.log("revenueByDate[dateKey].storeRevenue", revenueByDate[dateKey].storeRevenue);
     //   }})
-  })
-  return revenueByDate
-}
+  });
+  return revenueByDate;
+};
 
 function DatePickerWithRange({
   className,
@@ -150,60 +152,68 @@ function DatePickerWithRange({
 }
 
 export function StoreRevenueVsOrderAreaChart({ orders }: { orders: any }) {
-  const currentDate = new Date();
+  const [isMounted, setIsMounted] = useState(false)
+  const { storeId } = useParams()
+  
+  const currentDate = new Date()
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: startOfYear(currentDate),
     to: endOfYear(currentDate),
-  });
-  const [isMonthly, setIsMonthly] = useState(true);
-  const [yearOffset, setYearOffset] = useState(0);
-  const [chartData, setChartData] = useState<any[]>([]);
-  const [filteredRevenue, setFilteredRevenue] = useState(0);
-  const [filteredOrders, setFilteredOrders] = useState(0);
-  const { storeId } = useParams();
-  
+  })
+  const [isMonthly, setIsMonthly] = useState(true)
+  const [yearOffset, setYearOffset] = useState(0)
+  const [chartData, setChartData] = useState<any[]>([])
+  const [filteredRevenue, setFilteredRevenue] = useState(0)
+  const [filteredOrders, setFilteredOrders] = useState(0)
 
   useEffect(() => {
-    if (dateRange?.from && dateRange?.to) {
+    setIsMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (isMounted && dateRange?.from && dateRange?.to) {
       const filteredData = calculateRevenueAndOrdersByDate(
         orders,
         dateRange.from,
         dateRange.to,
         isMonthly,
         storeId
-      );
+      )
 
       const newChartData = Object.entries(filteredData).map(([date, data]) => ({
         date,
         revenue: data.revenue,
         orders: data.orders,
-      }));
-      setChartData(newChartData);
+      }))
+      setChartData(newChartData)
       setFilteredRevenue(
         newChartData.reduce((sum, data) => sum + data.revenue, 0)
-      );
+      )
       setFilteredOrders(
         newChartData.reduce((sum, data) => sum + data.orders, 0)
-      );
+      )
     }
-  }, [dateRange, orders, isMonthly]);
+  }, [isMounted, dateRange, orders, isMonthly, storeId])
 
-  // Modified selectDateRange to accept an offset
   const selectDateRange = (offset: number) => {
-    const today = new Date();
-    const yearToSelect = new Date().getFullYear() + offset;
-
+    const yearToSelect = new Date().getFullYear() + offset
     setDateRange({
       from: startOfYear(new Date(yearToSelect, 0, 1)),
       to: endOfYear(new Date(yearToSelect, 11, 31)),
-    });
-  };
+    })
+  }
 
-  // Function to handle year adjustment
   const adjustYear = (increment: number) => {
-    setYearOffset((prev) => prev + increment);
-    selectDateRange(yearOffset + increment); // Update the date range based on the new offset
-  };
+    setYearOffset((prev) => {
+      const newOffset = prev + increment
+      selectDateRange(newOffset)
+      return newOffset
+    })
+  }
+
+  if (!isMounted) {
+    return null
+  }
 
   if (!orders || orders.length === 0) {
     return (
@@ -216,7 +226,7 @@ export function StoreRevenueVsOrderAreaChart({ orders }: { orders: any }) {
           <div>No data to display</div>
         </CardContent>
       </Card>
-    );
+    )
   }
 
   const chartConfig = {
@@ -278,7 +288,6 @@ export function StoreRevenueVsOrderAreaChart({ orders }: { orders: any }) {
                       <SelectItem value="daily">Daily</SelectItem>
                     </SelectContent>
                   </Select>
-
                 </div>
               </div>
             </div>
@@ -345,8 +354,8 @@ export function StoreRevenueVsOrderAreaChart({ orders }: { orders: any }) {
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="leading-none text-muted-foreground">
           Showing {isMonthly ? "monthly" : "daily"} revenue and orders from{" "}
-          {dateRange?.from?.toLocaleDateString()} to{" "}
-          {dateRange?.to?.toLocaleDateString()}
+          {dateRange?.from ? format(dateRange.from, "dd/MM/yyyy") : ""} to{" "}
+          {dateRange?.to ? format(dateRange.to, "dd/MM/yyyy") : ""}
         </div>
       </CardFooter>
     </Card>
@@ -688,4 +697,3 @@ export function StoreRevenueVsOrderAreaChart({ orders }: { orders: any }) {
 //     </Card>
 //   );
 // }
-

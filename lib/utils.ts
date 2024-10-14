@@ -13,6 +13,15 @@ export const formatter = new Intl.NumberFormat("en-GB", {
   currency: "GBP",
 });
 
+export const formatCurrency = (value: number) => {
+  return value.toLocaleString('en-GB', {
+    style: 'currency',
+    currency: 'GBP',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  })
+}
+
 // Utility function to convert Decimal fields to numbers
 export function convertDecimalFields(obj: any): any {
   if (Array.isArray(obj)) {

@@ -9,15 +9,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
 import { Order, Payout, Seller } from "@prisma/client";
+import { format } from "date-fns";
 
 type PayoutWithSeller = Payout & {
   seller: Seller;
@@ -47,20 +43,22 @@ export default function PayoutsAndOrdersCard({
         <div className="flex items-center justify-between">
           <CardTitle className="flex flex-row gap-2 items-center">
             Payouts and Orders
-            {isExpanded ? <Button
-              variant="link"
-              className=" p-2"
-              onClick={() =>
-                router.push(
-                  activeTab === "payouts"
-                    ? `/${params.storeId}/payouts`
-                    : `/${params.storeId}/orders`
-                )
-              }
-            >
-              View all {activeTab}
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button> : null}
+            {isExpanded ? (
+              <Button
+                variant="link"
+                className=" p-2"
+                onClick={() =>
+                  router.push(
+                    activeTab === "payouts"
+                      ? `/${params.storeId}/payouts`
+                      : `/${params.storeId}/orders`
+                  )
+                }
+              >
+                View all {activeTab}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            ) : null}
           </CardTitle>
           <div className="flex items-center">
             <Tabs
@@ -144,7 +142,7 @@ export default function PayoutsAndOrdersCard({
                           : "Our Store"}
                       </td>
                       <td className="px-4 py-2">
-                        {new Date(payout.createdAt).toLocaleDateString()}
+                        {format(new Date(payout.createdAt), "dd/MM/yyyy") || ""}
                       </td>
                     </tr>
                   ))
@@ -158,7 +156,7 @@ export default function PayoutsAndOrdersCard({
                         ${order.totalAmount.toString()}
                       </td>
                       <td className="px-4 py-2">
-                        {new Date(order.createdAt).toLocaleDateString()}
+                        {format(new Date(order.createdAt), "dd/MM/yyyy") || ""}
                       </td>
                     </tr>
                   ))}
@@ -275,7 +273,7 @@ export default function PayoutsAndOrdersCard({
 //                         onClick={() => {
 //                           if (
 //                             payout.seller?.instagramHandle ||
-//                             payout.seller?.firstName 
+//                             payout.seller?.firstName
 //                           ) {
 //                             router.push(
 //                               `/${params.storeId}/sellers/${payout.seller.id}/details`
