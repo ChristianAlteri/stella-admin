@@ -471,6 +471,7 @@ export default function StripeTerminalComponent() {
             }}
             className="w-full"
           >
+            
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="search">Search</TabsTrigger>
               <TabsTrigger value="seller">Seller</TabsTrigger>

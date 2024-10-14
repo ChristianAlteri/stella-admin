@@ -21,6 +21,7 @@ export default function StockCard({
   soldStock,
   averagePrice,
   products,
+  // TODO: pass in orders and calculate only todays revenue
 }: {
   liveStock: number;
   soldStock: number;
@@ -46,6 +47,13 @@ export default function StockCard({
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     }
   });
+
+  const totalStockWorth = products.reduce((total, product) => {
+    if (!product.isArchived) {
+        return total + (Number(product.ourPrice) || 0);
+    }
+    return total;
+}, 0);
 
   return (
     <Card className="h-full flex flex-col">
@@ -76,6 +84,16 @@ export default function StockCard({
             <span className="block text-2xl font-bold">
               £
               {averagePrice.toLocaleString(undefined, {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              })}
+            </span>
+            <span className="text-sm font-medium text-muted-foreground">
+              Total Stock Worth
+            </span>
+            <span className="block text-2xl font-bold">
+              £
+              {totalStockWorth.toLocaleString(undefined, {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0,
               })}
