@@ -22,6 +22,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 interface Seller {
   id: string;
   instagramHandle: string;
+  storeName: string | null;
 }
 
 interface Category {
@@ -140,7 +141,7 @@ export const ProductClient: React.FC<ProductClientProps> = ({
                 <SelectContent>
                   {sellers.map((seller) => (
                     <SelectItem key={seller.id} value={seller.id}>
-                      {seller.instagramHandle}
+                      {seller.storeName || seller.instagramHandle}
                     </SelectItem>
                   ))}
                 </SelectContent>

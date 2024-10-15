@@ -30,6 +30,7 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
     select: {
       id: true,
       instagramHandle: true,
+      storeName: true,
     },
   });
   const categories = await prismadb.category.findMany({
@@ -42,7 +43,7 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
   const formattedProducts: ProductColumn[] = products.map((item) => ({
     id: item.id,
     name: item.name,
-    description: item.description,
+    description: item.description || "",
     isFeatured: item.isFeatured,
     isArchived: item.isArchived,
     isOnSale: item.isOnSale,
@@ -54,7 +55,8 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
     clicks: item.clicks,
     category: item.category.name,
     designer: item.designer.name,
-    sellerHandle: item.seller.instagramHandle,
+    sellerHandle: item.seller?.instagramHandle || "",
+    sellerStoreName: item.seller?.storeName || "",
     size: item.size.name,
     color: item.color.name,
     condition: item.condition.value,
@@ -65,7 +67,7 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
     imageUrl: item.images[0].url,
     designerId: item.designerId,
     categoryId: item.categoryId,
-    sellerId: item.seller.id,
+    sellerId: item.seller?.id || "",
     storeId: item.storeId,
   }));
 

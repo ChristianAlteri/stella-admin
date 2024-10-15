@@ -77,8 +77,6 @@ export async function POST(request: Request) {
         productAmount: new Prisma.Decimal(product.ourPrice),
       })),
     });
-    console.log("orderItems", orderItems);
-    console.log("newOrder", newOrder);
 
     const sellerIds = products.map((product: any) => product.seller.id);
 

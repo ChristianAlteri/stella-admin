@@ -29,7 +29,7 @@ export default function PayoutsAndOrdersCard({
   latestOrders,
 }: PayoutsAndOrdersCardProps) {
   const [activeTab, setActiveTab] = useState<"payouts" | "orders">("payouts");
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const router = useRouter();
   const params = useParams();
 
@@ -126,7 +126,7 @@ export default function PayoutsAndOrdersCard({
                         className="px-4 py-2 hover:underline hover:cursor-pointer"
                         onClick={() => {
                           if (
-                            payout.seller?.instagramHandle ||
+                            payout.seller?.storeName || payout.seller?.instagramHandle ||
                             payout.seller?.firstName
                           ) {
                             router.push(
@@ -135,10 +135,10 @@ export default function PayoutsAndOrdersCard({
                           }
                         }}
                       >
-                        {payout.seller?.instagramHandle
+                        {payout.seller?.storeName
+                          ? payout.seller.storeName
+                          : payout.seller?.instagramHandle
                           ? payout.seller.instagramHandle
-                          : payout.seller?.firstName
-                          ? payout.seller.firstName
                           : "Our Store"}
                       </td>
                       <td className="px-4 py-2">

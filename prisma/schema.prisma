@@ -16,10 +16,10 @@ model Store {
   name   String
   userId String // Clerk js user id
 
-  consignmentRate  Int     @default(50)
-  currency         String  @default("GBP")
-  countryCode      String  @default("GB")
- 
+  consignmentRate Int    @default(50)
+  currency        String @default("GBP")
+  countryCode     String @default("GB")
+
   our_platform_fee Int     @default(5) // just incase we wana offer the servce at a discount rate
   email            String?
 
@@ -191,22 +191,9 @@ model Designer {
 model Product {
   id            String      @id @default(uuid())
   name          String
-  description   String?
-  retailPrice   Decimal     @default(0.0)
   ourPrice      Decimal     @default(0.0)
-  measurements  String?
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
-  likes         Int?        @default(0)
-  clicks        Int?        @default(0)
-  isOnSale      Boolean     @default(false)
-  isFeatured    Boolean     @default(false)
-  isArchived    Boolean     @default(false)
-  isCharity     Boolean     @default(false)
-  isHidden      Boolean     @default(false)
-
-
-  // TODO: make seller optional so we can support stores making sales -- reflect this in the verify payment route where you add the storeId if there is no sellerId
   images        Image[] // Relation to Image model
   orderItems    OrderItem[] // Relation to Order model
   storeId       String // Foreign Key to Store
@@ -219,16 +206,27 @@ model Product {
   seller        Seller      @relation("SellerToProduct", fields: [sellerId], references: [id])
   sizeId        String // Foreign Key to Size
   size          Size        @relation(fields: [sizeId], references: [id])
-  colorId       String // Foreign Key to Color
-  color         Color       @relation(fields: [colorId], references: [id])
-  conditionId   String // Foreign Key to Color
-  condition     Condition   @relation(fields: [conditionId], references: [id])
-  materialId    String // Foreign Key to Color
-  material      Material    @relation(fields: [materialId], references: [id])
-  genderId      String // Foreign Key to Color
-  gender        Gender      @relation(fields: [genderId], references: [id])
   subcategoryId String // Foreign Key to Color
   subcategory   Subcategory @relation(fields: [subcategoryId], references: [id])
+
+  colorId      String? // Foreign Key to Color
+  color        Color?     @relation(fields: [colorId], references: [id])
+  conditionId  String? // Foreign Key to Color
+  condition    Condition? @relation(fields: [conditionId], references: [id])
+  materialId   String? // Foreign Key to Color
+  material     Material?  @relation(fields: [materialId], references: [id])
+  genderId     String? // Foreign Key to Color
+  gender       Gender?    @relation(fields: [genderId], references: [id])
+  isOnSale     Boolean    @default(false)
+  isFeatured   Boolean    @default(false)
+  isArchived   Boolean    @default(false)
+  isCharity    Boolean    @default(false)
+  isHidden     Boolean    @default(false)
+  retailPrice  Decimal?   @default(0.0)
+  likes        Int?       @default(0)
+  clicks       Int?       @default(0)
+  description  String?
+  measurements String?
 
   @@index([storeId])
   @@index([sellerId])

@@ -552,7 +552,7 @@ export default function StripeTerminalComponent() {
                                     </div>
                                     <div className="flex flex-row gap-2 text-end items-center w-full">
                                       <p className="text-xs text-gray-500 w-full mr-4">
-                                        {result.seller.instagramHandle ||
+                                        {result.seller.storeName || result.seller.instagramHandle ||
                                           result.seller.firstName}
                                       </p>
                                     </div>

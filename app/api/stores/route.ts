@@ -78,6 +78,17 @@ export async function POST(req: Request) {
         address: true
       }
     });
+
+    const seller = await prismadb.seller.create({
+      data: {
+        id: store.id, 
+        storeId: store.id,
+        storeName: store.name,
+        firstName: store.name,
+        lastName: store.name,
+        instagramHandle: store.name,
+      }
+    });
   
     return NextResponse.json(store);
   } catch (error) {

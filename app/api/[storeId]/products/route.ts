@@ -137,7 +137,7 @@ export async function POST(
         },
         seller: {
           connect: {
-            id: sellerId || params.storeId,
+            id: sellerId,
           },
         },
       },

@@ -1,7 +1,7 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
 import * as z from "zod";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
@@ -62,16 +62,16 @@ const formSchema = z.object({
   description: z.string().min(1).optional(),
   images: z.object({ url: z.string() }).array(),
   ourPrice: z.coerce.number().min(1),
-  retailPrice: z.coerce.number().min(1).optional(),
+  retailPrice: z.coerce.number().optional(),
   designerId: z.string().min(1),
   sellerId: z.string().min(1),
   categoryId: z.string().min(1),
   subcategoryId: z.string().min(1),
-  colorId: z.string().min(1).optional(),
+  colorId: z.string().optional(),
   sizeId: z.string().min(1),
-  conditionId: z.string().min(1).optional(),
-  materialId: z.string().min(1).optional(),
-  genderId: z.string().min(1).optional(),
+  conditionId: z.string().optional(),
+  materialId: z.string().optional(),
+  genderId: z.string().optional(),
   isFeatured: z.boolean().default(false).optional(),
   isArchived: z.boolean().default(false).optional(),
   isOnSale: z.boolean().default(false).optional(),
@@ -291,20 +291,22 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData
-      ? {
+      ? {// edit product
           ...initialData,
           ourPrice: parseFloat(String(initialData?.ourPrice)), // TODO: i think entering product amount bug and it being wrong is from here, the parseFloat
           retailPrice: parseFloat(String(initialData?.retailPrice)),
+          description: initialData.description ?? undefined,
+          sellerId: initialData.sellerId ?? undefined,
         }
-      : {
+      : {// create new product
           name: "",
-          description: "",
+          description: undefined,
           images: [],
           ourPrice: 0,
           retailPrice: 0,
           designerId: "",
-          // sellerId: `${params.storeId}`,
           sellerId: "",
+          // sellerId: `${params.storeId}`,
           categoryId: "",
           subcategoryId: "",
           colorId: "",
@@ -335,7 +337,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     });
   };
 
-  const onSubmit = async (data: ProductFormValues) => {
+  // const onSubmit = async (data: ProductFormValues) => {
+    const onSubmit: SubmitHandler<ProductFormValues> = async (data) => {
     try {
       setLoading(true);
       if (initialData) {
@@ -379,103 +382,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   };
   
 
-  // const renderSelector = (
-  //   name: string,
-  //   label: string,
-  //   options: any[],
-  //   optionKey: string,
-  //   isDialogOpen: boolean,
-  //   setIsDialogOpen: (open: boolean) => void
-  // ) => {
-  //   const isPopoverOpen = popoverStates[name] || false;
-  //   return (
-  //     <FormField
-  //       control={form.control}
-  //       name={name as keyof ProductFormValues}
-  //       render={({ field }) => (
-  //         <FormItem className="flex flex-col space-y-2 w-[300px]">
-  //           <FormLabel htmlFor={name}>{label}</FormLabel>
-  //           <div className="flex items-center space-x-2">
-  //           <Popover
-  //             open={isPopoverOpen}
-  //             onOpenChange={() => togglePopover(name)}
-  //           >
-  //               <PopoverTrigger asChild>
-  //                 <FormControl>
-  //                   <Button
-  //                     variant="outline"
-  //                     role="combobox"
-  //                     className={cn(
-  //                       "w-full justify-between",
-  //                       !field.value && "text-muted-foreground"
-  //                     )}
-  //                   >
-  //                     {field.value
-  //                       ? options.find((option) => option.id === field.value)?.[
-  //                           optionKey
-  //                         ]
-  //                       : `Select ${label.toLowerCase()}`}
-  //                     <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-  //                   </Button>
-  //                 </FormControl>
-  //               </PopoverTrigger>
-  //               <PopoverContent className="w-[300px] p-0">
-  //                 <Command>
-  //                   <CommandInput
-  //                     placeholder={`Search ${label.toLowerCase()}...`}
-  //                   />
-  //                   <CommandEmpty>No {label.toLowerCase()} found.</CommandEmpty>
-  //                   <CommandGroup>
-  //                     {options.map((option) => (
-  //                       <CommandItem
-  //                         value={option[optionKey]}
-  //                         key={option[optionKey]}
-  //                         onSelect={() => {
-  //                           form.setValue(
-  //                             name as keyof ProductFormValues,
-  //                             option.id
-  //                           );
-  //                           togglePopover(name);
-  //                         }}
-  //                       >
-  //                         <Check
-  //                           className={cn(
-  //                             "mr-2 h-4 w-4",
-  //                             field.value === option.id
-  //                               ? "opacity-100"
-  //                               : "opacity-0"
-  //                           )}
-  //                         />
-  //                         {option[optionKey]}
-  //                       </CommandItem>
-  //                     ))}
-  //                   </CommandGroup>
-  //                 </Command>
-  //               </PopoverContent>
-  //             </Popover>
-  //             {label.toLowerCase() !== "seller" && (
-  //               <Button
-  //                 type="button"
-  //                 variant="outline"
-  //                 size="icon"
-  //                 onClick={() => setIsDialogOpen(true)}
-  //                 className="flex-shrink-0"
-  //               >
-  //                 <Plus className="h-4 w-4" />
-  //                 <span className="sr-only">Add new {label.toLowerCase()}</span>
-  //               </Button>
-  //             )}
-  //           </div>
-  //           {/* <FormDescription>
-  //             Select from the {label.toLowerCase()}
-  //           </FormDescription> */}
-  //           <FormMessage />
-  //         </FormItem>
-  //       )}
-  //     />
-  //   );
-  // };
-
+ 
   const renderSelector = (
     name: string,
     label: string,
@@ -512,7 +419,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                             optionKey
                           ]
                         : label.toLowerCase() === "seller"
-                        ? "Defaults to your store"
+                        ? "Select Seller or your Store"
                         : `Select ${label.toLowerCase()}`}
                       <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
@@ -671,7 +578,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   "sellerId",
                   "Seller",
                   sellers,
-                  "instagramHandle",
+                  "storeName",
                   activeFieldType === "colors",
                   () => openAddFieldDialog("colors")
                 )}
@@ -1750,3 +1657,101 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 //     />
 //   )
 // }
+
+
+ // const renderSelector = (
+  //   name: string,
+  //   label: string,
+  //   options: any[],
+  //   optionKey: string,
+  //   isDialogOpen: boolean,
+  //   setIsDialogOpen: (open: boolean) => void
+  // ) => {
+  //   const isPopoverOpen = popoverStates[name] || false;
+  //   return (
+  //     <FormField
+  //       control={form.control}
+  //       name={name as keyof ProductFormValues}
+  //       render={({ field }) => (
+  //         <FormItem className="flex flex-col space-y-2 w-[300px]">
+  //           <FormLabel htmlFor={name}>{label}</FormLabel>
+  //           <div className="flex items-center space-x-2">
+  //           <Popover
+  //             open={isPopoverOpen}
+  //             onOpenChange={() => togglePopover(name)}
+  //           >
+  //               <PopoverTrigger asChild>
+  //                 <FormControl>
+  //                   <Button
+  //                     variant="outline"
+  //                     role="combobox"
+  //                     className={cn(
+  //                       "w-full justify-between",
+  //                       !field.value && "text-muted-foreground"
+  //                     )}
+  //                   >
+  //                     {field.value
+  //                       ? options.find((option) => option.id === field.value)?.[
+  //                           optionKey
+  //                         ]
+  //                       : `Select ${label.toLowerCase()}`}
+  //                     <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+  //                   </Button>
+  //                 </FormControl>
+  //               </PopoverTrigger>
+  //               <PopoverContent className="w-[300px] p-0">
+  //                 <Command>
+  //                   <CommandInput
+  //                     placeholder={`Search ${label.toLowerCase()}...`}
+  //                   />
+  //                   <CommandEmpty>No {label.toLowerCase()} found.</CommandEmpty>
+  //                   <CommandGroup>
+  //                     {options.map((option) => (
+  //                       <CommandItem
+  //                         value={option[optionKey]}
+  //                         key={option[optionKey]}
+  //                         onSelect={() => {
+  //                           form.setValue(
+  //                             name as keyof ProductFormValues,
+  //                             option.id
+  //                           );
+  //                           togglePopover(name);
+  //                         }}
+  //                       >
+  //                         <Check
+  //                           className={cn(
+  //                             "mr-2 h-4 w-4",
+  //                             field.value === option.id
+  //                               ? "opacity-100"
+  //                               : "opacity-0"
+  //                           )}
+  //                         />
+  //                         {option[optionKey]}
+  //                       </CommandItem>
+  //                     ))}
+  //                   </CommandGroup>
+  //                 </Command>
+  //               </PopoverContent>
+  //             </Popover>
+  //             {label.toLowerCase() !== "seller" && (
+  //               <Button
+  //                 type="button"
+  //                 variant="outline"
+  //                 size="icon"
+  //                 onClick={() => setIsDialogOpen(true)}
+  //                 className="flex-shrink-0"
+  //               >
+  //                 <Plus className="h-4 w-4" />
+  //                 <span className="sr-only">Add new {label.toLowerCase()}</span>
+  //               </Button>
+  //             )}
+  //           </div>
+  //           {/* <FormDescription>
+  //             Select from the {label.toLowerCase()}
+  //           </FormDescription> */}
+  //           <FormMessage />
+  //         </FormItem>
+  //       )}
+  //     />
+  //   );
+  // };

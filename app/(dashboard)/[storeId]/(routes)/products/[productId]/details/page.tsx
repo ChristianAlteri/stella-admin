@@ -53,7 +53,7 @@ export default async function ProductDetailsPage({
   const productColumnData: ProductColumn = {
     id: product.id,
     name: product.name,
-    description: product.description,
+    description: product.description || "",
     ourPrice: formatter.format(product.ourPrice.toNumber()),
     retailPrice: formatter.format(product.retailPrice.toNumber()),
     designer: product.designer.name,
