@@ -312,3 +312,12 @@ export const getPayoutSums = (payouts: any[], storeId: string) => {
     sellerPayoutSum: sellerPayoutSum.toNumber(),  
   };
 };
+
+export const getFieldTypeSingular = (fieldType: string) => {
+  if (fieldType === "sub-categories") {
+    return "subcategory";
+  } else if (fieldType === "categories") {
+    return "category";
+  }
+  return fieldType.slice(0, -1);
+};

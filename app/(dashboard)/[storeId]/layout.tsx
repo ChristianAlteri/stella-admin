@@ -1,8 +1,9 @@
 import NavBar from "@/components/NavBar";
 import prismadb from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
+import { HomeIcon } from "lucide-react";
 import { redirect } from "next/navigation";
-
+import { TbCash, TbDeviceAnalytics, TbFriends, TbSettings, TbTag } from "react-icons/tb";
 
 export default async function DashboardLayout({
   children,
@@ -32,9 +33,25 @@ export default async function DashboardLayout({
   }
 
   return (
-    <>
+    //     <>
+    //       <NavBar />
+    //       <aside className="bg-red-400 w-[20px]">
+    // HI
+    //       {children}
+    //       </aside>
+    //     </>
+    <div className="min-h-screen flex flex-col bg-slate-100">
       <NavBar />
-      {children}
-    </>
+      <div className="flex flex-1">
+        <aside className="w-14 bg-slate-100 border">
+        <TbDeviceAnalytics />
+          <TbCash />
+          <TbTag />
+          <TbFriends />
+          <TbSettings />
+        </aside>
+        <main className="flex-1 p-6">{children}</main>
+      </div>
+    </div>
   );
 }

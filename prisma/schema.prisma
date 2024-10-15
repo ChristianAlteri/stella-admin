@@ -19,8 +19,8 @@ model Store {
   consignmentRate  Int     @default(50)
   currency         String  @default("GBP")
   countryCode      String  @default("GB")
-  // our_platform_fee Decimal @default(0.05) 
-  our_platform_fee Int     @default(5) // just incase we wana offer the servce at a discount rat
+ 
+  our_platform_fee Int     @default(5) // just incase we wana offer the servce at a discount rate
   email            String?
 
   // Address relation
@@ -191,7 +191,7 @@ model Designer {
 model Product {
   id            String      @id @default(uuid())
   name          String
-  description   String
+  description   String?
   retailPrice   Decimal     @default(0.0)
   ourPrice      Decimal     @default(0.0)
   measurements  String?
@@ -204,9 +204,9 @@ model Product {
   isArchived    Boolean     @default(false)
   isCharity     Boolean     @default(false)
   isHidden      Boolean     @default(false)
-  //TODO:  isRental     Boolean     @default(false)
-  //TODO: Make some of these fields optional
-  // TODO: make seller optional so we can support stores making sales
+
+
+  // TODO: make seller optional so we can support stores making sales -- reflect this in the verify payment route where you add the storeId if there is no sellerId
   images        Image[] // Relation to Image model
   orderItems    OrderItem[] // Relation to Order model
   storeId       String // Foreign Key to Store
@@ -439,8 +439,6 @@ model Payout {
   seller   Seller? @relation(fields: [sellerId], references: [id])
   storeId  String? // Foreign Key to Seller
   store    Store?  @relation(fields: [storeId], references: [id])
-
-  // TODO: Add the products here and display them on the front end
 
   amount           Decimal? @default(0.0)
   transferGroupId  String?  @default("")

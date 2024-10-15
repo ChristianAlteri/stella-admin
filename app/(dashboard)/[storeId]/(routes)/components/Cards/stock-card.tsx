@@ -24,7 +24,7 @@ export default function StockCard({
   averagePrice,
   products,
   todaysOrders,
-}: // TODO: pass in orders and calculate only todays revenue
+}:
 {
   liveStock: number;
   soldStock: number;
@@ -72,7 +72,7 @@ export default function StockCard({
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="col-span-full">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle>Today's Overview</CardTitle>
+              <CardTitle>Today&apos;s Overview</CardTitle>
         <Package className="h-6 w-6 text-primary" />
             </CardHeader>
             <CardContent>

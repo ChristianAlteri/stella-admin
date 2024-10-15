@@ -55,26 +55,9 @@ export async function POST(
       return new NextResponse("Price is required", { status: 400 });
     }
 
-    if (!description) {
-      return new NextResponse("Description is required", { status: 400 });
-    }
-
-    // if (!categoryId) {
-    //   return new NextResponse("Category id is required", { status: 400 });
-    // }
-
-    // if (!colorId) {
-    //   return new NextResponse("Color id is required", { status: 400 });
-    // }
-
-    if (!sizeId) {
-      return new NextResponse("Size id is required", { status: 400 });
-    }
-
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
     }
-    console.log(params.storeId);
 
     const storeByUserId = await prismadb.store.findFirst({
       where: {
@@ -82,7 +65,6 @@ export async function POST(
         userId,
       },
     });
-    // console.log("storeByUserId", storeByUserId);
 
     if (!storeByUserId) {
       return new NextResponse("Unauthorized", { status: 405 });
@@ -103,11 +85,6 @@ export async function POST(
         isArchived,
         isOnSale,
         isHidden,
-        // categoryId,
-        // designerId,
-        // colorId,
-        // sizeId,
-        // storeId: params.storeId,
         images: {
           createMany: {
             data: [...images.map((image: { url: string }) => image)],
@@ -160,7 +137,7 @@ export async function POST(
         },
         seller: {
           connect: {
-            id: sellerId,
+            id: sellerId || params.storeId,
           },
         },
       },

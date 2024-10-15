@@ -121,22 +121,6 @@ export async function PATCH(
       return new NextResponse("Product id is required", { status: 400 });
     }
 
-    if (!name) {
-      return new NextResponse("Name is required", { status: 400 });
-    }
-
-    if (!images || !images.length) {
-      return new NextResponse("Images are required", { status: 400 });
-    }
-
-    if (!colorId) {
-      return new NextResponse("Color id is required", { status: 400 });
-    }
-
-    if (!sizeId) {
-      return new NextResponse("Size id is required", { status: 400 });
-    }
-
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: params.storeId,
@@ -165,11 +149,6 @@ export async function PATCH(
         isOnSale,
         isCharity,
         isHidden,
-        // categoryId,
-        // designerId,
-        // colorId,
-        // sizeId,
-        // sellerId,
         images: {
           deleteMany: {},
         },
