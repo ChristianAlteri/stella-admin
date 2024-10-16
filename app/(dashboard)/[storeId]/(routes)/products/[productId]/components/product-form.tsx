@@ -122,7 +122,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [popoverStates, setPopoverStates] = useState<Record<string, boolean>>({});
+  const [popoverStates, setPopoverStates] = useState<Record<string, boolean>>(
+    {}
+  );
   const [activeFieldType, setActiveFieldType] = useState<
     | "sizes"
     | "colors"
@@ -291,35 +293,34 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData
-      ? {// edit product
+      ? {
+          // edit product
           ...initialData,
           ourPrice: parseFloat(String(initialData?.ourPrice)), // TODO: i think entering product amount bug and it being wrong is from here, the parseFloat
           retailPrice: parseFloat(String(initialData?.retailPrice)),
           description: initialData.description ?? undefined,
           sellerId: initialData.sellerId ?? undefined,
+          colorId: initialData.colorId ?? undefined,
+          conditionId: initialData.conditionId ?? undefined,
+          materialId: initialData.materialId ?? undefined,
+          genderId: initialData.genderId ?? undefined,
         }
-      : {// create new product
+      : {
+          // create new product
           name: "",
-          description: undefined,
           images: [],
           ourPrice: 0,
-          retailPrice: 0,
           designerId: "",
           sellerId: "",
-          // sellerId: `${params.storeId}`,
           categoryId: "",
           subcategoryId: "",
-          colorId: "",
           sizeId: "",
           conditionId: "",
-          materialId: "",
-          genderId: "",
           isFeatured: false,
           isArchived: false,
           isOnSale: false,
           isCharity: false,
           isHidden: false,
-          measurements: "",
         },
   });
 
@@ -338,7 +339,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   };
 
   // const onSubmit = async (data: ProductFormValues) => {
-    const onSubmit: SubmitHandler<ProductFormValues> = async (data) => {
+  const onSubmit: SubmitHandler<ProductFormValues> = async (data) => {
     try {
       setLoading(true);
       if (initialData) {
@@ -380,9 +381,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       [name]: !prev[name],
     }));
   };
-  
 
- 
   const renderSelector = (
     name: string,
     label: string,
@@ -479,7 +478,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     );
   };
 
-
   const renderCheckbox = (name: string, label: string, description: string) => {
     return (
       <FormField
@@ -533,6 +531,41 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             <CardContent className="p-6">
               <h2 className="text-xl font-semibold mb-4">Required Fields</h2>
               <div className="grid grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="images"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Images</FormLabel>
+                      <FormControl>
+                        <S3Upload
+                          value={field.value.map((image) => image.url)}
+                          disabled={loading}
+                          onChange={(input) => {
+                            const urlsToAdd = Array.isArray(input)
+                              ? input
+                              : [input];
+                            urlsToAdd.forEach((url) => {
+                              if (typeof url === "string") {
+                                field.onChange([...field.value, { url }]);
+                              }
+                            });
+                          }}
+                          onRemove={(url) => {
+                            if (typeof url === "string") {
+                              field.onChange([
+                                ...field.value.filter(
+                                  (current) => current.url !== url
+                                ),
+                              ]);
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="name"
@@ -629,41 +662,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             {isOptionalFieldsOpen && (
               <CardContent className="p-6">
                 <div className="grid grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="images"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Images</FormLabel>
-                        <FormControl>
-                          <S3Upload
-                            value={field.value.map((image) => image.url)}
-                            disabled={loading}
-                            onChange={(input) => {
-                              const urlsToAdd = Array.isArray(input)
-                                ? input
-                                : [input];
-                              urlsToAdd.forEach((url) => {
-                                if (typeof url === "string") {
-                                  field.onChange([...field.value, { url }]);
-                                }
-                              });
-                            }}
-                            onRemove={(url) => {
-                              if (typeof url === "string") {
-                                field.onChange([
-                                  ...field.value.filter(
-                                    (current) => current.url !== url
-                                  ),
-                                ]);
-                              }
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                   <FormField
                     control={form.control}
                     name="description"
@@ -1658,100 +1656,99 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 //   )
 // }
 
-
- // const renderSelector = (
-  //   name: string,
-  //   label: string,
-  //   options: any[],
-  //   optionKey: string,
-  //   isDialogOpen: boolean,
-  //   setIsDialogOpen: (open: boolean) => void
-  // ) => {
-  //   const isPopoverOpen = popoverStates[name] || false;
-  //   return (
-  //     <FormField
-  //       control={form.control}
-  //       name={name as keyof ProductFormValues}
-  //       render={({ field }) => (
-  //         <FormItem className="flex flex-col space-y-2 w-[300px]">
-  //           <FormLabel htmlFor={name}>{label}</FormLabel>
-  //           <div className="flex items-center space-x-2">
-  //           <Popover
-  //             open={isPopoverOpen}
-  //             onOpenChange={() => togglePopover(name)}
-  //           >
-  //               <PopoverTrigger asChild>
-  //                 <FormControl>
-  //                   <Button
-  //                     variant="outline"
-  //                     role="combobox"
-  //                     className={cn(
-  //                       "w-full justify-between",
-  //                       !field.value && "text-muted-foreground"
-  //                     )}
-  //                   >
-  //                     {field.value
-  //                       ? options.find((option) => option.id === field.value)?.[
-  //                           optionKey
-  //                         ]
-  //                       : `Select ${label.toLowerCase()}`}
-  //                     <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-  //                   </Button>
-  //                 </FormControl>
-  //               </PopoverTrigger>
-  //               <PopoverContent className="w-[300px] p-0">
-  //                 <Command>
-  //                   <CommandInput
-  //                     placeholder={`Search ${label.toLowerCase()}...`}
-  //                   />
-  //                   <CommandEmpty>No {label.toLowerCase()} found.</CommandEmpty>
-  //                   <CommandGroup>
-  //                     {options.map((option) => (
-  //                       <CommandItem
-  //                         value={option[optionKey]}
-  //                         key={option[optionKey]}
-  //                         onSelect={() => {
-  //                           form.setValue(
-  //                             name as keyof ProductFormValues,
-  //                             option.id
-  //                           );
-  //                           togglePopover(name);
-  //                         }}
-  //                       >
-  //                         <Check
-  //                           className={cn(
-  //                             "mr-2 h-4 w-4",
-  //                             field.value === option.id
-  //                               ? "opacity-100"
-  //                               : "opacity-0"
-  //                           )}
-  //                         />
-  //                         {option[optionKey]}
-  //                       </CommandItem>
-  //                     ))}
-  //                   </CommandGroup>
-  //                 </Command>
-  //               </PopoverContent>
-  //             </Popover>
-  //             {label.toLowerCase() !== "seller" && (
-  //               <Button
-  //                 type="button"
-  //                 variant="outline"
-  //                 size="icon"
-  //                 onClick={() => setIsDialogOpen(true)}
-  //                 className="flex-shrink-0"
-  //               >
-  //                 <Plus className="h-4 w-4" />
-  //                 <span className="sr-only">Add new {label.toLowerCase()}</span>
-  //               </Button>
-  //             )}
-  //           </div>
-  //           {/* <FormDescription>
-  //             Select from the {label.toLowerCase()}
-  //           </FormDescription> */}
-  //           <FormMessage />
-  //         </FormItem>
-  //       )}
-  //     />
-  //   );
-  // };
+// const renderSelector = (
+//   name: string,
+//   label: string,
+//   options: any[],
+//   optionKey: string,
+//   isDialogOpen: boolean,
+//   setIsDialogOpen: (open: boolean) => void
+// ) => {
+//   const isPopoverOpen = popoverStates[name] || false;
+//   return (
+//     <FormField
+//       control={form.control}
+//       name={name as keyof ProductFormValues}
+//       render={({ field }) => (
+//         <FormItem className="flex flex-col space-y-2 w-[300px]">
+//           <FormLabel htmlFor={name}>{label}</FormLabel>
+//           <div className="flex items-center space-x-2">
+//           <Popover
+//             open={isPopoverOpen}
+//             onOpenChange={() => togglePopover(name)}
+//           >
+//               <PopoverTrigger asChild>
+//                 <FormControl>
+//                   <Button
+//                     variant="outline"
+//                     role="combobox"
+//                     className={cn(
+//                       "w-full justify-between",
+//                       !field.value && "text-muted-foreground"
+//                     )}
+//                   >
+//                     {field.value
+//                       ? options.find((option) => option.id === field.value)?.[
+//                           optionKey
+//                         ]
+//                       : `Select ${label.toLowerCase()}`}
+//                     <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+//                   </Button>
+//                 </FormControl>
+//               </PopoverTrigger>
+//               <PopoverContent className="w-[300px] p-0">
+//                 <Command>
+//                   <CommandInput
+//                     placeholder={`Search ${label.toLowerCase()}...`}
+//                   />
+//                   <CommandEmpty>No {label.toLowerCase()} found.</CommandEmpty>
+//                   <CommandGroup>
+//                     {options.map((option) => (
+//                       <CommandItem
+//                         value={option[optionKey]}
+//                         key={option[optionKey]}
+//                         onSelect={() => {
+//                           form.setValue(
+//                             name as keyof ProductFormValues,
+//                             option.id
+//                           );
+//                           togglePopover(name);
+//                         }}
+//                       >
+//                         <Check
+//                           className={cn(
+//                             "mr-2 h-4 w-4",
+//                             field.value === option.id
+//                               ? "opacity-100"
+//                               : "opacity-0"
+//                           )}
+//                         />
+//                         {option[optionKey]}
+//                       </CommandItem>
+//                     ))}
+//                   </CommandGroup>
+//                 </Command>
+//               </PopoverContent>
+//             </Popover>
+//             {label.toLowerCase() !== "seller" && (
+//               <Button
+//                 type="button"
+//                 variant="outline"
+//                 size="icon"
+//                 onClick={() => setIsDialogOpen(true)}
+//                 className="flex-shrink-0"
+//               >
+//                 <Plus className="h-4 w-4" />
+//                 <span className="sr-only">Add new {label.toLowerCase()}</span>
+//               </Button>
+//             )}
+//           </div>
+//           {/* <FormDescription>
+//             Select from the {label.toLowerCase()}
+//           </FormDescription> */}
+//           <FormMessage />
+//         </FormItem>
+//       )}
+//     />
+//   );
+// };

@@ -110,31 +110,35 @@ export async function POST(
             id: sizeId,
           },
         },
-        condition: {
-          connect: {
-            id: conditionId,
-          },
-        },
-        material: {
-          connect: {
-            id: materialId,
-          },
-        },
-        color: {
-          connect: {
-            id: colorId,
-          },
-        },
+        // condition: {
+          //   connect: {
+            //     id: conditionId,
+            //   },
+            // },
+        ...(conditionId ? { condition: { connect: { id: conditionId } } } : {}),
+        // material: {
+        //   connect: {
+        //     id: materialId,
+        //   },
+        // },
+        ...(materialId ? { material: { connect: { id: materialId } } } : {}),
+        // color: {
+        //   connect: {
+        //     id: colorId,
+        //   },
+        // },
+        ...(colorId ? { color: { connect: { id: colorId } } } : {}),
         subcategory: {
           connect: {
             id: subcategoryId,
           },
         },
-        gender: {
-          connect: {
-            id: genderId,
-          },
-        },
+        // gender: {
+        //   connect: {
+        //     id: genderId,
+        //   },
+        // },
+        ...(genderId ? { gender: { connect: { id: genderId } } } : {}),
         seller: {
           connect: {
             id: sellerId,

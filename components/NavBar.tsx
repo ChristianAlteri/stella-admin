@@ -1,16 +1,17 @@
 import { UserButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { FiSettings } from "react-icons/fi";
-
-// import StoreSwitcher from "@/components/store-switcher";
+import { redirect, useParams } from "next/navigation";
 import { MainNav } from "@/components/main-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
 import prismadb from "@/lib/prismadb";
 import StoreSwitcher from "./store-switcher";
-import { Button } from "./ui/button";
+import Sidebar from "./side-bar";
 
-const Navbar = async () => {
+interface NavbarProps {
+  storeId: string;
+}
+
+const Navbar: React.FC<NavbarProps> = async ({ storeId }) => {
   const { userId } = auth();
 
   if (!userId) {
@@ -24,11 +25,12 @@ const Navbar = async () => {
   });
 
   return (
-    <div className="border-b">
-      <div className="flex h-16 items-center px-4">
+    <div className="w-full h-full">
+      <Sidebar storeId={storeId} />
+      <div className="flex h-12 items-center p-4 ml-[50px]">
         <StoreSwitcher items={stores} />
-        <div className="flex-1 flex items-center justify-between space-x-8 px-6">
-          <MainNav className="flex-1" />
+        <div className="flex-1 flex items-center justify-between w-2/3">
+          <MainNav className="flex-1 w-full mr-4" />
         </div>
         <div className="ml-auto flex items-center space-x-4">
           <ThemeToggle />
