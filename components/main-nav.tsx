@@ -32,16 +32,16 @@ export function MainNav({
       label: 'Payouts',
       active: pathname === `/${params.storeId}/payouts`,
     },
-    {
-      href: `/${params.storeId}/designers`,
-      label: 'Designers',
-      active: pathname === `/${params.storeId}/designers`,
-    },
-    {
-      href: `/${params.storeId}/categories`,
-      label: 'Categories',
-      active: pathname === `/${params.storeId}/categories`,
-    },
+    // {
+    //   href: `/${params.storeId}/designers`,
+    //   label: 'Designers',
+    //   active: pathname === `/${params.storeId}/designers`,
+    // },
+    // {
+    //   href: `/${params.storeId}/categories`,
+    //   label: 'Categories',
+    //   active: pathname === `/${params.storeId}/categories`,
+    // },
   ]
 
   const configRoutes = [
@@ -94,7 +94,7 @@ export function MainNav({
 
   return (
     <nav
-      className={cn("flex items-center space-x-4 lg:space-x-8 w-2/3", className)}
+      className={cn("flex flex-row items-center justify-center  w-full", className)}
       {...props}
     >
       {routes.map((route) => (
@@ -102,14 +102,14 @@ export function MainNav({
           key={route.href}
           href={route.href}
           className={cn(
-            'text-sm font-medium transition-colors hover:text-primary px-3 py-2 w-2/3',
+            'text-sm font-medium transition-colors hover:text-primary px-3 py-1 hover:underline hover:cursor-pointer hover:bg-background rounded-md',
             route.active ? 'text-black dark:text-white' : 'text-muted-foreground'
           )}
         >
           {route.label}
         </Link>
       ))}
-      <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+      {/* <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="h-10 px-4 flex items-center">
             Store Config
@@ -131,7 +131,7 @@ export function MainNav({
             </DropdownMenuItem>
           ))}
         </DropdownMenuContent>
-      </DropdownMenu>
+      </DropdownMenu> */}
     </nav>
   )
 }

@@ -9,7 +9,6 @@ import { TbFaceId, TbFaceIdError } from "react-icons/tb";
 import { FaRegEdit } from "react-icons/fa";
 import { IoAnalyticsSharp, IoInformationOutline } from "react-icons/io5";
 
-
 import { AlertModal } from "@/components/modals/alert-modal";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -77,8 +76,8 @@ export default function SellerActions({ data }: { data: SellerColumn }) {
 
   return (
     <>
-      <div className="flex justify-end space-x-2 mb-4">
-      <div className="flex flex-data gap-2">
+      <div className="flex justify-end space-x-2 mb-4 text-muted-foreground">
+        <div className="flex flex-data gap-2">
           <Button variant="outline" size="icon" onClick={handleCardClick}>
             <IoAnalyticsSharp className="w-4 h-4" />
           </Button>

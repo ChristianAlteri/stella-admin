@@ -13,6 +13,7 @@ body,
   :root {
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
+    --sidebar: 10 0% 200%;; 
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
@@ -36,8 +37,9 @@ body,
   }
  
   .dark {
-    --background: 20 14.3% 4.1%;
+    --background: 20 14.3% 15.1%;
     --foreground: 0 0% 95%;
+    --sidebar: 0 0% 95%; 
     --card: 24 9.8% 10%;
     --card-foreground: 0 0% 95%;
     --popover: 0 0% 9%;
@@ -47,7 +49,8 @@ body,
     --secondary: 210 10% 25%;
     --secondary-foreground: 210 10% 15%;
     --muted: 0 0% 15%;
-    --muted-foreground: 240 5% 64.9%;
+    /* --muted-foreground: 240 5% 64.9%; */
+    --muted-foreground: 29 100% 50%;
     --accent: 202.1 106.2% 40.9%; 
     --accent-foreground: 240 115.9% 40%;
     --destructive: 0 62.8% 30.6%;
@@ -56,6 +59,30 @@ body,
     --input: 40 3.7% 15.9%;
     --ring: 200.1 346.2% 6.3%;
     --radius: 0.65rem;
+  }
+
+  .galaxy {
+    --background: 240 30% 8%;  /* Dark space-like background */
+    --foreground: 210 20% 90%; /* Star-like text color */
+    --sidebar: 210 20% 90%; 
+    --card: 240 40% 10%; /* Slightly lighter for cards */
+    --card-foreground: 210 10% 95%; /* Light text on cards */
+    --popover: 240 30% 12%;
+    --popover-foreground: 210 10% 90%;
+    --primary: 260 80% 60%; /* Vibrant cosmic blue for primary elements */
+    --primary-foreground: 60 100% 97%; /* White text for primary elements */
+    --secondary: 280 70% 40%; /* Purple nebula tone for secondary elements */
+    --secondary-foreground: 60 100% 97%; /* White text for secondary elements */
+    --muted: 240 30% 15%; /* Muted, subtle background for muted elements */
+    --muted-foreground: 210 5% 70%;
+    --accent: 40 90% 60%; /* Vibrant star-like accent color (golden yellow) */
+    --accent-foreground: 60 100% 97%; /* White text for accent elements */
+    --destructive: 0 70% 45%; /* Red for destructive actions */
+    --destructive-foreground: 0 0% 98%; /* Light foreground for destructive actions */
+    --border: 240 20% 20%; /* Dark, subtle borders */
+    --input: 240 20% 20%; /* Input backgrounds matching the border */
+    --ring: 260 100% 50%; /* Cosmic blue ring for focus */
+    --radius: 0.75rem; /* Slightly larger border radius for rounded corners */
   }
 }
  

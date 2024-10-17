@@ -171,29 +171,35 @@ const SellerDetailsPage = async ({
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <div className="flex items-center">
-                  <Mail className="mr-2 h-4 w-4" />
+                  <Mail className="mr-3 h-5 w-5 text-muted-foreground" />
                   <span>{seller?.email}</span>
                 </div>
-
                 <div className="flex items-center">
-                  <MapPin className="mr-2 h-4 w-4" />
+                  <MapPin className="mr-3 h-5 w-5 text-muted-foreground" />
                   <span>
                     {seller?.country} {seller?.shippingAddress}
                   </span>
                 </div>
                 <div className="flex items-center">
-                  <Badge variant="default">{seller?.sellerType}</Badge>
+                  <Badge variant="default" className="text-sm">
+                    {seller?.sellerType}
+                  </Badge>
                 </div>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="flex items-center">
-                  <Calendar className="mr-2 h-4 w-4" />
+                  <Calendar className="mr-3 h-5 w-5 text-muted-foreground" />
                   <span>
                     Joined:{" "}
                     {new Date(seller?.createdAt ?? "").toLocaleDateString()}
                   </span>
                 </div>
-                <span>Stripe Id: {seller?.stripe_connect_unique_id}</span>
+                <div className="flex items-center">
+                  <FaStripe className="mr-3 h-5 w-5 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">
+                    Stripe ID: {seller?.stripe_connect_unique_id}
+                  </span>
+                </div>
               </div>
             </div>
           </CardContent>
