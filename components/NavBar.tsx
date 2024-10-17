@@ -27,7 +27,7 @@ const Navbar: React.FC<NavbarProps> = async ({ storeId }) => {
   return (
     <div className="w-full h-full">
       <Sidebar storeId={storeId} />
-      <div className="flex h-12 items-center p-4 ml-[50px]">
+      <div className="flex h-12 items-center p-4 ml-[50px] bg-secondary">
         <StoreSwitcher items={stores} />
         <div className="flex-1 flex items-center justify-between w-2/3">
           <MainNav className="flex-1 w-full mr-4" />

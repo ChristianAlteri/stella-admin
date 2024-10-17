@@ -6,7 +6,6 @@ import { ProductClient } from "./components/client";
 
 import { formatter } from "@/lib/utils";
 
-
 const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
   const products = await prismadb.product.findMany({
     where: { storeId: params.storeId },
@@ -49,8 +48,10 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
     isOnSale: item.isOnSale,
     isCharity: item.isCharity,
     isHidden: item.isHidden,
-    ourPrice: formatter.format(item.ourPrice.toNumber()), 
-    retailPrice: item.retailPrice ? formatter.format(item.retailPrice.toNumber()) : "",
+    ourPrice: formatter.format(item.ourPrice.toNumber()),
+    retailPrice: item.retailPrice
+      ? formatter.format(item.retailPrice.toNumber())
+      : "",
     likes: item.likes,
     clicks: item.clicks,
     category: item.category.name,
@@ -72,8 +73,8 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
   }));
 
   return (
-    <div className="flex-col">
-      <div className="flex-1 space-y-4 p-8 pt-6">
+    <div className="flex flex-col items-center justify-center w-full bg-secondary h-full">
+      <div className="flex-1 space-y-4 p-8 pt-6 items-center justify-center w-2/3 h-full">
         <ProductClient
           data={formattedProducts}
           sellers={sellers}

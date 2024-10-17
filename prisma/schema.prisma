@@ -105,8 +105,8 @@ model Seller {
   instagramHandle String     @default("https://www.instagram.com/anon.drobe")
   firstName       String?    @default("")
   lastName        String?    @default("")
-  email           String?    @unique
-  phoneNumber     String?    @unique
+  email           String?    @default("")
+  phoneNumber     String?    @default("")
   shippingAddress String?    @default("")
   country         String?    @default("")
   soldCount       Int?       @default(0)
@@ -119,8 +119,8 @@ model Seller {
   payouts                  Payout[]
   consignmentRate          Int?
 
-  charityName String? @default("") //TODO: we dont need this once we start onbaording charities
-  charityUrl  String? @default("") //TODO: we dont need this once we start onbaording charities
+  charityName String? @default("") 
+  charityUrl  String? @default("") 
 
   // Influencer specific fields
   shoeSizeEU String? @default("")
@@ -130,14 +130,6 @@ model Seller {
   // Re-seller specific fields
   storeName   String? @default("")
   description String? @default("")
-
-  // TODO: Add a relation to a Charity model
-
-  //   likeList  // array of product ids
-  //   clickList // array of product ids
-  //   orderHistory // array of order ids
-  //   purchaseHistory // array of product ids
-  //    followingSeller // array of seller ids
 
   // Items listed by the seller
   products     Product[]   @relation("SellerToProduct")

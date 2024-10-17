@@ -65,10 +65,13 @@ export async function DELETE(
     if (!storeByUserId) {
       return new NextResponse("Unauthorized", { status: 405 });
     }
-
-    const product = await prismadb.product.delete({
+    // Perform soft-delete by setting isDeleted to true
+    const product = await prismadb.product.update({
       where: {
         id: productId
+      },
+      data: {
+        isArchived: true,
       },
     });
     console.log('[PRODUCT_DELETE]', product);

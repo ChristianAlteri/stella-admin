@@ -20,7 +20,7 @@ body,
     /* Main color  */
     --primary: 200.1 346.2% 16.3%;
     --primary-foreground: 355.7 100% 97.3%;
-    --secondary: 40 4.8% 95.9%;
+    --secondary: 210 4.8% 95.9%%;
     --secondary-foreground: 40 5.9% 10%;
     --muted: 240 4.8% 95.9%;
     --muted-foreground: 240 3.8% 46.1%;
@@ -42,10 +42,10 @@ body,
     --card-foreground: 0 0% 95%;
     --popover: 0 0% 9%;
     --popover-foreground: 0 0% 95%;
-    --primary: 200.1 346.2% 6.3%;
+    --primary: 200.1 346.2% 25.3%;
     --primary-foreground: 355.7 100% 97.3%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 210 10% 25%;
+    --secondary-foreground: 210 10% 15%;
     --muted: 0 0% 15%;
     --muted-foreground: 240 5% 64.9%;
     --accent: 202.1 106.2% 40.9%; 

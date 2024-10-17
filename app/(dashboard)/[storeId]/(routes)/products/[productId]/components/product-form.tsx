@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { Check, ChevronDown, ChevronUp, Trash } from "lucide-react";
+import { Car, Check, ChevronDown, ChevronUp, Trash } from "lucide-react";
 import { TbFaceId, TbFaceIdError } from "react-icons/tb";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -41,7 +41,6 @@ import {
 import S3Upload from "@/components/ui/s3-upload";
 import { DescriptionInput } from "@/components/ui/descriptionInput";
 import { cn } from "@/lib/utils";
-
 import {
   Category,
   Color,
@@ -209,9 +208,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const [updatedDesigners, setUpdatedDesigners] =
     useState<Designer[]>(initialDesigners);
 
-  const title = initialData ? "Edit product" : "Create product";
-  const description = initialData ? "Edit a product." : "Add a new product";
-  const toastMessage = initialData ? "Product updated." : "Product created.";
+  const title = initialData ? "Edit Product" : "Create Product";
+  const description = initialData ? "Edit a product." : "Create a new Product";
+  const toastMessage = initialData ? "Product updated!" : "Product created!";
   const action = initialData ? "Save changes" : "Create";
 
   const fetchSizes = async () => {
@@ -504,7 +503,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   };
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <Card className="w-full p-6">
       <AlertModal
         isOpen={open}
         onClose={() => setOpen(false)}
@@ -529,8 +528,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <Card>
             <CardContent className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Required Fields</h2>
-              <div className="grid grid-cols-2 gap-6">
+              <h2 className="text-xl font-semibold mb-4 underline">Required Fields</h2>
+              <div className="grid grid-cols-2 gap-6 w-full">
                 <FormField
                   control={form.control}
                   name="images"
@@ -809,7 +808,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             : ""
         }
       />
-    </div>
+    </Card>
   );
 };
 

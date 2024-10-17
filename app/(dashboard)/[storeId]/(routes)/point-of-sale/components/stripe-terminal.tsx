@@ -637,9 +637,7 @@ export default function StripeTerminalComponent() {
                                 }}
                               >
                                 {tab === "seller"
-                                  ? item.instagramHandle ??
-                                    `${item.firstName} ${item.lastName}`
-                                  : item.name}
+                                  ? item.storeName : item.instagramHandle}
                               </Button>
                             ))}
                           </div>

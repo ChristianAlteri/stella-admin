@@ -42,7 +42,10 @@ export const useStripeConnect = (connectedAccountId: string) => {
           appearance: {
             overlays: "dialog",
             variables: {
-              colorPrimary: "#635BFF",
+              colorBackground: "#FFFFFF",
+              buttonPrimaryColorText: "#FFFFFF",
+              borderRadius: "24px",
+              spacingUnit: "10px",
             },
           },
         });

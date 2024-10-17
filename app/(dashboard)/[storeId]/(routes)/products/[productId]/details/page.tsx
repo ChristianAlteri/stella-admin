@@ -279,13 +279,13 @@ function PriceInfo({
 
 function ProductDetails({ product }: { product: any }) {
   const details = [
-    { icon: Heart, label: "likes", value: product.likes || 0 },
-    { icon: MousePointer, label: "clicks", value: product.clicks || 0 },
-    { icon: Palette, label: "Color", value: product.color.name },
-    { icon: Ruler, label: "Size", value: product.size.name },
-    { icon: Shirt, label: "Material", value: product.material?.name || "N/A" },
-    { icon: Users, label: "Gender", value: product.gender.name },
-    { icon: Layers, label: "Subcategory", value: product.subcategory.name },
+    { icon: Heart, label: "likes", value: product?.likes || 0 },
+    { icon: MousePointer, label: "clicks", value: product?.clicks || 0 },
+    { icon: Palette, label: "Color", value: product?.color?.name ?? "N/A" },
+    { icon: Ruler, label: "Size", value: product?.size?.name ?? "N/A" },
+    { icon: Shirt, label: "Material", value: product?.material?.name ?? "N/A" },
+    { icon: Users, label: "Gender", value: product?.gender?.name ?? "N/A" },
+    { icon: Layers, label: "Subcategory", value: product?.subcategory?.name ?? "N/A" },
   ];
 
   return (

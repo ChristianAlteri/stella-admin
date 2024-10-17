@@ -15,6 +15,8 @@ import {
   Heart,
   MousePointer,
   PercentSquare,
+  Package,
+  ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -32,6 +34,7 @@ import PopularCategoryChart from "./components/popular-category-chart";
 import { CellAction } from "../../components/cell-action";
 import { SellerColumn } from "../../components/columns";
 import RevenueByMonthChart from "./components/revenue-by-month-chart";
+import { FaStripe } from "react-icons/fa6";
 
 const SellerDetailsPage = async ({
   params,
@@ -97,8 +100,10 @@ const SellerDetailsPage = async ({
     sellerType: seller?.sellerType ?? "",
     description: seller?.description ?? "",
     storeName: seller?.storeName ?? "",
-    stripe_connect_unique_id: seller?.stripe_connect_unique_id ?? "No Stripe ID",
+    stripe_connect_unique_id:
+      seller?.stripe_connect_unique_id ?? "No Stripe ID",
     consignmentRate: seller?.consignmentRate ?? undefined,
+    isArchived: seller?.isArchived ?? false,
   };
 
   const archivedProducts = seller?.products.filter(
@@ -130,202 +135,218 @@ const SellerDetailsPage = async ({
   );
 
   return (
-    <div className="container mx-auto py-10">
-      <Card className="mb-8">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <div className="flex items-center space-x-4">
-            <Avatar className="h-20 w-20">
-              <AvatarImage
-                src={seller?.billboard?.imageUrl}
-                alt={`${seller?.firstName} ${seller?.lastName}`}
-              />
-              <AvatarFallback>
-                {seller?.firstName?.[0]}
-                {seller?.lastName?.[0]}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <CardTitle className="text-2xl font-bold">
-                {seller?.firstName} {seller?.lastName}
+    <div className="flex flex-col items-center justify-center w-full bg-secondary h-full">
+      <div className="flex-1 space-y-4 p-8 pt-6 items-center justify-center w-2/3 h-full">
+        <Card className="mb-8">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <div className="flex items-center space-x-4">
+              <Avatar className="h-20 w-20">
+                <AvatarImage
+                  src={seller?.billboard?.imageUrl}
+                  alt={`${seller?.firstName} ${seller?.lastName}`}
+                />
+                <AvatarFallback>
+                  {seller?.firstName?.[0]}
+                  {seller?.lastName?.[0]}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <CardTitle className="text-2xl font-bold">
+                  {seller?.storeName}
+                </CardTitle>
+                {seller?.instagramHandle ? (
+                  <Link
+                    href={`https://instagram.com/${seller?.instagramHandle}`}
+                    className="text-muted-foreground hover:underline flex items-center"
+                  >
+                    <Instagram className="mr-1 h-4 w-4" />
+                    {seller?.instagramHandle}
+                  </Link>
+                ) : null}
+              </div>
+            </div>
+            <CellAction data={sellerColumnData} />
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <div className="flex items-center">
+                  <Mail className="mr-2 h-4 w-4" />
+                  <span>{seller?.email}</span>
+                </div>
+
+                <div className="flex items-center">
+                  <MapPin className="mr-2 h-4 w-4" />
+                  <span>
+                    {seller?.country} {seller?.shippingAddress}
+                  </span>
+                </div>
+                <div className="flex items-center">
+                  <Badge variant="default">{seller?.sellerType}</Badge>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  <span>
+                    Joined:{" "}
+                    {new Date(seller?.createdAt ?? "").toLocaleDateString()}
+                  </span>
+                </div>
+                <span>Stripe Id: {seller?.stripe_connect_unique_id}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total Payouts
               </CardTitle>
-              <Link
-                href={`https://instagram.com/${seller?.instagramHandle}`}
-                className="text-muted-foreground hover:underline flex items-center"
-              >
-                <Instagram className="mr-1 h-4 w-4" />@{seller?.instagramHandle}
-              </Link>
-            </div>
-          </div>
-          <CellAction data={sellerColumnData} />
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <div className="flex items-center">
-                <Mail className="mr-2 h-4 w-4" />
-                <span>{seller?.email}</span>
+              <FaStripe className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {formatter.format(parseFloat(totalPayout))}
               </div>
-              <div className="flex items-center">
-                <Phone className="mr-2 h-4 w-4" />
-                <span>{seller?.phoneNumber}</span>
-              </div>
-              <div className="flex items-center">
-                <MapPin className="mr-2 h-4 w-4" />
-                <span>
-                  {seller?.shippingAddress}, {seller?.country}
-                </span>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center">
-                <Badge variant="outline">{seller?.sellerType}</Badge>
-              </div>
-              <div className="flex items-center">
-                <Calendar className="mr-2 h-4 w-4" />
-                <span>
-                  Joined:{" "}
-                  {new Date(seller?.createdAt ?? "").toLocaleDateString()}
-                </span>
-              </div>
-                <span>
-                  Stripe Id:{" "}
-                  {seller?.stripe_connect_unique_id}
-                </span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Products Sold
+              </CardTitle>
+              <Package className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{itemsSold}</div>
+              <p className="text-xs text-muted-foreground">
+                <Link
+                  href={`/${params.storeId}/products?sellerId=${params.sellerId}`}
+                  className="hover:underline text-primary flex flex-row"
+                >
+                  View all products
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </p>
+            </CardContent>
+          </Card>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Products Sold</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{itemsSold}</div>
-            <p className="text-xs text-muted-foreground">
-              <Link
-                href={`/${params.storeId}/products?sellerId=${params.sellerId}`}
-                className="hover:underline"
-              >
-                View all products
-              </Link>
-            </p>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Avg. Item Price
+              </CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {formatter.format(parseFloat(averageSalePrice))}
+              </div>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Conversion Rate
-            </CardTitle>
-            <PercentSquare className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{orderConversionRate}%</div>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Live Products
+              </CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {liveProducts?.length || 0}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                <Link
+                  href={`/${params.storeId}/products?sellerId=${params.sellerId}`}
+                  className="hover:underline text-primary flex flex-row"
+                >
+                  View all products
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </p>
+            </CardContent>
+          </Card>
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Likes</CardTitle>
-            <Heart className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalLikes}</div>
-          </CardContent>
-        </Card>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mt-8">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Conversion Rate
+              </CardTitle>
+              <PercentSquare className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{orderConversionRate}%</div>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Clicks</CardTitle>
-            <MousePointer className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalClicks}</div>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Likes</CardTitle>
+              <Heart className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalLikes}</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total Clicks
+              </CardTitle>
+              <MousePointer className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalClicks}</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Tabs defaultValue="revenue" className="mt-8">
+          <TabsList>
+            <TabsTrigger value="revenue">Revenue</TabsTrigger>
+            <TabsTrigger value="designers">Designers</TabsTrigger>
+            <TabsTrigger value="categories">Categories</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="revenue" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Monthly Revenue</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-2">
+                <RevenueByMonthChart monthlyRevenue={monthlyRevenue} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="designers" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Popular Designers</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-2">
+                <PopularDesignerChart popularDesigners={popularDesigners} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="categories" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Sales by Category</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-2">
+                <PopularCategoryChart salesByCategory={salesByCategory} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mt-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Payouts</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {formatter.format(parseFloat(totalPayout))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Avg. Sale Price
-            </CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {formatter.format(parseFloat(averageSalePrice))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Live Products</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {liveProducts?.length || 0}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs defaultValue="revenue" className="mt-8">
-        <TabsList>
-          <TabsTrigger value="revenue">Revenue</TabsTrigger>
-          <TabsTrigger value="popularity">Popularity</TabsTrigger>
-          <TabsTrigger value="categories">Categories</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="revenue" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Monthly Revenue</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-2">
-              <RevenueByMonthChart monthlyRevenue={monthlyRevenue} />
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="popularity" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Popular Designers</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-2">
-              <PopularDesignerChart popularDesigners={popularDesigners} />
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="categories" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Sales by Category</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-2">
-              <PopularCategoryChart salesByCategory={salesByCategory} />
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
     </div>
   );
 };

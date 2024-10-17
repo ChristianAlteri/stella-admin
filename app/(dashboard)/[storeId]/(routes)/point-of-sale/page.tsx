@@ -6,7 +6,7 @@ import StripeTerminal from "./components/stripe-terminal"
 
 const PointOfSalePage = () => {
   return (
-    <div className="w-full h-full justify-center items-center text-center">
+    <div className="bg-secondary w-full h-full justify-center items-center text-center">
       <CardHeader>
         <div className="text-2xl text-black font-bold flex items-center w-full text-center">
           <CreditCard className="mr-2 h-6 w-6" />

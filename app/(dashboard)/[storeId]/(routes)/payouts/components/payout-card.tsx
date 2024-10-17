@@ -46,7 +46,7 @@ export default function PayoutCard({ row }: { row: PayoutColumn }) {
             className="text-center"
           >
             <span className=" hover:underline font-bold">
-              Name: {row.sellerHandle}
+              Name: {row.storeName}
             </span>
           </Link>
           <p>

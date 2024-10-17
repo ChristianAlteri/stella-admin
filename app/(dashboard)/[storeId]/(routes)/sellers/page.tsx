@@ -12,7 +12,7 @@ const SellerPage = async ({
 }) => {
   const sellers = await prismadb.seller.findMany({
     where: {
-      storeId: params.storeId
+      storeId: params.storeId,
     },
     include: {
       designers: true,
@@ -53,11 +53,12 @@ const SellerPage = async ({
     storeName: item.storeName || '',
     stripe_connect_unique_id: item.stripe_connect_unique_id || 'No Stripe ID',
     consignmentRate: item.consignmentRate || undefined,
+    isArchived: item.isArchived
   }));
 
   return (
-    <div className="flex-col">
-      <div className="flex-1 space-y-4 p-8 pt-6">
+    <div className="flex flex-col items-center justify-center w-full bg-secondary h-full">
+      <div className="flex-1 space-y-4 p-8 pt-6 items-center justify-center w-2/3 h-full">
         <SellerClient data={formattedSellers} />
       </div>
     </div>

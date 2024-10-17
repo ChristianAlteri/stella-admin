@@ -20,7 +20,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Check, Trash } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -47,6 +46,8 @@ import { Heading } from "@/components/ui/heading";
 import { AlertModal } from "@/components/modals/alert-modal";
 import { TbFaceId, TbFaceIdError } from "react-icons/tb";
 import { cn } from "@/lib/utils";
+import { Card, CardContent } from "@/components/ui/card";
+import { Check, ChevronDown, ChevronUp, Trash } from "lucide-react";
 
 interface SellerFormProps {
   initialData: Seller | null;
@@ -63,6 +64,11 @@ export const SellerForm: React.FC<SellerFormProps> = ({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [sellerType, setSellerType] = useState<string>("re-seller");
+  const [isOptionalFieldsOpen, setOptionalFieldsOpen] = useState(false);
+
+  const toggleOptionalFieldsOpen = () => {
+    setOptionalFieldsOpen(!isOptionalFieldsOpen);
+  };
 
   const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
@@ -153,13 +159,13 @@ export const SellerForm: React.FC<SellerFormProps> = ({
     });
   };
 
-  const title = initialData ? "Edit a Seller" : "Create a new Seller";
+  const title = initialData ? "Edit Seller" : "Create Seller";
   const description = initialData ? "Edit a Seller." : "Create a new Seller";
   const toastMessage = initialData ? "Seller updated!" : "Seller created!";
-  const action = initialData ? "Save changes" : "Create new Seller";
+  const action = initialData ? "Save changes" : "Create";
 
   const countries = [
-    // "Australia",
+    "Australia",
     // "Austria",
     // "Belgium",
     // "Brazil",
@@ -216,7 +222,6 @@ export const SellerForm: React.FC<SellerFormProps> = ({
     try {
       const payload = {
         ...data,
-        // sellerType,
       };
       setLoading(true);
       if (initialData) {
@@ -225,8 +230,9 @@ export const SellerForm: React.FC<SellerFormProps> = ({
           `/api/${params.storeId}/sellers/${params.sellerId}`,
           payload
         );
+        router.push(`/${params.storeId}/sellers`);
+        toastSuccess(toastMessage);
       } else {
-        console.log("DATA = ", payload);
         const seller = await axios.post(
           `/api/${params.storeId}/sellers`,
           payload
@@ -235,9 +241,7 @@ export const SellerForm: React.FC<SellerFormProps> = ({
           `/${params.storeId}/stripe-connect?sellerId=${seller.data.id}`
         );
       }
-      // router.refresh();
-      // router.push(`/${params.storeId}/sellers`);
-      // toastSuccess(toastMessage);
+      toastSuccess(toastMessage);
     } catch (error: any) {
       toastError("Something went wrong.");
     } finally {
@@ -262,27 +266,26 @@ export const SellerForm: React.FC<SellerFormProps> = ({
   };
 
   return (
-    <>
+    <Card className="w-full p-6">
       <AlertModal
         isOpen={open}
         onClose={() => setOpen(false)}
         onConfirm={onDelete}
         loading={loading}
       />
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-8">
         <Heading title={title} description={description} />
         {initialData && (
           <Button
             disabled={loading}
             variant="destructive"
-            size="sm"
+            size="icon"
             onClick={() => setOpen(true)}
           >
             <Trash className="h-4 w-4" />
           </Button>
         )}
       </div>
-      <Separator />
 
       {/* Select component for seller type */}
       {/* <div className="flex items-center space-x-2 my-4">
@@ -299,60 +302,26 @@ export const SellerForm: React.FC<SellerFormProps> = ({
           </SelectContent>
         </Select>
       </div> */}
-
+      <Separator className="mb-8" />
       <Form {...form}>
-        <form
-          onSubmit={onSubmit}
-          className="flex flex-col w-full justify-center items-center"
-        >
-          <div className="flex flex-col items-center justify-center w-full h-full gap-2 p-4">
-            <div className="gap-2 w-2/3 flex flex-row">
-              <div className="flex flex-col w-full h-full">
+        <form onSubmit={onSubmit} className="space-y-8">
+          <Card>
+            <CardContent className="p-6">
+              <h2 className="text-xl font-semibold mb-4 underline">
+                Required Fields
+              </h2>
+              <div className="grid grid-cols-2 gap-6 w-full p-2 mb-2">
                 {/* Common fields */}
                 <FormField
                   control={form.control}
-                  name="firstName"
+                  name="storeName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>First Name</FormLabel>
+                      <FormLabel>Store Name</FormLabel>
                       <FormControl>
                         <Input
                           disabled={loading}
-                          placeholder="First Name"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="lastName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Last Name</FormLabel>
-                      <FormControl>
-                        <Input
-                          disabled={loading}
-                          placeholder="Last Name"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="instagramHandle"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Instagram Handle</FormLabel>
-                      <FormControl>
-                        <Input
-                          disabled={loading}
-                          placeholder="Instagram Handle"
+                          placeholder="Store Name"
                           {...field}
                         />
                       </FormControl>
@@ -378,63 +347,9 @@ export const SellerForm: React.FC<SellerFormProps> = ({
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="phoneNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
-                      <FormControl>
-                        <Input
-                          disabled={loading}
-                          placeholder="Phone Number"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="consignmentRate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Consignment Rate (%)</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min={0}
-                          max={100}
-                          disabled={loading}
-                          placeholder="Consignment rate"
-                          {...field}
-                          onChange={(e) =>
-                            field.onChange(e.target.valueAsNumber)
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="shippingAddress"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Shipping Address</FormLabel>
-                      <FormControl>
-                        <Input
-                          disabled={loading}
-                          placeholder="Shipping Address"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+
+                
+
                 <FormField
                   control={form.control}
                   name="country"
@@ -497,179 +412,281 @@ export const SellerForm: React.FC<SellerFormProps> = ({
                   )}
                 />
               </div>
-
-              <div className="flex flex-col w-full h-full">
-                <FormField
-                  control={form.control}
-                  name="billboardId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Profile Picture</FormLabel>
-                      <Select
-                        disabled={loading}
-                        onValueChange={field.onChange}
-                        value={field.value}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue
-                              defaultValue={field.value}
-                              placeholder="Select a billboard"
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {billboards?.map((billboard) => (
-                            <SelectItem key={billboard.id} value={billboard.id}>
-                              {billboard.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                {/* <FormField
-                  control={form.control}
-                  name="charityName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Charity Name</FormLabel>
-                      <FormControl>
-                        <Input
-                          disabled={loading}
-                          placeholder="Oxfam"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="charityUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Charity Url</FormLabel>
-                      <FormControl>
-                        <Input
-                          disabled={loading}
-                          placeholder="www.oxfam.com"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                /> */}
-                {/* TODO: Add Charity selector */}
-
-                {/* Conditional form fields based on seller type */}
-                {sellerType === "re-seller" ? (
-                  <>
-                    <FormField
-                      control={form.control}
-                      name="storeName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Store Name</FormLabel>
-                          <FormControl>
-                            <Input
-                              disabled={loading}
-                              placeholder="Store Name"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="description"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Description</FormLabel>
-                          <FormControl>
-                            <Input
-                              disabled={loading}
-                              placeholder="Description"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </>
-                ) : (
-                  <>
-                    {/* Influencer-specific fields */}
-                    <FormField
-                      control={form.control}
-                      name="shoeSizeEU"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>EU Shoe Size</FormLabel>
-                          <FormControl>
-                            <Input
-                              disabled={loading}
-                              placeholder="39"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="topSize"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Top Size</FormLabel>
-                          <FormControl>
-                            <Input
-                              disabled={loading}
-                              placeholder="small"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="bottomSize"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Bottom Size</FormLabel>
-                          <FormControl>
-                            <Input
-                              disabled={loading}
-                              placeholder="medium"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </>
-                )}
-              </div>
+            </CardContent>
+          </Card>
+          <Card className="rounded-md p-4 shadow-md">
+            <div
+              className="flex justify-between items-center cursor-pointer"
+              onClick={toggleOptionalFieldsOpen}
+            >
+              <h2 className="text-lg font-semibold">Optional Fields</h2>
+              {isOptionalFieldsOpen ? <ChevronUp /> : <ChevronDown />}
             </div>
-          </div>
-
-          <Button disabled={loading} className="ml-auto" type="submit">
+            {isOptionalFieldsOpen && (
+              <CardContent className="p-6">
+                <div className="grid grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="firstName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>First Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            disabled={loading}
+                            placeholder="First Name"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="lastName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Last Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            disabled={loading}
+                            placeholder="Last Name"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="instagramHandle"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Instagram Handle</FormLabel>
+                        <FormControl>
+                          <Input
+                            disabled={loading}
+                            placeholder="Instagram Handle"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                  control={form.control}
+                  name="consignmentRate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Consignment Rate (%)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min={0}
+                          max={100}
+                          disabled={loading}
+                          placeholder="Consignment rate"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(e.target.valueAsNumber)
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                  <FormField
+                    control={form.control}
+                    name="phoneNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone Number</FormLabel>
+                        <FormControl>
+                          <Input
+                            disabled={loading}
+                            placeholder="Phone Number"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="shippingAddress"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Shipping Address</FormLabel>
+                        <FormControl>
+                          <Input
+                            disabled={loading}
+                            placeholder="Shipping Address"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="billboardId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Profile Picture</FormLabel>
+                        <Select
+                          disabled={loading}
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue
+                                defaultValue={field.value}
+                                placeholder="Select a billboard"
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {billboards?.map((billboard) => (
+                              <SelectItem
+                                key={billboard.id}
+                                value={billboard.id}
+                              >
+                                {billboard.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                          <Input
+                            disabled={loading}
+                            placeholder="Description"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  {/* Conditional form fields based on seller type */}
+                  {sellerType === "re-seller" ? (
+                    <></>
+                  ) : (
+                    <>
+                      {/* Influencer-specific fields */}
+                      <FormField
+                        control={form.control}
+                        name="charityName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Charity Name</FormLabel>
+                            <FormControl>
+                              <Input
+                                disabled={loading}
+                                placeholder="Oxfam"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="charityUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Charity Url</FormLabel>
+                            <FormControl>
+                              <Input
+                                disabled={loading}
+                                placeholder="www.oxfam.com"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="shoeSizeEU"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>EU Shoe Size</FormLabel>
+                            <FormControl>
+                              <Input
+                                disabled={loading}
+                                placeholder="39"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="topSize"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Top Size</FormLabel>
+                            <FormControl>
+                              <Input
+                                disabled={loading}
+                                placeholder="small"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="bottomSize"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Bottom Size</FormLabel>
+                            <FormControl>
+                              <Input
+                                disabled={loading}
+                                placeholder="medium"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </>
+                  )}
+                </div>
+              </CardContent>
+            )}
+          </Card>
+          <Button disabled={loading} className="w-full " type="submit">
             {action}
           </Button>
         </form>
       </Form>
-    </>
+    </Card>
   );
 };

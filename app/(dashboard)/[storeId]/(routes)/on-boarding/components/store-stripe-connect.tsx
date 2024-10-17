@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import axios from 'axios'
 import { CreditCard, CheckCircle, AlertCircle } from 'lucide-react'
+import { Card } from '@/components/ui/card'
 
 const StoreStripeConnect = () => {
   const router = useRouter()
@@ -47,10 +48,10 @@ const StoreStripeConnect = () => {
   }
 
   return (
-    <div className="flex justify-center items-center w-full min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-4">
-      <div className="w-full max-w-md">
+    <Card className="w-full">
+      <div className="w-full ">
         {!accountCreatePending && !connectedAccountId && (
-          <div className="bg-white rounded-lg shadow-xl overflow-hidden">
+          <div className=" rounded-lg shadow-xl overflow-hidden w-full">
             <div className="p-8">
               <div className="flex justify-center mb-6">
                 <CreditCard className="w-16 h-16 text-blue-600" />
@@ -75,14 +76,16 @@ const StoreStripeConnect = () => {
               </ul>
               <Button
                 onClick={handleCreateStripeAccount}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300"
+                className="w-full  text-white font-bold py-3 px-4 rounded-lg transition duration-300"
               >
                 Connect with Stripe
               </Button>
             </div>
           </div>
         )}
+
         {stripeConnectInstance && (
+        <div className='flex h-full'>
           <ConnectComponentsProvider connectInstance={stripeConnectInstance}>
             <ConnectAccountOnboarding
               onExit={() => {
@@ -91,6 +94,7 @@ const StoreStripeConnect = () => {
               }}
             />
           </ConnectComponentsProvider>
+        </div>
         )}
         {error && (
           <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg mt-4" role="alert">
@@ -101,7 +105,7 @@ const StoreStripeConnect = () => {
           </div>
         )}
         {(connectedAccountId || accountCreatePending || onboardingExited) && (
-          <div className="bg-white rounded-lg shadow-md p-6 mt-4">
+          <div className="rounded-lg shadow-md p-6 mt-4">
             {accountCreatePending && (
               <div className="flex items-center justify-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -117,7 +121,7 @@ const StoreStripeConnect = () => {
           </div>
         )}
       </div>
-    </div>
+    </Card>
   )
 }
 

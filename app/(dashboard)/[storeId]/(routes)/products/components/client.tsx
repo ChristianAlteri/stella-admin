@@ -112,7 +112,7 @@ export const ProductClient: React.FC<ProductClientProps> = ({
             size="sm"
           >
             <PlusCircle className="mr-2 h-4 w-4" />
-            Add New
+            Create New
           </Button>
         </div>
       </CardHeader>

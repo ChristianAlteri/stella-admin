@@ -159,8 +159,8 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
   const topSellingCondition = await getTopSellingGenderCount(params.storeId);
   const topSellingGender = await getTopSellingConditionCount(params.storeId);
   return (
-    <div className="flex-col bg-slate-100 md:w-full w-1/2">
-      <div className="flex-1 space-y-4 p-8 pt-6">
+    <div className="flex-col bg-secondary md:w-full w-1/2">
+      <div className="flex-1 space-y-4 p-3">
         {/* <Heading title="Dashboard" description="Overview of your store" /> */}
         <CardHeader className="text-2xl text-black font-bold flex items-start w-full text-start flex-col">
           Dashboard

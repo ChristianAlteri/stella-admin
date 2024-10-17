@@ -181,6 +181,7 @@ export default function StockCard({
                 <thead className="text-xs uppercase bg-gray-50 sticky top-0 rounded-md">
                   <tr className="rounded-md">
                     <th className="px-4 py-2">Product Name</th>
+                    <th className="px-4 py-2">Seller</th>
                     <th className="px-4 py-2">Designer</th>
                     <th className="px-4 py-2">Category</th>
                     <th className="px-4 py-2">Price</th>
@@ -199,6 +200,7 @@ export default function StockCard({
                       }
                     >
                       <td className="px-4 py-2">{product.name}</td>
+                      <td className="px-4 py-2">{product.seller?.storeName ?? product.seller?.instagramHandle}</td>
                       <td className="px-4 py-2">
                         {product.designer?.name ?? "N/A"}
                       </td>
