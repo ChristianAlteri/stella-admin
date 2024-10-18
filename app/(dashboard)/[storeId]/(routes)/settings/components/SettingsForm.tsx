@@ -61,6 +61,7 @@ const formSchema = z.object({
     .max(100)
     .int("Consignment rate must be a whole number."),
   currency: z.enum(["AUD", "GBP"]),
+  countryCode: z.enum(["AU", "GB"]),
 });
 
 type SettingsFormValues = z.infer<typeof formSchema>;
@@ -78,6 +79,7 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
     defaultValues: {
       ...initialData,
       currency: initialData.currency as "AUD" | "GBP",
+      countryCode: initialData.currency as "AU" | "GB",
     },
   });
 
@@ -194,6 +196,32 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
                         <SelectContent>
                           <SelectItem value="AUD">AUD</SelectItem>
                           <SelectItem value="GBP">GBP</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="countryCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Country Code</FormLabel>
+                      <Select
+                        disabled={loading}
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue defaultValue={field.value} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="AU">AU</SelectItem>
+                          <SelectItem value="GB">GB</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

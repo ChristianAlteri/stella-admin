@@ -74,10 +74,13 @@ export const MaterialForm: React.FC<MaterialFormProps> = ({
 
   const form = useForm<MaterialFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || {
-      name: '',
-      value: ''
-    }
+    defaultValues: initialData
+      ? {
+          name: initialData.name ?? undefined,
+        }
+      : {
+          name: "",
+        },
   });
 
   const onSubmit = async (data: MaterialFormValues) => {

@@ -22,10 +22,7 @@ export async function POST(
       return new NextResponse("Name is required", { status: 400 });
     }
 
-    if (!value) {
-      return new NextResponse("Value is required", { status: 400 });
-    }
-
+ 
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
     }

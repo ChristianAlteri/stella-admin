@@ -84,10 +84,7 @@ export async function PATCH(
       return new NextResponse("Name is required", { status: 400 });
     }
 
-    if (!value) {
-      return new NextResponse("Value is required", { status: 400 });
-    }
-
+ 
 
     if (!params.materialId) {
       return new NextResponse("material id is required", { status: 400 });

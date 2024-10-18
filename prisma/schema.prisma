@@ -68,19 +68,6 @@ model StoreAddress {
   Store Store[]
 }
 
-// model BankAccount {
-//   id                String  @id @default(uuid())
-//   accountHolderName String
-//   accountNumber     String
-//   routingNumber     String
-//   bankName          String
-//   currency          String  // Example: "USD", "EUR", "GBP"
-//   country           String  // Example: "US", "GB", "DE"
-//   accountType       String  // "personal" or "business"
-//   swiftCode         String? // Optional for international transfers
-//   bankBranch        String? // Optional in some cases
-// }
-
 model Billboard {
   id         String     @id @default(uuid())
   storeId    String
@@ -237,7 +224,7 @@ model Size {
   storeId   String // Foreign Key to Store
   store     Store     @relation("StoreToSize", fields: [storeId], references: [id])
   name      String
-  value     String
+  value     String?
   products  Product[] // Relation to Product model
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -250,7 +237,7 @@ model Color {
   storeId   String // Foreign Key to Store
   store     Store     @relation("StoreToColor", fields: [storeId], references: [id])
   name      String
-  value     String
+  value     String?
   products  Product[] // Relation to Product model
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -263,7 +250,7 @@ model Gender {
   storeId   String // Foreign Key to Store
   store     Store     @relation("StoreToStyle", fields: [storeId], references: [id])
   name      String
-  value     String
+  value     String?
   products  Product[] // Relation to Product model
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -276,7 +263,7 @@ model Subcategory {
   storeId   String // Foreign Key to Store
   store     Store     @relation("StoreToSubcategory", fields: [storeId], references: [id])
   name      String
-  value     String
+  value     String?
   products  Product[] // Relation to Product model
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -303,7 +290,7 @@ model Material {
   storeId   String // Foreign Key to Store
   store     Store     @relation("StoreToMaterial", fields: [storeId], references: [id])
   name      String
-  value     String
+  value     String?
   products  Product[] // Relation to Product model
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -316,7 +303,7 @@ model Condition {
   storeId   String // Foreign Key to Store
   store     Store     @relation("StoreToCondition", fields: [storeId], references: [id])
   name      String
-  value     String
+  value     String?
   products  Product[] // Relation to Product model
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

@@ -10,7 +10,14 @@ export async function PATCH(
     const { userId } = auth();
     const body = await req.json();
 
-    const { name, address, consignmentRate, currency, stripe_connect_unique_id } = body;
+    const {
+      name,
+      address,
+      consignmentRate,
+      currency,
+      stripe_connect_unique_id,
+      countryCode,
+    } = body;
 
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 403 });
@@ -60,7 +67,9 @@ export async function PATCH(
     if (name) storeData.name = name;
     if (consignmentRate) storeData.consignmentRate = consignmentRate;
     if (currency) storeData.currency = currency;
-    if (stripe_connect_unique_id) storeData.stripe_connect_unique_id = stripe_connect_unique_id;
+    if (stripe_connect_unique_id)
+      storeData.stripe_connect_unique_id = stripe_connect_unique_id;
+    if (countryCode) storeData.countryCode = countryCode;
     if (addressId) storeData.addressId = addressId;
     console.log("stripe_connect_unique_id", stripe_connect_unique_id);
 
@@ -73,7 +82,27 @@ export async function PATCH(
       data: storeData,
     });
 
-    console.log("[STORE_PATCH]", store);
+    const sellerUpdateData: any = {};
+    if (name) {
+      sellerUpdateData.storeName = name;
+      sellerUpdateData.firstName = name; 
+      sellerUpdateData.lastName = name; 
+    }
+    if (stripe_connect_unique_id) {
+      sellerUpdateData.stripe_connect_unique_id = stripe_connect_unique_id;
+    }
+    if (countryCode) {
+      sellerUpdateData.country = countryCode;
+    }
+
+    const seller = await prismadb.seller.update({
+      where: {
+        id: params.storeId,
+      },
+      data: sellerUpdateData,
+    });
+
+    console.log("[STORE_PATCH]", store, "seller", seller);
     return NextResponse.json(store);
   } catch (error) {
     console.log("[STORE_PATCH]", error);

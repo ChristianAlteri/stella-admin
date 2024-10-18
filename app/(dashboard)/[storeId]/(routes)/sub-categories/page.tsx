@@ -22,7 +22,7 @@ const SubcategoriesPage = async ({
   const formattedSubcategories: SubcategoryColumn[] = subcategories.map((item) => ({
     id: item.id,
     name: item.name,
-    value: item.value,
+    value: item.value || "",
     createdAt: format(item.createdAt, 'MMMM do, yyyy'),
   }));
 

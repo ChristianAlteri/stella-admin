@@ -89,11 +89,11 @@ export const SellerForm: React.FC<SellerFormProps> = ({
       .string()
       .min(1, "Phone number is required")
       .regex(/^[0-9]+$/, "Phone number must contain only digits"),
-    country: z.string().min(1, "Country is required"),
     shippingAddress: z.string().min(1, "Shipping Address is required"),
     storeName: z.string().optional(),
     description: z.string().optional(),
     consignmentRate: z.number().optional(),
+    country: z.enum(["AU", "GB"]),
   });
 
   type SellerFormValues = z.infer<typeof formSchema>;
@@ -112,7 +112,7 @@ export const SellerForm: React.FC<SellerFormProps> = ({
           lastName: initialData.lastName || "",
           email: initialData.email || "",
           phoneNumber: initialData.phoneNumber || "",
-          country: initialData.country || "",
+          country: initialData.country as "AU" | "GB",
           shippingAddress: initialData.shippingAddress || "",
           storeName: initialData.storeName || "",
           description: initialData.description || "",
@@ -130,7 +130,7 @@ export const SellerForm: React.FC<SellerFormProps> = ({
           lastName: "",
           email: "",
           phoneNumber: "",
-          country: "",
+          country: "GB",
           shippingAddress: "",
           storeName: "",
           description: "",
@@ -163,58 +163,6 @@ export const SellerForm: React.FC<SellerFormProps> = ({
   const description = initialData ? "Edit a Seller." : "Create a new Seller";
   const toastMessage = initialData ? "Seller updated!" : "Seller created!";
   const action = initialData ? "Save changes" : "Create";
-
-  const countries = [
-    "Australia",
-    // "Austria",
-    // "Belgium",
-    // "Brazil",
-    // "Bulgaria",
-    // "Canada",
-    // "Croatia",
-    // "Cyprus",
-    // "Czech Republic",
-    // "Denmark",
-    // "Estonia",
-    // "Finland",
-    // "France",
-    // "Germany",
-    // "Ghana",
-    // "Gibraltar",
-    // "Greece",
-    // "Hong Kong",
-    // "Hungary",
-    // "India",
-    // "Indonesia",
-    // "Ireland",
-    // "Italy",
-    // "Japan",
-    // "Kenya",
-    // "Latvia",
-    // "Liechtenstein",
-    // "Lithuania",
-    // "Luxembourg",
-    // "Malaysia",
-    // "Malta",
-    // "Mexico",
-    // "Netherlands",
-    // "New Zealand",
-    // "Nigeria",
-    // "Norway",
-    // "Poland",
-    // "Portugal",
-    // "Romania",
-    // "Singapore",
-    // "Slovakia",
-    // "Slovenia",
-    // "South Africa",
-    // "Spain",
-    // "Sweden",
-    // "Switzerland",
-    // "Thailand",
-    "United Kingdom",
-    // "United Arab Emirates",
-  ];
 
   const onSubmit: FormEventHandler<HTMLFormElement> = async (event: any) => {
     const data = form.getValues();
@@ -347,10 +295,34 @@ export const SellerForm: React.FC<SellerFormProps> = ({
                     </FormItem>
                   )}
                 />
-
-                
-
                 <FormField
+                  control={form.control}
+                  name="country"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Country</FormLabel>
+                      <Select
+                        disabled={loading}
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue defaultValue={field.value} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="AU">AU</SelectItem>
+                          <SelectItem value="GB">GB</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* <FormField
                   control={form.control}
                   name="country"
                   render={({ field }) => (
@@ -410,7 +382,7 @@ export const SellerForm: React.FC<SellerFormProps> = ({
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
               </div>
             </CardContent>
           </Card>
@@ -477,28 +449,28 @@ export const SellerForm: React.FC<SellerFormProps> = ({
                     )}
                   />
                   <FormField
-                  control={form.control}
-                  name="consignmentRate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Consignment Rate (%)</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min={0}
-                          max={100}
-                          disabled={loading}
-                          placeholder="Consignment rate"
-                          {...field}
-                          onChange={(e) =>
-                            field.onChange(e.target.valueAsNumber)
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                    control={form.control}
+                    name="consignmentRate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Consignment Rate (%)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min={0}
+                            max={100}
+                            disabled={loading}
+                            placeholder="Consignment rate"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(e.target.valueAsNumber)
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <FormField
                     control={form.control}
                     name="phoneNumber"

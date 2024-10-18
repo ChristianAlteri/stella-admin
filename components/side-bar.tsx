@@ -25,7 +25,7 @@ export default function Sidebar({ storeId }: { storeId: string | string[] }) {
   ];
 
   return (
-    <aside className="absolute w-[50px] bg-sidebar  h-full shadow-2xl border-opacity-50 border-sidebar">
+    <aside className="absolute w-[50px] bg-sidebar  h-full shadow-2xl border-opacity-50 ">
       <nav className="h-full flex flex-col items-center py-2 space-y-4">
         <div className="flex flex-col gap-3">
           <div className="p-2 rounded-md">

@@ -95,6 +95,11 @@ export async function POST(
             id: storeByUserId.id,
           },
         },
+        seller: {
+          connect: {
+            id: sellerId,
+          },
+        },
         category: {
           connect: {
             id: categoryId,
@@ -139,11 +144,6 @@ export async function POST(
         //   },
         // },
         ...(genderId ? { gender: { connect: { id: genderId } } } : {}),
-        seller: {
-          connect: {
-            id: sellerId,
-          },
-        },
       },
     });
     // console.log('[PRODUCTS_POST]', product);

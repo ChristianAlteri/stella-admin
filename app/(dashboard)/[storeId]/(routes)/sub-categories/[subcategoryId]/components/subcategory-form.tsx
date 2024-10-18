@@ -74,10 +74,13 @@ export const SubcategoryForm: React.FC<SubcategoryFormProps> = ({
 
   const form = useForm<SubcategoryFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || {
-      name: '',
-      value: ''
-    }
+    defaultValues: initialData
+      ? {
+          name: initialData.name ?? undefined,
+        }
+      : {
+          name: "",
+        },
   });
 
   const onSubmit = async (data: SubcategoryFormValues) => {

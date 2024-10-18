@@ -75,10 +75,13 @@ export const GenderForm: React.FC<GenderFormProps> = ({
 
   const form = useForm<GenderFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || {
-      name: '',
-      value: ''
-    }
+    defaultValues: initialData
+      ? {
+          name: initialData.name ?? undefined,
+        }
+      : {
+          name: "",
+        },
   });
 
   const onSubmit = async (data: GenderFormValues) => {
