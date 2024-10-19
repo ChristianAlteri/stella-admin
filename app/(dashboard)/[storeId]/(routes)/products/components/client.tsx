@@ -100,7 +100,7 @@ export const ProductClient: React.FC<ProductClientProps> = ({
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full ">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-2xl font-bold flex items-center">

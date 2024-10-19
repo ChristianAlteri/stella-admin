@@ -34,7 +34,7 @@ const StoreStripeConnect = () => {
       if (account) {
         setConnectedAccountId(account.id)
         await axios.patch(`/api/stores/${params.storeId}`, { stripe_connect_unique_id: account.id })
-        await axios.patch(`/api/${params.storeId}/sellers/${params.storeId}`, { connectedAccountId: account.id })
+        // await axios.patch(`/api/${params.storeId}/sellers/${params.storeId}`, { connectedAccountId: account.id })
       } else {
         console.error('Failed to update seller with Stripe account')
         setError(true)

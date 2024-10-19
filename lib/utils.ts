@@ -2,7 +2,7 @@ import { type ClassValue, clsx } from "clsx";
 import Decimal from "decimal.js";
 import { twMerge } from "tailwind-merge";
 import { format } from "date-fns";
-import { Order } from "@prisma/client";
+import { Order, StoreAddress } from "@prisma/client";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -321,3 +321,26 @@ export const getFieldTypeSingular = (fieldType: string) => {
   }
   return fieldType.slice(0, -1);
 };
+
+export function sanitiseAddress(address: StoreAddress | null) {
+  if (!address) {
+    return {
+      city: undefined,
+      country: undefined,
+      line1: undefined,
+      line2: undefined,
+      postalCode: undefined,
+      state: undefined,
+    };
+  }
+
+  return {
+    ...address,
+    city: address.city ?? undefined,
+    country: address.country ?? undefined,
+    line1: address.line1 ?? undefined,
+    line2: address.line2 ?? undefined,
+    postalCode: address.postalCode ?? undefined,
+    state: address.state ?? undefined,
+  };
+}

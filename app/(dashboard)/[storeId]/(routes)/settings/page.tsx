@@ -6,6 +6,7 @@ import SettingsForm from "./components/SettingsForm";
 import axios from "axios";
 import ReadersSettings from "../manage-readers/components/readers-settings";
 import ManageStoreConnect from "./components/manage-store-connect-account";
+import { sanitiseAddress } from "@/lib/utils";
 
 // import { SettingsForm } from "./components/settings-form";
 
@@ -27,14 +28,26 @@ const SettingsPage = async ({
     }
   });
 
+  const storeAddress = await prismadb.storeAddress.findFirst({
+    where: {
+      Store: {
+        some: {
+          id: params.storeId
+        }
+      }
+    }
+  })
+  console.log("store", store);
+  console.log("storeAddress", storeAddress);
+
   if (!store) {
     redirect('/');
   }
 
   return ( 
-    <div className="flex-col">
-      <div className="flex-1 space-y-4 p-8 pt-6">
-        <SettingsForm initialData={store} />
+    <div className="flex flex-col items-center justify-center w-full bg-secondary h-full">
+      <div className="flex-1 space-y-4 p-8 pt-6 items-center justify-center w-2/3 h-full">
+        <SettingsForm initialData={store} storeAddress={storeAddress} />
         <ManageStoreConnect initialData={store} />
       </div>
     </div>

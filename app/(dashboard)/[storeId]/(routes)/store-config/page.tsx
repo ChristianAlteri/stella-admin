@@ -2,10 +2,9 @@ import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server"
 
 import prismadb from "@/lib/prismadb";
-import ReadersSettings from "./components/readers-settings";
 
 
-const ManageReadersPage = async ({
+const StoreConfigPage = async ({
   params
 }: {
   params: { storeId: string }
@@ -20,12 +19,8 @@ const ManageReadersPage = async ({
     where: {
       id: params.storeId,
       userId
-    },
-    include: {
-      address: true
     }
   });
-
 
   if (!store) {
     redirect('/');
@@ -34,10 +29,11 @@ const ManageReadersPage = async ({
   return ( 
     <div className="flex flex-col items-center justify-center w-full bg-secondary h-full">
       <div className="flex-1 space-y-4 p-8 pt-6 items-center justify-center w-2/3 h-full">
-        <ReadersSettings />
+        {/* StoreConfig sfc goes here  */}
+
       </div>
     </div>
   );
 }
 
-export default ManageReadersPage;
+export default StoreConfigPage;

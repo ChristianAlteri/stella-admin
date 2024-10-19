@@ -78,6 +78,8 @@ export default async function ProductDetailsPage({
     categoryId: product.categoryId,
     storeId: product.storeId,
     sellerId: product.sellerId,
+    sellerStoreName: product.seller.storeName || "",
+    consignmentRate: product.seller.consignmentRate || product.store.consignmentRate || 0,
   };
 
   return (

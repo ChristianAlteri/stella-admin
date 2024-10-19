@@ -32,16 +32,6 @@ export function MainNav({
       label: 'Payouts',
       active: pathname === `/${params.storeId}/payouts`,
     },
-    // {
-    //   href: `/${params.storeId}/designers`,
-    //   label: 'Designers',
-    //   active: pathname === `/${params.storeId}/designers`,
-    // },
-    // {
-    //   href: `/${params.storeId}/categories`,
-    //   label: 'Categories',
-    //   active: pathname === `/${params.storeId}/categories`,
-    // },
   ]
 
   const configRoutes = [

@@ -57,8 +57,7 @@ export default function ProductDetailsComponent({
   };
 
   return (
-    <Card
-      className="w-full">
+    <Card className="w-full">
       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
         <div className="flex items-start space-x-4">
           <div className="relative h-32 w-32">
@@ -75,7 +74,7 @@ export default function ProductDetailsComponent({
               <Image
                 src={data.imageUrl || "/placeholder.png"}
                 alt={data.name}
-                width={128} 
+                width={128}
                 height={128}
                 className="rounded-md object-cover"
               />
@@ -86,9 +85,9 @@ export default function ProductDetailsComponent({
             <p className="text-muted-foreground">{data.designer}</p>
             <p className="text-muted-foreground">{data.id}</p>
             <div className="flex items-center">
-                <Tag className="mr-2 h-4 w-4" />
-                <span>{data.category}</span>
-              </div>
+              <Tag className="mr-2 h-4 w-4" />
+              <span>{data.category}</span>
+            </div>
             <div className="flex flex-wrap gap-2 mt-2">
               <ProductBadge
                 condition={!data.isArchived}
@@ -140,39 +139,100 @@ export default function ProductDetailsComponent({
               <div className="flex items-center">
                 <span>RRP: {data.retailPrice}</span>
               </div>
-              <div onClick={() => {router.push(`/${data.storeId}/sellers/${data.sellerId}/details`)}} className="flex items-center hover:underline hover:cursor-pointer">
-                <span>{data.sellerHandle}</span>
+              <div
+                onClick={() => {
+                  router.push(
+                    `/${data.storeId}/sellers/${data.sellerId}/details`
+                  );
+                }}
+                className="flex items-center hover:underline hover:cursor-pointer"
+              >
+                <span>{data.sellerStoreName}</span>
               </div>
             </div>
-            <div className="flex flex-row gap-8 justify-end w-full items-end">
-              <div className="flex items-center space-x-2">
+            {/* <div className="flex flex-row gap-3 justify-end w-full items-end">
+              <div className="flex items-center space-x-1">
+                <Percent className="h-4 w-4" />
+                <span>{data.consignmentRate || 0}</span>
+              </div>
+              <div className="flex items-center space-x-1">
                 <Heart className="h-4 w-4" />
                 <span>{data.likes || 0}</span>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1">
                 <MousePointer className="h-4 w-4" />
                 <span>{data.clicks || 0}</span>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1">
                 <Palette className="h-4 w-4" />
                 <span>{data.color}</span>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1">
                 <Ruler className="h-4 w-4" />
                 <span>{data.size}</span>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1">
                 <Shirt className="h-4 w-4" />
                 <span>{data.material || "N/A"}</span>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1">
                 <Users className="h-4 w-4" />
                 <span>{data.gender}</span>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1">
                 <Layers className="h-4 w-4" />
                 <span>{data.subcategory}</span>
               </div>
+            </div> */}
+            <div className="flex flex-row gap-3 justify-end w-full items-end flex-wrap">
+              {data.consignmentRate !== undefined && (
+                <div className="flex items-center space-x-1">
+                  <Percent className="h-4 w-4" />
+                  <span>{data.consignmentRate}</span>
+                </div>
+              )}
+              {data.likes !== undefined && data.likes !== 0 && (
+                <div className="flex items-center space-x-1">
+                  <Heart className="h-4 w-4" />
+                  <span>{data.likes}</span>
+                </div>
+              )}
+              {data.clicks !== undefined && data.likes !== 0 && (
+                <div className="flex items-center space-x-1">
+                  <MousePointer className="h-4 w-4" />
+                  <span>{data.clicks}</span>
+                </div>
+              )}
+              {data.color && (
+                <div className="flex items-center space-x-1">
+                  <Palette className="h-4 w-4" />
+                  <span>{data.color}</span>
+                </div>
+              )}
+              {data.size && (
+                <div className="flex items-center space-x-1">
+                  <Ruler className="h-4 w-4" />
+                  <span>{data.size}</span>
+                </div>
+              )}
+              {data.material && (
+                <div className="flex items-center space-x-1">
+                  <Shirt className="h-4 w-4" />
+                  <span>{data.material}</span>
+                </div>
+              )}
+              {data.gender && (
+                <div className="flex items-center space-x-1">
+                  <Users className="h-4 w-4" />
+                  <span>{data.gender}</span>
+                </div>
+              )}
+              {data.subcategory && (
+                <div className="flex items-center space-x-1">
+                  <Layers className="h-4 w-4" />
+                  <span>{data.subcategory}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>

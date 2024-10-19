@@ -6,7 +6,7 @@ export async function GET(req: NextRequest) {
     const locations = await stripe.terminal.locations.list({
       limit: 8,
     });
-    console.log("locations", locations);
+    // console.log("locations", locations);
     return NextResponse.json(locations);
   } catch (error) {
     console.error("Error fetching locations:", error);
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
         display_name: filteredData.display_name,
         address: {
           line1: filteredData.address_line1,
-          line2: filteredData.address_line2,  // Will be omitted if empty
+          line2: filteredData.address_line2,  
           city: filteredData.city,
           postal_code: filteredData.postal_code,
           state: filteredData.state,

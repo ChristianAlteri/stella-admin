@@ -1,5 +1,9 @@
 {
     "cSpell.words": [
         "prismadb"
+    ],
+    "cSpell.ignoreWords": [
+        "sanitise",
+        "sanitised"
     ]
 }

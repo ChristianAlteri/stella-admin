@@ -38,6 +38,11 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
       name: true,
     },
   });
+  const store = await prismadb.store.findUnique({
+    where: {
+      id: params.storeId,
+    },
+  })
 
   const formattedProducts: ProductColumn[] = products.map((item) => ({
     id: item.id,
@@ -70,6 +75,7 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
     categoryId: item.categoryId,
     sellerId: item.seller?.id || "",
     storeId: item.storeId,
+    consignmentRate: item.seller.consignmentRate || store?.consignmentRate || 0,
   }));
 
   return (

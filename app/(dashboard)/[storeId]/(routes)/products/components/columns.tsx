@@ -32,6 +32,8 @@ export type ProductColumn = {
   designerId: string;
   categoryId: string;
   storeId: string;
+  sellerStoreName: string;
+  consignmentRate: number;
 };
 
 export const columns: ColumnDef<ProductColumn>[] = [

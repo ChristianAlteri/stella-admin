@@ -97,6 +97,7 @@ export async function PATCH(
 
     const seller = await prismadb.seller.update({
       where: {
+        storeId: params.storeId,
         id: params.storeId,
       },
       data: sellerUpdateData,

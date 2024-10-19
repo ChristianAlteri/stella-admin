@@ -1,85 +1,33 @@
 "use client";
 
-import * as z from "zod";
-import axios from "axios";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
-import { Trash2 } from "lucide-react";
-import { Store } from "@prisma/client"; 
-import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { useOrigin } from "@/hooks/use-origin";
-
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Separator } from "@/components/ui/separator";
-import { AlertModal } from "@/components/modals/alert-modal";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Store } from "@prisma/client";
+import { Card, CardTitle, CardContent } from "@/components/ui/card";
+import StoreStripeConnect from "../../on-boarding/components/store-stripe-connect";
+import { ChevronDown, ChevronUp } from "lucide-react"; // Assuming you're using Lucide icons
 
 interface ManageStoreConnectProps {
   initialData: Store;
 }
 
-
-
 export default function ManageStoreConnect({ initialData }: ManageStoreConnectProps) {
-  
+  const [isStoreConnectOpen, setIsStoreConnectOpen] = useState(false);
 
-  const onSubmit = async (data: any) => {
-    try {
-
-    } catch (error: any) {
-
-    } finally {
-
-    }
+  const toggleStoreConnectOpen = () => {
+    setIsStoreConnectOpen(!isStoreConnectOpen);
   };
 
-  
-
   return (
-    <>
-      
-      <Card className="w-full max-w-3xl mx-auto">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-
-              <CardTitle className="text-2xl">Manage your stores account</CardTitle>
-
-
-
-          </div>
-        </CardHeader>
-        <CardContent>
-          
+    <Card className="w-full max-w-3xl mx-auto rounded-md p-4 shadow-md">
+      <div className="flex justify-between items-center cursor-pointer" onClick={toggleStoreConnectOpen}>
+        <CardTitle className="text-2xl">Manage your store&apos;s Stripe Connect</CardTitle>
+        {isStoreConnectOpen ? <ChevronUp /> : <ChevronDown />}
+      </div>
+      {isStoreConnectOpen && (
+        <CardContent className="p-6">
+          <StoreStripeConnect />
         </CardContent>
-        <CardFooter className="flex justify-between">
-         
-        </CardFooter>
-      </Card>
-    </>
+      )}
+    </Card>
   );
 }
