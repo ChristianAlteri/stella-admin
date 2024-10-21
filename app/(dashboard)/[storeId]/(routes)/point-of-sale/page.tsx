@@ -1,23 +1,14 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CreditCard } from "lucide-react"
 import StripeTerminal from "./components/stripe-terminal"
 
 const PointOfSalePage = () => {
   return (
-    <div className="bg-secondary w-full h-full justify-center items-center text-center">
-      <CardHeader>
-        <div className="text-2xl text-black font-bold flex items-center w-full text-center">
-          <CreditCard className="mr-2 h-6 w-6" />
-          Point of Sale
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-col justify-center items-center w-full">
+    
+    <div className="flex flex-col items-center justify-center w-full bg-secondary h-full">
+      <div className="flex-1 space-y-4 p-8 pt-6 items-center justify-center w-2/3 h-full">
           <StripeTerminal />
         </div>
-      </CardContent>
     </div>
   )
 }

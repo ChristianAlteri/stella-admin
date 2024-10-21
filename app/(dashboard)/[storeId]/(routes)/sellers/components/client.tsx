@@ -20,20 +20,16 @@ export const SellerClient: React.FC<SellerClientProps> = ({ data }) => {
   const params = useParams();
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   const filteredData = data.filter((seller) =>
     Object.values(seller).some(
       (value) =>
         typeof value === "string" &&
-      value.toLowerCase().includes(searchTerm.toLowerCase())
+        value.toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
   const archivedSellers = filteredData.filter((seller) => seller.isArchived);
   const liveSellers = filteredData.filter((seller) => !seller.isArchived);
-
-  console.log("archivedSellers", archivedSellers);
-  console.log("liveSellers", liveSellers);
-  
 
   return (
     <Card className="w-full">
@@ -66,25 +62,28 @@ export const SellerClient: React.FC<SellerClientProps> = ({ data }) => {
             </div>
           </div>
         </div>
-        <Separator className="my-6" />
-        <Tabs defaultValue="live" className="w-full">
+        <Separator className="my-6 mb-4" />
+        <Tabs defaultValue="live" className="w-full ">
           <TabsList>
             <TabsTrigger value="live">Live Sellers</TabsTrigger>
             <TabsTrigger value="archived">Archived Sellers</TabsTrigger>
           </TabsList>
           <TabsContent value="live">
-            <Heading
-              title={`Live Sellers (${liveSellers.length})`}
-              description="Manage live sellers"
-            />
+            <div className="flex mt-4">
+              <Heading
+                title={`Live Sellers (${liveSellers.length})`}
+                description="Manage live sellers"
+              />
+            </div>
             <DataTable columns={columns} data={liveSellers} />
-
           </TabsContent>
           <TabsContent value="archived">
-            <Heading
-              title={`Archived Sellers (${archivedSellers.length})`}
-              description="See archived sellers"
-            />
+            <div className="flex mt-4">
+              <Heading
+                title={`Archived Sellers (${archivedSellers.length})`}
+                description="See archived sellers"
+              />
+            </div>
             <DataTable columns={columns} data={archivedSellers} />
           </TabsContent>
         </Tabs>

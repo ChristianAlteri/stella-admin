@@ -106,8 +106,8 @@ model Seller {
   payouts                  Payout[]
   consignmentRate          Int?
 
-  charityName String? @default("") 
-  charityUrl  String? @default("") 
+  charityName String? @default("")
+  charityUrl  String? @default("")
 
   // Influencer specific fields
   shoeSizeEU String? @default("")
@@ -143,8 +143,9 @@ model Category {
   products Product[] @relation("CategoryToProduct")
   sellers  Seller[]  @relation("SellerToCategory")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  isArchived Boolean  @default(false)
 
   @@index([storeId])
   @@index([billboardId])
@@ -157,11 +158,13 @@ model Designer {
   billboardId String? // Foreign Key to Billboard
   billboard   Billboard? @relation(fields: [billboardId], references: [id])
 
-  name      String
-  products  Product[] @relation("DesignerToProduct")
-  seller    Seller[]  @relation("SellerToDesigner")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  name     String
+  products Product[] @relation("DesignerToProduct")
+  seller   Seller[]  @relation("SellerToDesigner")
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  isArchived Boolean  @default(false)
 
   @@index([storeId])
   @@index([billboardId])
@@ -228,6 +231,7 @@ model Size {
   products  Product[] // Relation to Product model
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  isArchived      Boolean    @default(false)
 
   @@index([storeId])
 }
@@ -241,6 +245,7 @@ model Color {
   products  Product[] // Relation to Product model
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  isArchived      Boolean    @default(false)
 
   @@index([storeId])
 }
@@ -254,6 +259,7 @@ model Gender {
   products  Product[] // Relation to Product model
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  isArchived      Boolean    @default(false)
 
   @@index([storeId])
 }
@@ -267,6 +273,7 @@ model Subcategory {
   products  Product[] // Relation to Product model
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  isArchived      Boolean    @default(false)
 
   @@index([storeId])
 }
@@ -294,6 +301,7 @@ model Material {
   products  Product[] // Relation to Product model
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  isArchived      Boolean    @default(false)
 
   @@index([storeId])
 }
@@ -307,6 +315,7 @@ model Condition {
   products  Product[] // Relation to Product model
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  isArchived      Boolean    @default(false)
 
   @@index([storeId])
 }
@@ -318,6 +327,7 @@ model Image {
   url       String // URL of the image
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  isArchived      Boolean    @default(false)
 
   @@index([productId])
 }

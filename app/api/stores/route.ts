@@ -1,39 +1,9 @@
+import { stripe } from "@/lib/stripe";
 import { NextResponse } from 'next/server';
 import { auth } from "@clerk/nextjs/server"
 
 import prismadb from '@/lib/prismadb';
 import { convertDecimalFields } from '@/lib/utils';
-
-// export async function POST(
-//   req: Request,
-// ) {
-//   try {
-//     const { userId } = auth();
-//     const body = await req.json();
-
-//     const { name } = body;
-
-//     if (!userId) {
-//       return new NextResponse("Unauthorized", { status: 403 });
-//     }
-
-//     if (!name) {
-//       return new NextResponse("Name is required", { status: 400 });
-//     }
-
-//     const store = await prismadb.store.create({
-//       data: {
-//         name,
-//         userId,
-//       }
-//     });
-  
-//     return NextResponse.json(store);
-//   } catch (error) {
-//     console.log('[API_STORES_POST]', error);
-//     return new NextResponse("Internal error", { status: 500 });
-//   }
-// };
 
 export async function POST(req: Request) {
   try {
@@ -88,6 +58,21 @@ export async function POST(req: Request) {
         lastName: store.name,
         instagramHandle: store.name,
       }
+    });
+
+    const location = await stripe.terminal.locations.create({
+      display_name: store.name,
+      metadata: {
+        storeId: store.id,
+      },
+      address: {
+        line1: address.line1,
+        line2: address.line2 || "",  
+        city: address.city,
+        postal_code: address.postalCode,
+        state: address.state || "",
+        country: address.country,
+      },
     });
   
     return NextResponse.json(store);

@@ -249,6 +249,7 @@ export default function ReadersSettings() {
         postal_code: postalCode,
         state: state,
         country: country,
+        store_id: params.storeId,
       };
 
       const response = await axios.post(

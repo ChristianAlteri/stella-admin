@@ -51,9 +51,12 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 405 });
     }
 
-    const subcategory = await prismadb.subcategory.delete({
+    const subcategory = await prismadb.subcategory.update({
       where: {
         id: params.subcategoryId
+      },
+      data: {
+        isArchived: true,
       }
     });
   

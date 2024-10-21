@@ -51,9 +51,12 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 405 });
     }
 
-    const condition = await prismadb.condition.delete({
+    const condition = await prismadb.condition.update({
       where: {
         id: params.conditionId
+      },
+      data: {
+        isArchived: true,
       }
     });
   

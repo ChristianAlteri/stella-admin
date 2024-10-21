@@ -27,6 +27,9 @@ export async function POST(req: NextRequest) {
       // Create a new terminal location with the cleaned data
       const location = await stripe.terminal.locations.create({
         display_name: filteredData.display_name,
+        metadata: {
+          storeId: filteredData.store_id,
+        },
         address: {
           line1: filteredData.address_line1,
           line2: filteredData.address_line2,  

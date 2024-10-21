@@ -51,9 +51,12 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 405 });
     }
 
-    const gender = await prismadb.gender.delete({
+    const gender = await prismadb.gender.update({
       where: {
         id: params.genderId
+      },
+      data: {
+        isArchived: true,
       }
     });
   

@@ -182,19 +182,22 @@ export const ProductClient: React.FC<ProductClientProps> = ({
             <TabsTrigger value="archived">Archived Products</TabsTrigger>
           </TabsList>
           <TabsContent value="live">
-            <Heading
-              title={`Live Products (${liveProducts.length})`}
-              description="Manage live stock"
-            />
-              {/* TABLE */}
+            <div className="flex mt-4">
+              <Heading
+                title={`Live Products (${liveProducts.length})`}
+                description="Manage live stock"
+              />
+            </div>
+            {/* TABLE */}
             <DataTable columns={columns} data={liveProducts} />
-
           </TabsContent>
           <TabsContent value="archived">
-            <Heading
-              title={`Archived Products (${archivedProducts.length})`}
-              description="See archived stock"
-            />
+            <div className="flex mt-4">
+              <Heading
+                title={`Archived Products (${archivedProducts.length})`}
+                description="See archived stock"
+              />
+            </div>
             <DataTable columns={columns} data={archivedProducts} />
           </TabsContent>
         </Tabs>

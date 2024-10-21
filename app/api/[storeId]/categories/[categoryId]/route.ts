@@ -64,11 +64,19 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 405 });
     }
 
-    const category = await prismadb.category.delete({
+    const category = await prismadb.category.update({
       where: {
         id: params.categoryId,
+      },
+      data: {
+        isArchived: true,
       }
     });
+    // const category = await prismadb.category.delete({
+    //   where: {
+    //     id: params.categoryId,
+    //   }
+    // });
   
     return NextResponse.json(category);
   } catch (error) {

@@ -104,7 +104,13 @@ export default function StripeTerminalComponent() {
   const [loadingSellers, setLoadingSellers] = useState<boolean>(false);
   const [loadingDesigners, setLoadingDesigners] = useState<boolean>(false);
   const [loadingCategories, setLoadingCategories] = useState<boolean>(false);
-
+  useEffect(() => {
+    if (readers.length > 0) {
+      setSelectedReader(readers[0].id);
+    } else {
+      setSelectedReader("");
+    }
+  }, [readers]);
   const [activeTab, setActiveTab] = useState("search");
 
   useEffect(() => {
@@ -422,11 +428,10 @@ export default function StripeTerminalComponent() {
     }
   };
   const getDesigners = async () => {
-    console.log("HERE");
     setLoadingDesigners(true);
     try {
       const { data } = await axios.get(`/api/${storeId}/designers`);
-      console.log("data", data);
+
       setDesigners(data);
     } catch (error) {
       console.error("Error fetching designers:", error);
@@ -454,406 +459,285 @@ export default function StripeTerminalComponent() {
   };
 
   return (
-    <div className="flex flex-col w-full h-full">
-      <div className="flex h-full w-full items-center justify-center">
-        <div className="flex flex-row gap-4 items-start w-2/3 h-full">
-          <Tabs
-            value={activeTab}
-            onValueChange={(value) => {
-              setActiveTab(value);
-              if (value === "seller") {
-                getSellers();
-              } else if (value === "designer") {
-                getDesigners();
-              } else if (value === "category") {
-                getCategories();
-              }
-            }}
-            className="w-full"
-          >
-            
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="search">Search</TabsTrigger>
-              <TabsTrigger value="seller">Seller</TabsTrigger>
-              <TabsTrigger value="designer">Designer</TabsTrigger>
-              <TabsTrigger value="category">Categories</TabsTrigger>
-            </TabsList>
+    <Card className="w-full space-y-4 p-6">
+      <CardTitle className="mb-6 text-primary">Point of Sale</CardTitle>
+      <div className="flex flex-col">
+        <div className="flex h-full items-center justify-center">
+          <div className="flex flex-row gap-4 items-start h-full w-full">
+            <Tabs
+              value={activeTab}
+              onValueChange={(value) => {
+                setActiveTab(value);
+                if (value === "seller") {
+                  getSellers();
+                } else if (value === "designer") {
+                  getDesigners();
+                } else if (value === "category") {
+                  getCategories();
+                }
+              }}
+              className="w-full"
+            >
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="search">Search</TabsTrigger>
+                <TabsTrigger value="seller">Seller</TabsTrigger>
+                <TabsTrigger value="designer">Designer</TabsTrigger>
+                <TabsTrigger value="category">Categories</TabsTrigger>
+              </TabsList>
 
-            <TabsContent value="search">
-              <div className="flex flex-row gap-4 items-start w-full h-full">
-                {loadingReaders ? (
-                  <div className="space-y-4 w-full">
-                    {[...Array(5)].map((_, i) => (
-                      <div key={i} className="flex items-center space-x-4">
-                        <Skeleton className="h-20 w-20 rounded-md" />
-                        <div className="flex-1 space-y-2">
-                          <Skeleton className="h-4 w-3/4" />
-                          <Skeleton className="h-4 w-1/2" />
+              <TabsContent value="search">
+                <div className="flex flex-row gap-4 items-start w-full h-full">
+                  {loadingReaders ? (
+                    <div className="space-y-4 w-full">
+                      {[...Array(5)].map((_, i) => (
+                        <div key={i} className="flex items-center space-x-4">
+                          <Skeleton className="h-20 w-20 rounded-md" />
+                          <div className="flex-1 space-y-2">
+                            <Skeleton className="h-4 w-3/4" />
+                            <Skeleton className="h-4 w-1/2" />
+                          </div>
+                          <Skeleton className="h-10 w-24" />
                         </div>
-                        <Skeleton className="h-10 w-24" />
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <Card className="w-full  h-[500px]">
-                    <CardContent className="p-4 h-full flex flex-col">
-                      <div className="flex flex-col gap-2 mb-4">
-                        <Input
-                          type="text"
-                          ref={inputRef}
-                          placeholder="Search product"
-                          onChange={handleSearch}
-                          className="w-full"
-                        />
-                        {/* <Button
-                          variant="outline"
-                          className="w-full  opacity-40 hover:opacity-100"
-                          onClick={() => setIsDialogOpen(true)}
-                        >
-                          Create a product
-                        </Button> */}
-                      </div>
-                      <ScrollArea className="flex-grow">
-                        {searchResults.length > 0 && (
-                          <div className="space-y-4">
-                            {searchResults.map((result: any) => (
-                              <div
-                                key={result.id}
-                                className="flex items-center justify-between"
-                              >
-                                <div className="flex items-center w-full rounded-md">
-                                  {result.images && result.images[0] && (
-                                    <Image
-                                      width={80}
-                                      height={80}
-                                      src={result.images[0].url}
-                                      alt={result.name}
-                                      className="w-20 h-20 object-cover rounded-md p-2"
-                                    />
-                                  )}
-                                  <div className="flex flex-row gap-2 justify-between text-center items-center w-full">
-                                    <div className="flex flex-row gap-2 text-center items-center w-full">
-                                      <h3
-                                        className="font-semibold hover:cursor-pointer hover:underline"
-                                        onClick={() =>
-                                          router.push(
-                                            `/${storeId}/products/${result.id}/details`
-                                          )
-                                        }
-                                      >
-                                        {result.name}
-                                      </h3>
-                                      <p className="text-sm text-gray-500">
-                                        £{result.ourPrice.toString()}
-                                      </p>
-                                      {/* <p className="text-xs text-gray-200">
-                                        £{result.id}
-                                      </p> */}
-                                    </div>
-                                    <div className="flex flex-row gap-2 text-end items-center w-full">
-                                      <p className="text-xs text-gray-500 w-full mr-4">
-                                        {result.seller.storeName || result.seller.instagramHandle ||
-                                          result.seller.firstName}
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
-                                <Button
-                                  onClick={() => handleSelect(result)}
-                                  variant={
-                                    selectedProducts.some(
-                                      (p) => p.id === result.id
-                                    )
-                                      ? "default"
-                                      : "outline"
-                                  }
-                                >
-                                  {selectedProducts.some(
-                                    (p) => p.id === result.id
-                                  )
-                                    ? "Selected"
-                                    : "Select for Sale"}
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </ScrollArea>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-            </TabsContent>
-
-            {["seller", "designer", "category"].map((tab) => {
-              const isLoading =
-                tab === "seller"
-                  ? loadingSellers
-                  : tab === "designer"
-                  ? loadingDesigners
-                  : loadingCategories;
-
-              const items =
-                tab === "seller"
-                  ? sellers
-                  : tab === "designer"
-                  ? designers
-                  : categories;
-
-              return (
-                <TabsContent key={tab} value={tab} className="mt-0">
-                  <Card className="h-[500px]">
-                    <CardHeader>
-                      <CardTitle>
-                        {tab === "category"
-                          ? "Categories"
-                          : tab.charAt(0).toUpperCase() + tab.slice(1) + "s"}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ScrollArea className="h-[calc(100%-80px)]">
-                        {isLoading ? (
-                          <div className="space-y-2">
-                            {[...Array(10)].map((_, i) => (
-                              <div
-                                key={i}
-                                className="flex flex-row w-full gap-2"
-                              >
-                                <Skeleton key={i} className="h-8 w-1/2" />
-                                <Skeleton key={i} className="h-8 w-1/2" />
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            {items.map((item: any) => (
-                              <Button
-                                key={item.id}
-                                variant="outline"
-                                className="justify-start h-auto py-2 px-4"
-                                onClick={() => {
-                                  handleSearchProductByIDClick(item.id);
-                                  setActiveTab("search");
-                                }}
-                              >
-                                {tab === "seller"
-                                  ? item.storeName : item.instagramHandle}
-                              </Button>
-                            ))}
-                          </div>
-                        )}
-                      </ScrollArea>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              );
-            })}
-          </Tabs>
-
-          <div className="w-full h-[550px]">
-            {loadingReaders ? (
-              <div className="flex flex-col space-y-4">
-                <div className="w-full h-full">
-                  <CardHeader>
-                    <Skeleton className="h-8 w-1/3 flex " />
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <Skeleton className="w-full h-10 rounded-md" />
-                    <Skeleton className="w-full h-12 rounded-md" />
-                    <div className="grid grid-cols-3 gap-2">
-                      {[...Array(12)].map((_, index) => (
-                        <Skeleton key={index} className="h-12 rounded-md" />
                       ))}
                     </div>
-                  </CardContent>
-                  <CardFooter className="flex flex-col gap-2">
-                    <Skeleton className="w-full h-10 rounded-md" />
-                  </CardFooter>
-                </div>
-              </div>
-            ) : (
-              <Card className="w-full h-full">
-                <CardHeader>
-                  <CardTitle className="flex w-full justify-center">
-                    New Sale
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {!isPaymentCaptured ? (
-                    <>
-                      <Select onValueChange={setSelectedReader}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a reader" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {readers.map((reader) => (
-                            <SelectItem key={reader.id} value={reader.id}>
-                              <div className="flex gap-2 flex-row justify-center items-center">
-                                {reader.label}
-                                <Wifi
-                                  className={`h-4 w-4 flex justify-center items-center  ${
-                                    reader.status === "online"
-                                      ? "text-green-500"
-                                      : "text-gray-300"
-                                  }`}
-                                />
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Input
-                        type="text"
-                        placeholder="Amount"
-                        value={amount}
-                        onChange={handleInputChange}
-                        className="text-2xl font-bold text-center"
-                      />
-                      <div className="grid grid-cols-3 gap-2">
-                        {keypadButtons.map((num, index) => (
-                          <Button
-                            key={index}
+                  ) : (
+                    <Card className="w-full  h-[500px]">
+                      <CardContent className="p-4 h-full flex flex-col">
+                        <div className="flex flex-col gap-2 mb-4">
+                          <Input
+                            type="text"
+                            ref={inputRef}
+                            placeholder="Search product"
+                            onChange={handleSearch}
+                            className="w-full"
+                          />
+                          {/* <Button
                             variant="outline"
-                            onClick={() => handleNumberClick(num)}
-                            className="h-12 text-lg"
+                            className="w-full  opacity-40 hover:opacity-100"
+                            onClick={() => setIsDialogOpen(true)}
                           >
-                            {num === "backspace" ? "Back" : num}
-                          </Button>
+                            Create a product
+                          </Button> */}
+                        </div>
+                        <ScrollArea className="flex-grow">
+                          {searchResults.length > 0 && (
+                            <div className="space-y-4">
+                              {searchResults.map((result: any) => (
+                                <div
+                                  key={result.id}
+                                  className="flex items-center justify-between"
+                                >
+                                  <div className="flex items-center w-full rounded-md">
+                                    {result.images && result.images[0] && (
+                                      <Image
+                                        width={80}
+                                        height={80}
+                                        src={result.images[0].url}
+                                        alt={result.name}
+                                        className="w-20 h-20 object-cover rounded-md p-2"
+                                      />
+                                    )}
+                                    <div className="flex flex-row gap-2 justify-between text-center items-center w-full">
+                                      <div className="flex flex-row gap-2 text-center items-center w-full">
+                                        <h3
+                                          className="font-semibold hover:cursor-pointer hover:underline"
+                                          onClick={() =>
+                                            router.push(
+                                              `/${storeId}/products/${result.id}/details`
+                                            )
+                                          }
+                                        >
+                                          {result.name}
+                                        </h3>
+                                        <p className="text-sm text-gray-500">
+                                          £{result.ourPrice.toString()}
+                                        </p>
+                                        {/* <p className="text-xs text-gray-200">
+                                          £{result.id}
+                                        </p> */}
+                                      </div>
+                                      <div className="flex flex-row gap-2 text-end items-center w-full">
+                                        <p className="text-xs text-gray-500 w-full mr-4">
+                                          {result.seller.storeName ||
+                                            result.seller.instagramHandle ||
+                                            result.seller.firstName}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <Button
+                                    onClick={() => handleSelect(result)}
+                                    variant={
+                                      selectedProducts.some(
+                                        (p) => p.id === result.id
+                                      )
+                                        ? "default"
+                                        : "outline"
+                                    }
+                                  >
+                                    {selectedProducts.some(
+                                      (p) => p.id === result.id
+                                    )
+                                      ? "Selected"
+                                      : "Select for Sale"}
+                                  </Button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </ScrollArea>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              </TabsContent>
+
+              {["seller", "designer", "category"].map((tab) => {
+                const isLoading =
+                  tab === "seller"
+                    ? loadingSellers
+                    : tab === "designer"
+                    ? loadingDesigners
+                    : loadingCategories;
+
+                const items =
+                  tab === "seller"
+                    ? sellers
+                    : tab === "designer"
+                    ? designers
+                    : categories;
+
+                return (
+                  <TabsContent key={tab} value={tab} className="mt-0">
+                    <Card className="h-[500px]">
+                      <CardHeader>
+                        <CardTitle>
+                          {tab === "category"
+                            ? "Categories"
+                            : tab.charAt(0).toUpperCase() + tab.slice(1) + "s"}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ScrollArea className="h-[calc(100%-80px)]">
+                          {isLoading ? (
+                            <div className="space-y-2">
+                              {[...Array(10)].map((_, i) => (
+                                <div
+                                  key={i}
+                                  className="flex flex-row w-full gap-2"
+                                >
+                                  <Skeleton key={i} className="h-8 w-1/2" />
+                                  <Skeleton key={i} className="h-8 w-1/2" />
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              {items.map((item: any) => (
+                                <Button
+                                  key={item.id}
+                                  variant="outline"
+                                  className="justify-start h-auto py-2 px-4"
+                                  onClick={() => {
+                                    handleSearchProductByIDClick(item.id);
+                                    setActiveTab("search");
+                                  }}
+                                >
+                                  {tab === "seller"
+                                    ? item.storeName || item.instagramHandle
+                                    : item.name}
+                                </Button>
+                              ))}
+                            </div>
+                          )}
+                        </ScrollArea>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                );
+              })}
+            </Tabs>
+
+            <div className="w-full h-[550px]">
+              {loadingReaders ? (
+                <div className="flex flex-col space-y-4">
+                  <div className="w-full h-full">
+                    <CardHeader>
+                      <Skeleton className="h-8 w-1/3 flex " />
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <Skeleton className="w-full h-10 rounded-md" />
+                      <Skeleton className="w-full h-12 rounded-md" />
+                      <div className="grid grid-cols-3 gap-2">
+                        {[...Array(12)].map((_, index) => (
+                          <Skeleton key={index} className="h-12 rounded-md" />
                         ))}
                       </div>
-                    </>
-                  ) : (
-                    <p className="text-xl font-semibold text-center">
-                      Payment successfully captured!
-                    </p>
-                  )}
-                </CardContent>
-                <CardFooter className="flex flex-col gap-2">
-                  {!isPaymentCaptured ? (
-                    <>
-                      {!paymentIntentId ? (
-                        <Button
-                          onClick={() => {
-                            createPendingPayment();
-                            setIsDialogOpen(true);
-                          }}
-                          disabled={!selectedReader || !amount}
-                          className="w-full"
-                        >
-                          Create Payment (£{amount})
-                        </Button>
-                      ) : (
-                        <>
-                          <Button
-                            onClick={cancelPayment}
-                            disabled={!selectedReader}
-                            className="w-full"
-                          >
-                            Cancel Payment
-                          </Button>
-                          <Button
-                            onClick={() => setIsPaymentCaptured(true)}
-                            disabled={!selectedReader}
-                            className="w-full"
-                          >
-                            Approve Card Payment
-                          </Button>
-                        </>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      <Button onClick={resetComponent} className="w-full">
-                        New Payment
-                      </Button>
-                      <Button onClick={printReceipt} className="w-full">
-                        Print Receipt
-                      </Button>
-                    </>
-                  )}
-                </CardFooter>
-              </Card>
-            )}
-          </div>
-        </div>
-
-        {!paymentIntentId ? ( // If paymentIntentId is not set, show the dialog
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogContent>
-              <div className="space-y-4">
-                <Skeleton className="h-8 w-1/3" />
-                <Skeleton className="w-full h-10 rounded-md" />
-                <Skeleton className="w-full h-12 rounded-md" />
-                <div className="grid grid-cols-2 gap-2">
-                  {[...Array(4)].map((_, index) => (
-                    <Skeleton key={index} className="h-10 rounded-md" />
-                  ))}
-                </div>
-                <Skeleton className="w-full h-10 rounded-md" />
-              </div>
-            </DialogContent>
-          </Dialog>
-        ) : (
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogContent>
-              {!paymentIntentId ? (
-                // Show loading skeleton if no paymentIntentId
-                <div className="space-y-4">
-                  <Skeleton className="h-8 w-1/3" />
-                  <Skeleton className="w-full h-10 rounded-md" />
-                  <Skeleton className="w-full h-12 rounded-md" />
-                  <div className="grid grid-cols-2 gap-2">
-                    {[...Array(4)].map((_, index) => (
-                      <Skeleton key={index} className="h-10 rounded-md" />
-                    ))}
+                    </CardContent>
+                    <CardFooter className="flex flex-col gap-2">
+                      <Skeleton className="w-full h-10 rounded-md" />
+                    </CardFooter>
                   </div>
-                  <Skeleton className="w-full h-10 rounded-md" />
                 </div>
               ) : (
-                <>
-                  {!isPaymentCaptured ? (
-                    // Show order summary if payment is not yet captured
-                    <>
-                      <DialogHeader>
-                        <DialogTitle>Order Summary</DialogTitle>
-                      </DialogHeader>
-
-                      <Card className="w-full">
-                        <CardHeader>
-                          <CardTitle className="text-2xl font-bold">
-                            Order Summary
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="grid gap-4">
-                          {selectedProducts.length > 0 && (
-                            <>
-                              <ScrollArea className="h-[150px] pr-4">
-                                {selectedProducts.map((product) => (
-                                  <div
-                                    key={product.id}
-                                    className="flex justify-between py-1"
-                                  >
-                                    <span className="text-sm text-muted-foreground">
-                                      {product.name}
-                                    </span>
-                                    <span className="text-sm font-medium">
-                                      £{Number(product.ourPrice).toFixed(2)}
-                                    </span>
-                                  </div>
-                                ))}
-                              </ScrollArea>
-                              <Separator />
-                              <div className="flex justify-between">
-                                <span className="text-lg font-bold">Total</span>
-                                <span className="text-lg font-bold">
-                                  £{amount}
-                                </span>
-                              </div>
-                            </>
-                          )}
-                        </CardContent>
-                      </Card>
-                      <DialogFooter>
+                <Card className="w-full h-full">
+                  <CardHeader></CardHeader>
+                  <CardContent className="space-y-4">
+                    {!isPaymentCaptured ? (
+                      <>
+                        <Select
+                          onValueChange={setSelectedReader}
+                          value={selectedReader || ""} 
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a reader" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {readers.map((reader) => (
+                              <SelectItem key={reader.id} value={reader.id}>
+                                <div className="flex gap-2 flex-row justify-center items-center">
+                                  {reader.label}
+                                  <Wifi
+                                    className={`h-4 w-4 flex justify-center items-center  ${
+                                      reader.status === "online"
+                                        ? "text-green-500"
+                                        : "text-gray-300"
+                                    }`}
+                                  />
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Input
+                          type="text"
+                          placeholder="Amount"
+                          value={amount}
+                          onChange={handleInputChange}
+                          className="text-2xl font-bold text-center"
+                        />
+                        <div className="grid grid-cols-3 gap-2">
+                          {keypadButtons.map((num, index) => (
+                            <Button
+                              key={index}
+                              variant="outline"
+                              onClick={() => handleNumberClick(num)}
+                              className="h-12 text-lg"
+                            >
+                              {num === "backspace" ? "Back" : num}
+                            </Button>
+                          ))}
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-xl font-semibold text-center">
+                        Payment successfully captured!
+                      </p>
+                    )}
+                  </CardContent>
+                  <CardFooter className="flex flex-col gap-2">
+                    {!isPaymentCaptured ? (
+                      <>
                         {!paymentIntentId ? (
                           <Button
                             onClick={() => {
@@ -883,83 +767,209 @@ export default function StripeTerminalComponent() {
                             </Button>
                           </>
                         )}
-                      </DialogFooter>
-                    </>
-                  ) : (
-                    // Show payment success message and print options if payment is captured
-                    <>
-                      <p className="text-xl font-semibold text-center">
-                        Payment successfully captured!
-                      </p>
-                      <DialogFooter>
+                      </>
+                    ) : (
+                      <>
                         <Button onClick={resetComponent} className="w-full">
-                          New Sale
+                          New Payment
                         </Button>
                         <Button onClick={printReceipt} className="w-full">
                           Print Receipt
                         </Button>
-                      </DialogFooter>
-                    </>
-                  )}
-                </>
+                      </>
+                    )}
+                  </CardFooter>
+                </Card>
               )}
-            </DialogContent>
-          </Dialog>
-        )}
-      </div>
+            </div>
+          </div>
 
-      {loadingReaders ? (
-        <div className="flex flex-col space-y-4 justify-center items-center p-2">
-          <Skeleton className="w-2/3 h-12" />
-          <Skeleton className="w-2/3 h-[100px]" />
-        </div>
-      ) : amount.length > 0 ? (
-        <div className="flex justify-center items-center w-full p-2">
-          <Card className="w-2/3 h-[200px]">
-            <CardHeader>
-              <CardTitle className="text-2xl font-bold">
-                Order Summary
-              </CardTitle>
-              <CardContent className="grid gap-4">
-                {selectedProducts.length > 0 && (
-                  <>
-                    <ScrollArea className="h-[50px] pr-4">
-                      {selectedProducts.map((product) => (
-                        <div
-                          key={product.id}
-                          className="flex justify-between py-1"
-                        >
-                          <span className="text-sm text-muted-foreground">
-                            {product.name}
-                          </span>
-                          <span className="text-sm font-medium">
-                            £{Number(product.ourPrice).toFixed(2)}
-                          </span>
-                        </div>
+          {!paymentIntentId ? ( // If paymentIntentId is not set, show the dialog
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogContent>
+                <div className="space-y-4">
+                  <Skeleton className="h-8 w-1/3" />
+                  <Skeleton className="w-full h-10 rounded-md" />
+                  <Skeleton className="w-full h-12 rounded-md" />
+                  <div className="grid grid-cols-2 gap-2">
+                    {[...Array(4)].map((_, index) => (
+                      <Skeleton key={index} className="h-10 rounded-md" />
+                    ))}
+                  </div>
+                  <Skeleton className="w-full h-10 rounded-md" />
+                </div>
+              </DialogContent>
+            </Dialog>
+          ) : (
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogContent>
+                {!paymentIntentId ? (
+                  // Show loading skeleton if no paymentIntentId
+                  <div className="space-y-4">
+                    <Skeleton className="h-8 w-1/3" />
+                    <Skeleton className="w-full h-10 rounded-md" />
+                    <Skeleton className="w-full h-12 rounded-md" />
+                    <div className="grid grid-cols-2 gap-2">
+                      {[...Array(4)].map((_, index) => (
+                        <Skeleton key={index} className="h-10 rounded-md" />
                       ))}
-                    </ScrollArea>
-                    <Separator />
-                    <div className="flex justify-between">
-                      <span className="text-lg font-bold">Total</span>
-                      <span className="text-lg font-bold">£{amount}</span>
                     </div>
+                    <Skeleton className="w-full h-10 rounded-md" />
+                  </div>
+                ) : (
+                  <>
+                    {!isPaymentCaptured ? (
+                      // Show order summary if payment is not yet captured
+                      <>
+                        <DialogHeader>
+                          <DialogTitle>Order Summary</DialogTitle>
+                        </DialogHeader>
+
+                        <Card className="w-full">
+                          <CardHeader>
+                            <CardTitle className="text-2xl font-bold">
+                              Order Summary
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent className="grid gap-4">
+                            {selectedProducts.length > 0 && (
+                              <>
+                                <ScrollArea className="h-[150px] pr-4">
+                                  {selectedProducts.map((product) => (
+                                    <div
+                                      key={product.id}
+                                      className="flex justify-between py-1"
+                                    >
+                                      <span className="text-sm text-muted-foreground">
+                                        {product.name}
+                                      </span>
+                                      <span className="text-sm font-medium">
+                                        £{Number(product.ourPrice).toFixed(2)}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </ScrollArea>
+                                <Separator />
+                                <div className="flex justify-between">
+                                  <span className="text-lg font-bold">
+                                    Total
+                                  </span>
+                                  <span className="text-lg font-bold">
+                                    £{amount}
+                                  </span>
+                                </div>
+                              </>
+                            )}
+                          </CardContent>
+                        </Card>
+                        <DialogFooter>
+                          {!paymentIntentId ? (
+                            <Button
+                              onClick={() => {
+                                createPendingPayment();
+                                setIsDialogOpen(true);
+                              }}
+                              disabled={!selectedReader || !amount}
+                              className="w-full"
+                            >
+                              Create Payment (£{amount})
+                            </Button>
+                          ) : (
+                            <>
+                              <Button
+                                onClick={cancelPayment}
+                                disabled={!selectedReader}
+                                className="w-full"
+                              >
+                                Cancel Payment
+                              </Button>
+                              <Button
+                                onClick={() => setIsPaymentCaptured(true)}
+                                disabled={!selectedReader}
+                                className="w-full"
+                              >
+                                Approve Card Payment
+                              </Button>
+                            </>
+                          )}
+                        </DialogFooter>
+                      </>
+                    ) : (
+                      // Show payment success message and print options if payment is captured
+                      <>
+                        <p className="text-xl font-semibold text-center">
+                          Payment successfully captured!
+                        </p>
+                        <DialogFooter>
+                          <Button onClick={resetComponent} className="w-full">
+                            New Sale
+                          </Button>
+                          <Button onClick={printReceipt} className="w-full">
+                            Print Receipt
+                          </Button>
+                        </DialogFooter>
+                      </>
+                    )}
                   </>
                 )}
-              </CardContent>
-            </CardHeader>
-          </Card>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
-      ) : (
-        <div className="flex justify-center items-center w-full p-2">
-          <Card className="w-2/3 h-[80px]">
-            <CardHeader>
-              <CardTitle className="text-2xl font-bold">
-                Order Summary
-              </CardTitle>
-            </CardHeader>
-          </Card>
-        </div>
-      )}
-    </div>
+
+        {loadingReaders ? (
+          <div className="flex flex-col space-y-4 justify-center items-center p-2">
+            <Skeleton className="w-2/3 h-12" />
+            <Skeleton className="w-2/3 h-[100px]" />
+          </div>
+        ) : amount.length > 0 ? (
+          <div className="flex justify-center items-center w-full p-2">
+            <Card className="w-2/3 h-[200px]">
+              <CardHeader>
+                <CardTitle className="text-2xl font-bold">
+                  Order Summary
+                </CardTitle>
+                <CardContent className="grid gap-4">
+                  {selectedProducts.length > 0 && (
+                    <>
+                      <ScrollArea className="h-[50px] pr-4">
+                        {selectedProducts.map((product) => (
+                          <div
+                            key={product.id}
+                            className="flex justify-between py-1"
+                          >
+                            <span className="text-sm text-muted-foreground">
+                              {product.name}
+                            </span>
+                            <span className="text-sm font-medium">
+                              £{Number(product.ourPrice).toFixed(2)}
+                            </span>
+                          </div>
+                        ))}
+                      </ScrollArea>
+                      <Separator />
+                      <div className="flex justify-between">
+                        <span className="text-lg font-bold">Total</span>
+                        <span className="text-lg font-bold">£{amount}</span>
+                      </div>
+                    </>
+                  )}
+                </CardContent>
+              </CardHeader>
+            </Card>
+          </div>
+        ) : (
+          <div className="flex justify-center items-center w-full p-2">
+            <Card className="w-2/3 h-[80px]">
+              <CardHeader>
+                <CardTitle className="text-2xl font-bold">
+                  Order Summary
+                </CardTitle>
+              </CardHeader>
+            </Card>
+          </div>
+        )}
+      </div>
+    </Card>
   );
 }

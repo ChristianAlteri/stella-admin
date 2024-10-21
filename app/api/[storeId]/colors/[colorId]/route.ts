@@ -51,9 +51,12 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 405 });
     }
 
-    const color = await prismadb.color.delete({
+    const color = await prismadb.color.update({
       where: {
         id: params.colorId
+      },
+      data: {
+        isArchived: true,
       }
     });
   

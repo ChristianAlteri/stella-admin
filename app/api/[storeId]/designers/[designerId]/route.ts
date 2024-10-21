@@ -64,9 +64,12 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 405 });
     }
 
-    const designer = await prismadb.designer.delete({
+    const designer = await prismadb.designer.update({
       where: {
         id: params.designerId,
+      },
+      data: {
+        isArchived: true,
       }
     });
   

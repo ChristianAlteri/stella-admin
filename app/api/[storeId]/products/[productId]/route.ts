@@ -65,7 +65,7 @@ export async function DELETE(
     if (!storeByUserId) {
       return new NextResponse("Unauthorized", { status: 405 });
     }
-    // Perform soft-delete by setting isDeleted to true
+    // Perform soft-delete by setting isArchived to true
     const product = await prismadb.product.update({
       where: {
         id: productId
@@ -170,26 +170,10 @@ export async function PATCH(
             id: sizeId
           }
         },
-        condition: {
-          connect: {
-            id: conditionId
-          }
-        },
-        color: {
-          connect: {
-            id: colorId
-          }
-        },
-        material: {
-          connect: {
-            id: materialId
-          }
-        },
-        gender: {
-          connect: {
-            id: genderId
-          }
-        },
+        ...(conditionId ? { condition: { connect: { id: conditionId } } } : {}),
+        ...(colorId ? { color: { connect: { id: colorId } } } : {}),
+        ...(materialId ? { material: { connect: { id: materialId } } } : {}),
+        ...(genderId ? { gender: { connect: { id: genderId } } } : {}),
         subcategory: {
           connect: {
             id: subcategoryId
