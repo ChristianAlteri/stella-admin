@@ -9,7 +9,6 @@ import { Plus, PlusCircle, PlusSquare } from "lucide-react";
 import { columns, BillboardColumn } from "./columns";
 import { useParams, useRouter } from "next/navigation";
 import { DataTable } from "@/components/ui/data-table";
-import { ApiList } from "@/components/ui/api-list";
 
 
 interface BillboardClientProps {
@@ -36,10 +35,6 @@ interface BillboardClientProps {
       </div>
       <Separator />
       <DataTable columns={columns} data={data}  />
-      <Heading title="API" description="API call for Billboards" />
-      <Separator />
-      <div>IS THIS NECCESARY</div>
-      <ApiList entityName="billboards" entityIdName="billboardId" />
     </>
   );
 };

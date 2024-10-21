@@ -25,18 +25,21 @@ const Navbar: React.FC<NavbarProps> = async ({ storeId }) => {
   });
 
   return (
-    <div className="w-full h-full">
-      <Sidebar storeId={storeId} />
-      <div className="flex h-12 items-center p-4 ml-[50px] bg-secondary">
+    <div className="w-full h-full sticky top-0 z-50">
+      <div className="absolute w-full flex h-[50px] items-center p-4  bg-secondary">
+        <div className="ml-[50px]">
         <StoreSwitcher items={stores} />
-        <div className="flex-1 flex items-center justify-between w-2/3">
-          <MainNav className="flex-1 w-full mr-4" />
+        </div>
+        <div className="flex-1 flex items-center justify-center w-full mr-[100px]">
+          <MainNav className="flex-1 w-full " />
         </div>
         <div className="ml-auto flex items-center space-x-4">
           <ThemeToggle />
           <UserButton afterSignOutUrl="/" />
         </div>
       </div>
+
+      <Sidebar storeId={storeId} />
     </div>
   );
 };

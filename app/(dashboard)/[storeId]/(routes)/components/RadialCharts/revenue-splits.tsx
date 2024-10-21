@@ -11,20 +11,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer } from "@/components/ui/chart";
 import { MdTrendingUp, MdTrendingDown } from "react-icons/md";
 import { BiCoinStack } from "react-icons/bi";
+import { currencyConvertor } from "@/lib/utils";
 
 export default function RevenueSplits({
+  countryCode,
   revenue,
   ourRevenue,
   payoutRevenue,
   lastMonthRevenue,
   currentMonthRevenue,
 }: {
+  countryCode: string;
   revenue: number;
   ourRevenue: number;
   payoutRevenue: number;
   lastMonthRevenue: number;
   currentMonthRevenue: number;
 }) {
+  const currencySymbol = currencyConvertor(countryCode)
   // convert to fixed
   revenue = Number(revenue.toFixed(2));
   ourRevenue = Number(ourRevenue.toFixed(2));
@@ -63,9 +67,11 @@ export default function RevenueSplits({
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       const percentage = ((data.ourRevenue / revenue) * 100).toFixed(2);
+      const dif = (100 - Number(percentage)).toFixed(2);
       return (
         <div className="custom-tooltip bg-background p-2 rounded shadow-md border border-border">
           <p className="label text-sm">{`Our Revenue: ${percentage}%`}</p>
+          <p className="label text-sm">{`Seller Payouts: ${dif}%`}</p>
         </div>
       );
     }
@@ -117,7 +123,7 @@ export default function RevenueSplits({
                             y={(viewBox.cy || 0) - 16}
                             className="fill-foreground text-2xl font-bold"
                           >
-                            £
+                            {currencySymbol}
                             {revenue.toLocaleString(undefined, {
                               minimumFractionDigits: 0,
                               maximumFractionDigits: 0,
@@ -160,7 +166,7 @@ export default function RevenueSplits({
           <div className="flex flex-col items-center justify-center rounded-lg bg-muted p-2">
             <div className="text-md font-medium">Store Revenue</div>
             <div className="mt-1 text-xl font-semibold">
-              £
+              {currencySymbol}
               {ourRevenue.toLocaleString(undefined, {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0,
@@ -170,7 +176,7 @@ export default function RevenueSplits({
           <div className="flex flex-col items-center justify-center rounded-lg bg-muted p-2">
             <div className="text-md font-medium">Seller Payouts</div>
             <div className="mt-1 text-xl font-semibold">
-              £
+             {currencySymbol}
               {payoutRevenue.toLocaleString(undefined, {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0,

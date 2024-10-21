@@ -9,7 +9,6 @@ import { Image, Plus, PlusCircle, PlusSquare } from "lucide-react";
 import { columns, DesignerColumn } from "./columns";
 import { useParams, useRouter } from "next/navigation";
 import { DataTable } from "@/components/ui/data-table";
-import { ApiList } from "@/components/ui/api-list";
 
 
 interface DesignerClientProps {
@@ -37,10 +36,6 @@ interface DesignerClientProps {
       </div>
       <Separator />
       <DataTable columns={columns} data={data} />
-      <Heading title="API" description="API call for Designers" />
-      <Separator />
-      <div>IS THIS NECCESARY</div>
-      <ApiList entityName="designer" entityIdName="designerId" />
     </>
   );
 };

@@ -22,6 +22,24 @@ export const formatCurrency = (value: number) => {
   })
 }
 
+export function currencyConvertor(countryCode: string) {
+  let currency;
+
+  switch (countryCode) {
+    case 'AU':
+      currency = '$'; 
+      break;
+    case 'GB':
+      currency = '£'; 
+      break;
+    default:
+      currency = '£'; 
+      break;
+  }
+
+  return currency;
+}
+
 // Utility function to convert Decimal fields to numbers
 export function convertDecimalFields(obj: any): any {
   if (Array.isArray(obj)) {

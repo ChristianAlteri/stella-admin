@@ -26,15 +26,9 @@ export default function RootLayout({
       <html lang="en">
         <head></head>
         <body className={font.className}>
-          {/* <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <ToastProvider />
-            <ModalProvider />
-            {children}
-          </ThemeProvider> */}
           <ThemeProvider
             attribute="class"
             defaultTheme="system" 
-            // enableSystem={true}
             themes={["light", "dark", "galaxy"]} 
           >
             <html lang="en">

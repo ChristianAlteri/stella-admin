@@ -47,6 +47,11 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
     },
     orderBy: { createdAt: "desc" },
   });
+  const store = await prismadb.store.findUnique({
+    where: {
+      id: params.storeId,
+    }
+  })
 
   const sellers = await prismadb.seller.findMany({
     where: {
@@ -170,8 +175,10 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
         </CardHeader> */}
         <Separator />
 
+
         <div className="grid gap-4 grid-cols-2">
           <RevenueSplits
+            countryCode={store?.countryCode || "GB"}
             revenue={revenue}
             ourRevenue={ourRevenue}
             payoutRevenue={payoutRevenue}

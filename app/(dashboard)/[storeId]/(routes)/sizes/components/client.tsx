@@ -9,7 +9,6 @@ import { Plus, PlusCircle, PlusSquare } from "lucide-react";
 import { columns, SizeColumn } from "./columns";
 import { useParams, useRouter } from "next/navigation";
 import { DataTable } from "@/components/ui/data-table";
-import { ApiList } from "@/components/ui/api-list";
 
 
 interface SizesClientProps {
@@ -35,10 +34,6 @@ interface SizesClientProps {
       </div>
       <Separator />
       <DataTable columns={columns} data={data}  />
-      <Heading title="API" description="API call for Sizes" />
-      <Separator />
-      <div>IS THIS NECCESARY</div>
-      <ApiList entityName="sizes" entityIdName="sizeId" />
     </>
   );
 };

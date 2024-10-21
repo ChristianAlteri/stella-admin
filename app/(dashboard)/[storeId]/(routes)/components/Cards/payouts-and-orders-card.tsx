@@ -12,16 +12,20 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
-import { Order, Payout, Seller } from "@prisma/client";
+import type { Order, OrderItem, Payout, Seller } from "@prisma/client";
 import { format } from "date-fns";
 
 type PayoutWithSeller = Payout & {
   seller: Seller;
 };
 
+type OrderWithItems = Order & {
+  orderItems: OrderItem[];
+};
+
 type PayoutsAndOrdersCardProps = {
   latestPayouts: PayoutWithSeller[];
-  latestOrders: Order[];
+  latestOrders: OrderWithItems[];
 };
 
 export default function PayoutsAndOrdersCard({
@@ -106,6 +110,7 @@ export default function PayoutsAndOrdersCard({
                   <>
                     <th className="px-4 py-2">Order ID</th>
                     <th className="px-4 py-2">Amount</th>
+                    <th className="px-4 py-2">Units per transaction</th>
                     <th className="px-4 py-2">Date</th>
                   </>
                 )}
@@ -154,6 +159,9 @@ export default function PayoutsAndOrdersCard({
                       <td className="px-4 py-2">{order.id}</td>
                       <td className="px-4 py-2">
                         ${order.totalAmount.toString()}
+                      </td>
+                      <td className="px-4 py-2">
+                        {order.orderItems.length} {order.orderItems.length > 1 ? "items" : "item"}
                       </td>
                       <td className="px-4 py-2">
                         {format(new Date(order.createdAt), "dd/MM/yyyy") || ""}
