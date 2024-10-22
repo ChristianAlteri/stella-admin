@@ -28,6 +28,7 @@ import {
   formatter,
   calculateMonthlyRevenue,
   calculateSellerOrderConversionRate,
+  currencyConvertor,
 } from "@/lib/utils";
 import PopularDesignerChart from "./components/popular-designer-chart";
 import PopularCategoryChart from "./components/popular-category-chart";
@@ -77,6 +78,11 @@ const SellerDetailsPage = async ({
       product: true,
     },
   });
+  const store = await prismadb.store.findUnique({
+    where: {
+      id: params.storeId,
+    },
+  })
 
   const sellerColumnData: SellerColumn = {
     id: seller?.id ?? "",
@@ -120,6 +126,7 @@ const SellerDetailsPage = async ({
     likes: product.likes || 0,
     clicks: product.clicks || 0,
   }));
+  const currencySymbol = currencyConvertor(store?.countryCode ?? "GB")
   const monthlyRevenue = calculateMonthlyRevenue(seller?.payouts || []);
   const popularDesigners = getPopularDesigners(productsWithNumberPrices);
   const salesByCategory = getSalesByCategory(productsWithNumberPrices);
@@ -146,8 +153,8 @@ const SellerDetailsPage = async ({
                   alt={`${seller?.firstName} ${seller?.lastName}`}
                 />
                 <AvatarFallback>
-                  {seller?.firstName?.[0]}
-                  {seller?.lastName?.[0]}
+                  {seller?.storeName?.[0].toUpperCase()}
+                  {seller?.storeName?.[1].toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div>
@@ -215,7 +222,8 @@ const SellerDetailsPage = async ({
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {formatter.format(parseFloat(totalPayout))}
+                {/* {formatter.format(parseFloat(totalPayout))} */}
+                {currencySymbol}{totalPayout}
               </div>
             </CardContent>
           </Card>
@@ -249,7 +257,8 @@ const SellerDetailsPage = async ({
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {formatter.format(parseFloat(averageSalePrice))}
+                {/* {formatter.format(parseFloat(averageSalePrice))} */}
+                {currencySymbol}{averageSalePrice}
               </div>
             </CardContent>
           </Card>
@@ -327,7 +336,7 @@ const SellerDetailsPage = async ({
                 <CardTitle>Monthly Revenue</CardTitle>
               </CardHeader>
               <CardContent className="pt-2">
-                <RevenueByMonthChart monthlyRevenue={monthlyRevenue} />
+                <RevenueByMonthChart countryCode={store?.countryCode || "GB"} monthlyRevenue={monthlyRevenue} />
               </CardContent>
             </Card>
           </TabsContent>

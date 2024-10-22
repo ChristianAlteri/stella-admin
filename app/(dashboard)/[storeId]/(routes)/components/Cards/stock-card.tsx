@@ -17,13 +17,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Badge,
-  DollarSign,
   Package,
   ShoppingCart,
   TrendingUp,
 } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
-import { format } from "date-fns";
+import { currencyConvertor } from "@/lib/utils";
 
 type ProductWithRelations = Product & {
   designer?: Designer;
@@ -36,6 +34,7 @@ type OrderWithItems = Order & {
 };
 
 type StockCardProps = {
+  countryCode: string;
   liveStock: number;
   soldStock: number;
   averagePrice: number;
@@ -44,12 +43,14 @@ type StockCardProps = {
 };
 
 export default function StockCard({
+  countryCode,
   liveStock,
   soldStock,
   averagePrice,
   products,
   todaysOrders,
 }: StockCardProps) {
+  const currencySymbol = currencyConvertor(countryCode)
   const router = useRouter();
   const params = useParams();
 
@@ -116,7 +117,7 @@ export default function StockCard({
                   </div>
                   <div className="text-2xl font-bold">
                     {todaysRevenue > 0 ? (
-                      formatCurrency(todaysRevenue)
+                     `${currencySymbol}${todaysRevenue.toLocaleString()}`
                     ) : (
                       <span className="flex text-xs text-muted-foreground">
                         No sales today
@@ -144,7 +145,7 @@ export default function StockCard({
                   </div>
                   {todaysOrders.length > 0 ? (
                     <div className="text-2xl font-bold">
-                      {formatCurrency(averageTransactionValue)}
+                      {currencySymbol}{averageTransactionValue.toLocaleString()}
                     </div>
                   ) : (
                     <div className="flex text-xs text-muted-foreground">
@@ -158,7 +159,7 @@ export default function StockCard({
                   </div>
                   {todaysOrders.length > 0 ? (
                     <div className="text-2xl font-bold">
-                      {formatCurrency(totalAverageForOneUnitToday)}
+                      {currencySymbol}{totalAverageForOneUnitToday.toLocaleString()}
                     </div>
                   ) : (
                     <div className="flex text-xs text-muted-foreground">
@@ -198,7 +199,7 @@ export default function StockCard({
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {formatCurrency(averagePrice)}
+                {currencySymbol}{averagePrice.toLocaleString()}
               </div>
               <p className="text-xs text-muted-foreground">Per item</p>
             </CardContent>
@@ -212,7 +213,7 @@ export default function StockCard({
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {formatCurrency(totalStockWorth)}
+                {currencySymbol}{totalStockWorth.toLocaleString()}
               </div>
               <p className="text-xs text-muted-foreground">Total value</p>
             </CardContent>
@@ -273,7 +274,7 @@ export default function StockCard({
                         {product.category?.name ?? "N/A"}
                       </td>
                       <td className="px-4 py-2">
-                        £{product.ourPrice.toString()}
+                      {currencySymbol}{product.ourPrice.toString()}
                       </td>
                       {/* <td className="px-4 py-2">
                         {new Date(product.createdAt).toLocaleDateString()}
@@ -310,7 +311,7 @@ export default function StockCard({
 // import { Button } from "@/components/ui/button";
 // import { Skeleton } from "@/components/ui/skeleton"
 // import { Badge, DollarSign, Package, ShoppingCart, TrendingUp } from "lucide-react"
-// import { formatCurrency } from "@/lib/utils";
+// import { {currencySymbol} } from "@/lib/utils";
 
 // type ProductWithRelations = Product & {
 //   designer?: Designer;
@@ -383,7 +384,7 @@ export default function StockCard({
 //                   </div>
 //                   <div className="text-2xl font-bold">
 //                     {todaysRevenue > 0 ? (
-//                       formatCurrency(todaysRevenue)
+//                       {currencySymbol}(todaysRevenue)
 //                     ) : (
 //                       <span className="flex text-xs text-muted-foreground">No sales today</span>
 //                     )}
@@ -435,7 +436,7 @@ export default function StockCard({
 //             </CardHeader>
 //             <CardContent>
 //               <div className="text-2xl font-bold">
-//                 {formatCurrency(averagePrice)}
+//                 {{currencySymbol}(averagePrice)}
 //               </div>
 //               <p className="text-xs text-muted-foreground">Per item</p>
 //             </CardContent>
@@ -449,7 +450,7 @@ export default function StockCard({
 //             </CardHeader>
 //             <CardContent>
 //               <div className="text-2xl font-bold">
-//                 {formatCurrency(totalStockWorth)}
+//                 {{currencySymbol}(totalStockWorth)}
 //               </div>
 //               <p className="text-xs text-muted-foreground">Total value</p>
 //             </CardContent>

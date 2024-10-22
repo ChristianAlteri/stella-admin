@@ -58,8 +58,8 @@ export default function SellerCard({ row }: { row: SellerColumn }) {
             alt={`${row.storeName}`}
           />
           <AvatarFallback>
-            {row.firstName[0]}
-            {row.lastName[0]}
+            {row.storeName[0]}
+            {row.storeName[1]}
           </AvatarFallback>
         </Avatar>
         <div className="flex-1">

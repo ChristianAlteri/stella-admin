@@ -38,6 +38,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Wifi } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
+import { currencyConvertor } from "@/lib/utils";
 
 // Custom Toast Error
 const toastError = (message: string) => {
@@ -83,7 +84,12 @@ interface Reader {
   status: string;
 }
 
-export default function StripeTerminalComponent() {
+interface StripeTerminalComponentProps {
+  countryCode: string;
+}
+
+export default function StripeTerminalComponent({ countryCode }: StripeTerminalComponentProps) {
+  const currencySymbol = currencyConvertor(countryCode)
   const router = useRouter();
   const [urlFrom, setUrlFrom] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
@@ -550,11 +556,8 @@ export default function StripeTerminalComponent() {
                                           {result.name}
                                         </h3>
                                         <p className="text-sm text-gray-500">
-                                          £{result.ourPrice.toString()}
+                                          {currencySymbol}{result.ourPrice.toString()}
                                         </p>
-                                        {/* <p className="text-xs text-gray-200">
-                                          £{result.id}
-                                        </p> */}
                                       </div>
                                       <div className="flex flex-row gap-2 text-end items-center w-full">
                                         <p className="text-xs text-gray-500 w-full mr-4">
@@ -747,7 +750,7 @@ export default function StripeTerminalComponent() {
                             disabled={!selectedReader || !amount}
                             className="w-full"
                           >
-                            Create Payment (£{amount})
+                            Create Payment ({currencySymbol}{amount})
                           </Button>
                         ) : (
                           <>
@@ -844,7 +847,7 @@ export default function StripeTerminalComponent() {
                                         {product.name}
                                       </span>
                                       <span className="text-sm font-medium">
-                                        £{Number(product.ourPrice).toFixed(2)}
+                                        {currencySymbol}{Number(product.ourPrice).toFixed(2)}
                                       </span>
                                     </div>
                                   ))}
@@ -855,7 +858,7 @@ export default function StripeTerminalComponent() {
                                     Total
                                   </span>
                                   <span className="text-lg font-bold">
-                                    £{amount}
+                                    {currencySymbol}{amount}
                                   </span>
                                 </div>
                               </>
@@ -872,7 +875,7 @@ export default function StripeTerminalComponent() {
                               disabled={!selectedReader || !amount}
                               className="w-full"
                             >
-                              Create Payment (£{amount})
+                              Create Payment ({currencySymbol}{amount})
                             </Button>
                           ) : (
                             <>
@@ -942,7 +945,7 @@ export default function StripeTerminalComponent() {
                               {product.name}
                             </span>
                             <span className="text-sm font-medium">
-                              £{Number(product.ourPrice).toFixed(2)}
+                              {currencySymbol}{Number(product.ourPrice).toFixed(2)}
                             </span>
                           </div>
                         ))}
@@ -950,7 +953,7 @@ export default function StripeTerminalComponent() {
                       <Separator />
                       <div className="flex justify-between">
                         <span className="text-lg font-bold">Total</span>
-                        <span className="text-lg font-bold">£{amount}</span>
+                        <span className="text-lg font-bold">{currencySymbol}{amount}</span>
                       </div>
                     </>
                   )}

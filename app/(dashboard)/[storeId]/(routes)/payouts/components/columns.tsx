@@ -17,6 +17,7 @@ export type PayoutColumn = {
   stripeTransferId: string;
   createdAt: Date;
   updatedAt: Date;
+  countryCode: string;
 }
 
 export const columns: ColumnDef<PayoutColumn>[] = [

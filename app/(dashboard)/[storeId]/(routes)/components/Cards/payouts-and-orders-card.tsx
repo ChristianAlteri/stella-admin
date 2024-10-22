@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
 import type { Order, OrderItem, Payout, Seller } from "@prisma/client";
 import { format } from "date-fns";
+import { currencyConvertor } from "@/lib/utils";
 
 type PayoutWithSeller = Payout & {
   seller: Seller;
@@ -24,14 +25,17 @@ type OrderWithItems = Order & {
 };
 
 type PayoutsAndOrdersCardProps = {
+  countryCode: string;
   latestPayouts: PayoutWithSeller[];
   latestOrders: OrderWithItems[];
 };
 
 export default function PayoutsAndOrdersCard({
+  countryCode,
   latestPayouts,
   latestOrders,
 }: PayoutsAndOrdersCardProps) {
+  const currencySymbol = currencyConvertor(countryCode);
   const [activeTab, setActiveTab] = useState<"payouts" | "orders">("payouts");
   const [isExpanded, setIsExpanded] = useState(true);
   const router = useRouter();
@@ -125,7 +129,7 @@ export default function PayoutsAndOrdersCard({
                     >
                       <td className="px-4 py-2">{payout.transferGroupId}</td>
                       <td className="px-4 py-2">
-                        ${payout.amount?.toString()}
+                      {currencySymbol}{payout.amount?.toString()}
                       </td>
                       <td
                         className="px-4 py-2 hover:underline hover:cursor-pointer"
@@ -158,7 +162,7 @@ export default function PayoutsAndOrdersCard({
                     >
                       <td className="px-4 py-2">{order.id}</td>
                       <td className="px-4 py-2">
-                        ${order.totalAmount.toString()}
+                        {currencySymbol}{order.totalAmount.toString()}
                       </td>
                       <td className="px-4 py-2">
                         {order.orderItems.length} {order.orderItems.length > 1 ? "items" : "item"}

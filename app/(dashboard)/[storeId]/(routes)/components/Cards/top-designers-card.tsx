@@ -10,6 +10,7 @@ import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { currencyConvertor } from "@/lib/utils"
 
 interface Product {
   id: string
@@ -22,6 +23,7 @@ interface Product {
 }
 
 interface TopDesignersCardProps {
+  countryCode: string
   products: Product[]
 }
 
@@ -32,7 +34,8 @@ interface DesignerStats {
   count: number
 }
 
-const TopDesignersCard: React.FC<TopDesignersCardProps> = ({ products }) => {
+const TopDesignersCard: React.FC<TopDesignersCardProps> = ({ products, countryCode }) => {
+  const currencySymbol = currencyConvertor(countryCode)
   const router = useRouter()
   const params = useParams()
   const [sortByValue, setSortByValue] = useState(true)
@@ -107,7 +110,7 @@ const TopDesignersCard: React.FC<TopDesignersCardProps> = ({ products }) => {
                 // onClick={() => router.push(`/${params.storeId}/designers/${designer.id}/details`)}
               >
                 <Avatar className="h-10 w-10 flex-shrink-0">
-                  <AvatarFallback>{designer.name[0]}</AvatarFallback>
+                  <AvatarFallback>{designer.name[0].toUpperCase()}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">
@@ -119,7 +122,7 @@ const TopDesignersCard: React.FC<TopDesignersCardProps> = ({ products }) => {
                 </div>
                 <Badge variant="secondary" className="ml-auto flex-shrink-0">
                   {sortByValue
-                    ? `£${designer.totalValue.toLocaleString(undefined, {
+                    ? `${currencySymbol}${designer.totalValue.toLocaleString(undefined, {
                         minimumFractionDigits: 0,
                         maximumFractionDigits: 0,
                       })}`

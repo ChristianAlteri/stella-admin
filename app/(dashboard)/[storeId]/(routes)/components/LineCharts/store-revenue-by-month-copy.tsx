@@ -1,7 +1,6 @@
 "use client";
 
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts";
-import { Decimal } from "decimal.js";
 import {
   Card,
   CardContent,

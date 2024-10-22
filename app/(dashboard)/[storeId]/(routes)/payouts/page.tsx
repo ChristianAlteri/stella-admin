@@ -18,6 +18,11 @@ const PayoutsPage = async ({ params }: { params: { storeId: string } }) => {
       createdAt: "desc",
     },
   });
+  const store = await prismadb.store.findUnique({
+    where: {
+      id: params.storeId,
+    },
+  })
 
   const formattedPayouts: PayoutColumn[] = payouts.map((item) => {
     return {
@@ -38,6 +43,7 @@ const PayoutsPage = async ({ params }: { params: { storeId: string } }) => {
       stripeTransferId: item.stripeTransferId ?? "",
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
+      countryCode: store?.countryCode || "GB"
     };
   });
 

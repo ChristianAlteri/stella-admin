@@ -43,15 +43,15 @@ const months = [
   "Dec",
 ]
 
-interface StoreRevenueVsOrderAreaChartProps {
+interface StoreRevenueVsOrderVsPayoutAreaChartProps {
   orders: Order[]
   payouts: Payout[]
 }
 
-export default function StoreRevenueVsOrderAreaChart({
+export default function StoreRevenueVsOrderVsPayoutAreaChart({
   orders,
   payouts,
-}: StoreRevenueVsOrderAreaChartProps) {
+}: StoreRevenueVsOrderVsPayoutAreaChartProps) {
   const currentYear = new Date().getFullYear()
   const params = useParams()
   const [selectedYear, setSelectedYear] = useState(currentYear)

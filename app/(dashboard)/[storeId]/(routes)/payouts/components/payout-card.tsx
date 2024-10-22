@@ -8,8 +8,10 @@ import { Separator } from "@/components/ui/separator";
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import { PayoutColumn } from "./columns";
 import Link from "next/link";
+import { currencyConvertor } from "@/lib/utils";
 
 export default function PayoutCard({ row }: { row: PayoutColumn }) {
+  const currencySymbol = currencyConvertor(row.countryCode)
   const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleExpand = () => {
@@ -22,7 +24,7 @@ export default function PayoutCard({ row }: { row: PayoutColumn }) {
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             <Badge className="p-2" variant="default">
-              £{row.amount}
+              {currencySymbol}{row.amount}
             </Badge>
           </div>
           <div className="flex items-center space-x-4">

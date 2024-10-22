@@ -11,16 +11,19 @@ import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { currencyConvertor } from "@/lib/utils"
 
 interface Seller extends PrismaSeller {
   payouts: { amount: number }[]
 }
 
 interface TopSellersCardProps {
+  countryCode: string
   sellers: Seller[]
 }
 
-const TopSellersCard: React.FC<TopSellersCardProps> = ({ sellers }) => {
+const TopSellersCard: React.FC<TopSellersCardProps> = ({ sellers, countryCode }) => {
+  const currencySymbol = currencyConvertor(countryCode)
   const router = useRouter()
   const params = useParams()
   const [sortByPayouts, setSortByPayouts] = useState(true)
@@ -82,7 +85,10 @@ const TopSellersCard: React.FC<TopSellersCardProps> = ({ sellers }) => {
                 onClick={() => router.push(`/${params.storeId}/sellers/${seller.id}/details`)}
               >
                 <Avatar className="h-10 w-10 flex-shrink-0">
-                  <AvatarFallback>{seller.firstName?.[0] ?? seller.storeName?.[0] ?? "S"}</AvatarFallback>
+                <AvatarFallback>
+                  {seller?.storeName?.[0]?.toUpperCase() || "?"}
+                  {seller?.storeName?.[1]?.toUpperCase() || "?"}
+                </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0 ">
                   <p className="text-sm font-medium truncate hover:underline">
@@ -94,7 +100,7 @@ const TopSellersCard: React.FC<TopSellersCardProps> = ({ sellers }) => {
                 </div>
                 <Badge variant="secondary" className="ml-auto flex-shrink-0">
                   {sortByPayouts
-                    ? `£${calculateTotalPayouts(seller.payouts).toLocaleString(undefined, {
+                    ? `${currencySymbol}${calculateTotalPayouts(seller.payouts).toLocaleString(undefined, {
                         minimumFractionDigits: 0,
                         maximumFractionDigits: 0,
                       })}`

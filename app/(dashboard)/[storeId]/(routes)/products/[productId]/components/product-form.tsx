@@ -15,7 +15,7 @@ import { Heading } from "@/components/ui/heading";
 import { AlertModal } from "@/components/modals/alert-modal";
 import { Input } from "@/components/ui/input";
 import { AddFieldDialog } from "./dialog-to-directly-add-product-field";
-import { getFieldTypeSingular } from "@/lib/utils";
+import { currencyConvertor, getFieldTypeSingular } from "@/lib/utils";
 import {
   Form,
   FormControl,
@@ -82,6 +82,7 @@ const formSchema = z.object({
 type ProductFormValues = z.infer<typeof formSchema>;
 
 interface ProductFormProps {
+  countryCode: string;
   initialData: (Product & { images: Image[] }) | null;
   categories: Category[];
   sellers: Seller[];
@@ -95,6 +96,7 @@ interface ProductFormProps {
 }
 
 export const ProductForm: React.FC<ProductFormProps> = ({
+  countryCode,
   initialData,
   categories: initialCategories,
   designers: initialDesigners,
@@ -106,6 +108,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   subcategories: initialSubcategories,
   genders: initialGenders,
 }) => {
+  const currencySymbol = currencyConvertor(countryCode)
   const params = useParams();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -593,7 +596,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                         <Input
                           type="number"
                           disabled={loading}
-                          placeholder="£99.99"
+                          placeholder={`${currencySymbol}99.99`}
                           {...field}
                           min="0.01"
                           step="0.01"
@@ -692,7 +695,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                           <Input
                             type="number"
                             disabled={loading}
-                            placeholder="£99.99"
+                            placeholder={`${currencySymbol}99.99`}
                             {...field}
                             min="0.01"
                             step="0.01"

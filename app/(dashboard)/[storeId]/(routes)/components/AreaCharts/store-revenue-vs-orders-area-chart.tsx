@@ -34,7 +34,7 @@ import {
   subYears,
 } from "date-fns";
 import { Calendar as CalendarIcon, ChevronDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, currencyConvertor } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -90,13 +90,6 @@ const calculateRevenueAndOrdersByDate = (
 
     revenueByDate[dateKey].revenue += totalAmount;
     revenueByDate[dateKey].orders += 1;
-
-    // TODO: calculate the store cut by passing in Payouts and doing a similar check as below
-    // order?.orderItems?.forEach((orderItem: { sellerId: string | string[]; }) => {
-    //   if (orderItem.sellerId === storeId) {
-    //     revenueByDate[dateKey].storeRevenue += order.totalAmount;
-    //     console.log("revenueByDate[dateKey].storeRevenue", revenueByDate[dateKey].storeRevenue);
-    //   }})
   });
   return revenueByDate;
 };
@@ -151,24 +144,31 @@ function DatePickerWithRange({
   );
 }
 
-export function StoreRevenueVsOrderAreaChart({ orders }: { orders: any }) {
-  const [isMounted, setIsMounted] = useState(false)
-  const { storeId } = useParams()
-  
-  const currentDate = new Date()
+export function StoreRevenueVsOrderAreaChart({
+  orders,
+  countryCode,
+}: {
+  orders: any;
+  countryCode: string;
+}) {
+  const currencySymbol = currencyConvertor(countryCode);
+  const [isMounted, setIsMounted] = useState(false);
+  const { storeId } = useParams();
+
+  const currentDate = new Date();
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: startOfYear(currentDate),
     to: endOfYear(currentDate),
-  })
-  const [isMonthly, setIsMonthly] = useState(true)
-  const [yearOffset, setYearOffset] = useState(0)
-  const [chartData, setChartData] = useState<any[]>([])
-  const [filteredRevenue, setFilteredRevenue] = useState(0)
-  const [filteredOrders, setFilteredOrders] = useState(0)
+  });
+  const [isMonthly, setIsMonthly] = useState(true);
+  const [yearOffset, setYearOffset] = useState(0);
+  const [chartData, setChartData] = useState<any[]>([]);
+  const [filteredRevenue, setFilteredRevenue] = useState(0);
+  const [filteredOrders, setFilteredOrders] = useState(0);
 
   useEffect(() => {
-    setIsMounted(true)
-  }, [])
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (isMounted && dateRange?.from && dateRange?.to) {
@@ -178,41 +178,41 @@ export function StoreRevenueVsOrderAreaChart({ orders }: { orders: any }) {
         dateRange.to,
         isMonthly,
         storeId
-      )
+      );
 
       const newChartData = Object.entries(filteredData).map(([date, data]) => ({
         date,
         revenue: data.revenue,
         orders: data.orders,
-      }))
-      setChartData(newChartData)
+      }));
+      setChartData(newChartData);
       setFilteredRevenue(
         newChartData.reduce((sum, data) => sum + data.revenue, 0)
-      )
+      );
       setFilteredOrders(
         newChartData.reduce((sum, data) => sum + data.orders, 0)
-      )
+      );
     }
-  }, [isMounted, dateRange, orders, isMonthly, storeId])
+  }, [isMounted, dateRange, orders, isMonthly, storeId]);
 
   const selectDateRange = (offset: number) => {
-    const yearToSelect = new Date().getFullYear() + offset
+    const yearToSelect = new Date().getFullYear() + offset;
     setDateRange({
       from: startOfYear(new Date(yearToSelect, 0, 1)),
       to: endOfYear(new Date(yearToSelect, 11, 31)),
-    })
-  }
+    });
+  };
 
   const adjustYear = (increment: number) => {
     setYearOffset((prev) => {
-      const newOffset = prev + increment
-      selectDateRange(newOffset)
-      return newOffset
-    })
-  }
+      const newOffset = prev + increment;
+      selectDateRange(newOffset);
+      return newOffset;
+    });
+  };
 
   if (!isMounted) {
-    return null
+    return null;
   }
 
   if (!orders || orders.length === 0) {
@@ -226,7 +226,7 @@ export function StoreRevenueVsOrderAreaChart({ orders }: { orders: any }) {
           <div>No data to display</div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   const chartConfig = {
@@ -242,7 +242,7 @@ export function StoreRevenueVsOrderAreaChart({ orders }: { orders: any }) {
       label: "Store Revenue",
       color: "hsl(271, 76%, 53%)", // Purple color
     },
-  } satisfies ChartConfig
+  } satisfies ChartConfig;
 
   return (
     <Card className="w-full">
@@ -251,10 +251,10 @@ export function StoreRevenueVsOrderAreaChart({ orders }: { orders: any }) {
         <CardDescription>
           <div className="flex flex-col sm:flex-row w-full justify-between items-start sm:items-center gap-4">
             <span className="text-lg font-semibold">
-              £{filteredRevenue.toLocaleString()}: {filteredOrders} orders
+              {currencySymbol}{filteredRevenue.toLocaleString()}: {filteredOrders} orders
               <br />
               <span className="text-sm font-normal">
-                Average order: £
+                Average order: {currencySymbol}
                 {filteredOrders > 0
                   ? (filteredRevenue / filteredOrders).toLocaleString(
                       undefined,
@@ -313,7 +313,7 @@ export function StoreRevenueVsOrderAreaChart({ orders }: { orders: any }) {
                       )
                 }
               />
-              <YAxis yAxisId="left" tickFormatter={(value) => `£${value}`} />
+              <YAxis yAxisId="left" tickFormatter={(value) => `${currencySymbol}${value}`} />
               <YAxis
                 yAxisId="right"
                 orientation="right"

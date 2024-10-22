@@ -187,6 +187,7 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
           />
 
           <StockCard
+            countryCode={store?.countryCode || "GB"}
             liveStock={liveStock}
             soldStock={soldStock}
             averagePrice={averagePrice}
@@ -205,17 +206,18 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
 
         <div className="flex flex-row w-full gap-4 justify-between">
           <PayoutsAndOrdersCard
+            countryCode={store?.countryCode || "GB"}
             latestPayouts={latestPayouts}
             latestOrders={latestOrders}
           />
         </div>
 
         <div className="flex flex-row w-full gap-4 justify-between">
-          <StoreRevenueVsOrderAreaChart orders={plainOrders} />
+          <StoreRevenueVsOrderAreaChart countryCode={store?.countryCode || "GB"} orders={plainOrders} />
           <div className="flex flex-col w-1/3 h-full gap-4 justify-between">
-            <TopSellersCard sellers={topSellers} />
-            <TopDesignersCard products={plainProducts} />
-            <TopCategoriesCard products={plainProducts} />
+            <TopSellersCard countryCode={store?.countryCode || "GB"} sellers={topSellers} />
+            <TopDesignersCard countryCode={store?.countryCode || "GB"} products={plainProducts} />
+            <TopCategoriesCard countryCode={store?.countryCode || "GB"} products={plainProducts} />
           </div>
         </div>
 

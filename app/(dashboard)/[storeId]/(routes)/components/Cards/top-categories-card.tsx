@@ -10,6 +10,7 @@ import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { currencyConvertor } from "@/lib/utils"
 
 interface Product {
   id: string
@@ -22,6 +23,7 @@ interface Product {
 }
 
 interface TopCategoriesCardProps {
+  countryCode: string
   products: Product[]
 }
 
@@ -32,7 +34,8 @@ interface CategoriesStats {
   count: number
 }
 
-const TopCategoriesCard: React.FC<TopCategoriesCardProps> = ({ products }) => {
+const TopCategoriesCard: React.FC<TopCategoriesCardProps> = ({ products, countryCode }) => {
+  const currencySymbol = currencyConvertor(countryCode)
   const router = useRouter()
   const params = useParams()
   const [sortByValue, setSortByValue] = useState(true)
@@ -107,7 +110,7 @@ const TopCategoriesCard: React.FC<TopCategoriesCardProps> = ({ products }) => {
                 // onClick={() => router.push(`/${params.storeId}/Categories/${category.id}/details`)}
               >
                 <Avatar className="h-10 w-10 flex-shrink-0">
-                  <AvatarFallback>{category.name[0]}</AvatarFallback>
+                  <AvatarFallback>{category.name[0].toUpperCase()}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">
@@ -119,7 +122,7 @@ const TopCategoriesCard: React.FC<TopCategoriesCardProps> = ({ products }) => {
                 </div>
                 <Badge variant="secondary" className="ml-auto flex-shrink-0">
                   {sortByValue
-                    ? `£${category.totalValue.toLocaleString(undefined, {
+                    ? `${currencySymbol}${category.totalValue.toLocaleString(undefined, {
                         minimumFractionDigits: 0,
                         maximumFractionDigits: 0,
                       })}`

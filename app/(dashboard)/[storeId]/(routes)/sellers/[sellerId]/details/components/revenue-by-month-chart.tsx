@@ -16,8 +16,10 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { currencyConvertor } from "@/lib/utils";
 
-const RevenueByMonthChart = ({ monthlyRevenue }: { monthlyRevenue: { [key: string]: string } | null }) => {
+const RevenueByMonthChart = ({ monthlyRevenue, countryCode }: { monthlyRevenue: { [key: string]: string } | null, countryCode: string }) => {
+  const currencySymbol = currencyConvertor(countryCode)
   
   if (!monthlyRevenue) {
     return (
@@ -66,11 +68,11 @@ const RevenueByMonthChart = ({ monthlyRevenue }: { monthlyRevenue: { [key: strin
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="month" />
             <YAxis
-              tickFormatter={(value) => `£${value}`}
+              tickFormatter={(value) => `${currencySymbol}${value}`}
             />
             <Tooltip
               content={<ChartTooltipContent indicator="line" />}
-              formatter={(value) => `£${value}`}
+              formatter={(value) => `${currencySymbol}${value}`}
             />
             <Line
               type="monotone"
