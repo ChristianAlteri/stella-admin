@@ -93,7 +93,7 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
 
   const payouts = await prismadb.payout.findMany({
     where: {
-      // storeId: params.storeId,
+      storeId: params.storeId,
     },
     orderBy: { createdAt: "desc" },
     include: { seller: true },

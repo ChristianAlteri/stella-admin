@@ -12,9 +12,7 @@ import { Card } from '@/components/ui/card'
 const StoreStripeConnect = () => {
   const router = useRouter()
   const params = useParams()
-  const searchParams = useSearchParams()
 
-  const storeId = searchParams.get('storeId')
   const [accountCreatePending, setAccountCreatePending] = useState(false)
   const [onboardingExited, setOnboardingExited] = useState(false)
   const [error, setError] = useState(false)
@@ -34,7 +32,7 @@ const StoreStripeConnect = () => {
       if (account) {
         setConnectedAccountId(account.id)
         await axios.patch(`/api/stores/${params.storeId}`, { stripe_connect_unique_id: account.id })
-        // await axios.patch(`/api/${params.storeId}/sellers/${params.storeId}`, { connectedAccountId: account.id })
+        await axios.patch(`/api/${params.storeId}/sellers/${params.storeId}`, { connectedAccountId: account.id })
       } else {
         console.error('Failed to update seller with Stripe account')
         setError(true)

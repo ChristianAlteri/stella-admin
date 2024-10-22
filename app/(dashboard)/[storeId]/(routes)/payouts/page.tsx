@@ -7,8 +7,7 @@ import { PayoutClient } from "./components/client";
 const PayoutsPage = async ({ params }: { params: { storeId: string } }) => {
   const payouts = await prismadb.payout.findMany({
     where: {
-      // storeId: params.storeId
-      // TODO: Add storeId to the payout table
+      storeId: params.storeId
     },
     include: {
       seller: true,

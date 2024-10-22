@@ -6,11 +6,14 @@ import prismadb from '@/lib/prismadb';
 import { convertDecimalFields } from '@/lib/utils';
 
 export async function POST(req: Request) {
+
   try {
     const { userId } = auth();
     const body = await req.json();
+    console.log("body", body);
+    console.log("userId", userId);
 
-    const { name, address, consignmentRate, currency } = body;
+    const { name, address, consignmentRate, currency, countryCode } = body;
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 403 });
@@ -20,7 +23,7 @@ export async function POST(req: Request) {
       return new NextResponse("Name is required", { status: 400 });
     }
 
-    if (!address || !address.street || !address.city || !address.state || !address.postalCode || !address.country) {
+    if (!address) {
       return new NextResponse("Complete address is required", { status: 400 });
     }
 
@@ -38,6 +41,7 @@ export async function POST(req: Request) {
         userId,
         consignmentRate,
         currency,
+        countryCode,
         address: {
           create: {
             ...address
@@ -66,15 +70,18 @@ export async function POST(req: Request) {
         storeId: store.id,
       },
       address: {
-        line1: address.line1,
-        line2: address.line2 || "",  
-        city: address.city,
-        postal_code: address.postalCode,
-        state: address.state || "",
-        country: address.country,
+        line1: address.line1 || " ",
+        line2: address.line2 || " ",  
+        city: address.city || " ",
+        postal_code: address.postalCode || " ",
+        country: countryCode || " ", 
+        ...(address.state ? { state: address.state } : {}),
       },
     });
   
+    console.log("New store created:", store);
+    console.log("New seller created:", seller);
+    console.log("New location created:", location);
     return NextResponse.json(store);
   } catch (error) {
     console.log('[API_STORES_POST]', error);

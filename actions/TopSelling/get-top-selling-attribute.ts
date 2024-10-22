@@ -7,6 +7,7 @@ export const getTopSellingSizeCount = async (storeId: string) => {
       JOIN "OrderItem" oi ON o.id = oi."orderId"
       JOIN "Product" p ON oi."productId" = p.id
       JOIN "Size" s ON p."sizeId" = s.id
+      WHERE p."storeId" = ${storeId}
       GROUP BY s.name
       ORDER BY count DESC
     `;
@@ -24,6 +25,7 @@ export const getTopSellingColorCount = async (storeId: string) => {
       JOIN "OrderItem" oi ON o.id = oi."orderId"
       JOIN "Product" p ON oi."productId" = p.id
       JOIN "Color" c ON p."colorId" = c.id
+      WHERE p."storeId" = ${storeId}
       GROUP BY c.name
       ORDER BY count DESC
     `;
@@ -42,6 +44,7 @@ export const getTopSellingMaterialCount = async (storeId: string) => {
       JOIN "OrderItem" oi ON o.id = oi."orderId"
       JOIN "Product" p ON oi."productId" = p.id
       JOIN "Material" c ON p."materialId" = c.id
+      WHERE p."storeId" = ${storeId}
       GROUP BY c.name
       ORDER BY count DESC
     `;
@@ -60,6 +63,7 @@ export const getTopSellingGenderCount = async (storeId: string) => {
       JOIN "OrderItem" oi ON o.id = oi."orderId"
       JOIN "Product" p ON oi."productId" = p.id
       JOIN "Gender" c ON p."genderId" = c.id
+      WHERE p."storeId" = ${storeId}
       GROUP BY c.name
       ORDER BY count DESC
     `;
@@ -78,6 +82,7 @@ export const getTopSellingSubcategoryCount = async (storeId: string) => {
       JOIN "OrderItem" oi ON o.id = oi."orderId"
       JOIN "Product" p ON oi."productId" = p.id
       JOIN "Subcategory" c ON p."subcategoryId" = c.id
+      WHERE p."storeId" = ${storeId}
       GROUP BY c.name
       ORDER BY count DESC
     `;
@@ -96,6 +101,7 @@ export const getTopSellingConditionCount = async (storeId: string) => {
       JOIN "OrderItem" oi ON o.id = oi."orderId"
       JOIN "Product" p ON oi."productId" = p.id
       JOIN "Condition" c ON p."conditionId" = c.id
+      WHERE p."storeId" = ${storeId}
       GROUP BY c.name
       ORDER BY count DESC
     `;
