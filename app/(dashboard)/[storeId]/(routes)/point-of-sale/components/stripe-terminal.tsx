@@ -39,6 +39,8 @@ import { Wifi } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import { currencyConvertor } from "@/lib/utils";
+import PrintableReceipt from "./printable-receipt";
+import { createRoot } from "react-dom/client";
 
 // Custom Toast Error
 const toastError = (message: string) => {
@@ -86,10 +88,14 @@ interface Reader {
 
 interface StripeTerminalComponentProps {
   countryCode: string;
+  storeName: string;
 }
 
-export default function StripeTerminalComponent({ countryCode }: StripeTerminalComponentProps) {
-  const currencySymbol = currencyConvertor(countryCode)
+export default function StripeTerminalComponent({
+  countryCode,
+  storeName,
+}: StripeTerminalComponentProps) {
+  const currencySymbol = currencyConvertor(countryCode);
   const router = useRouter();
   const [urlFrom, setUrlFrom] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
@@ -172,7 +178,7 @@ export default function StripeTerminalComponent({ countryCode }: StripeTerminalC
       }, 300);
 
       setDebounceTimeout(timeout);
-    }, [URL, debounceTimeout]);
+    }, [debounceTimeout]);
 
     useEffect(() => {
       if (inputRef.current) {
@@ -197,7 +203,7 @@ export default function StripeTerminalComponent({ countryCode }: StripeTerminalC
       }
     };
     fetchInitialProducts();
-  }, []);
+  }, [URL]);
 
   const handleSelect = (product: Product) => {
     // Check if the product is already selected
@@ -373,10 +379,66 @@ export default function StripeTerminalComponent({ countryCode }: StripeTerminalC
 
     window.location.reload();
   };
+  // const printReceipt = () => {
+
+  //   const receiptElement = document.createElement('div');
+  //   ReactDOM.render(
+  //     <PrintableReceipt
+  //       storeName={storeName}
+  //       selectedProducts={selectedProducts.map(product => ({
+  //         ...product,
+  //         ourPrice: Number(product.ourPrice)
+  //       }))}
+  //       total={parseFloat(amount)}
+  //       currencySymbol={currencySymbol}
+  //     />,
+  //     receiptElement
+  //   );
+
+  //   const printWindow = window.open('', '_blank');
+  //   printWindow?.document.write('<html><head><title>Print Receipt</title>');
+
+  //   printWindow?.document.write('<style>body { font-family: Arial, sans-serif; }</style>');
+  //   printWindow?.document.write('</head><body>');
+  //   printWindow?.document.write(receiptElement.innerHTML);
+  //   printWindow?.document.write('</body></html>');
+  //   printWindow?.document.close();
+
+  //   printWindow?.print();
+  // };
 
   const printReceipt = () => {
-    // TODO: For now, we'll just open the browser's print dialog
-    window.print();
+    const receiptElement = document.createElement("div");
+
+    // Create a root for rendering the component
+    const root = createRoot(receiptElement);
+
+    root.render(
+      <PrintableReceipt
+        storeName={storeName}
+        selectedProducts={selectedProducts.map((product) => ({
+          ...product,
+          ourPrice: Number(product.ourPrice),
+        }))}
+        total={parseFloat(amount)}
+        currencySymbol={currencySymbol}
+      />
+    );
+
+    const printWindow = window.open("", "_blank");
+    printWindow?.document.write("<html><head><title>Print Receipt</title>");
+    printWindow?.document.write(
+      "<style>body { font-family: Arial, sans-serif; }</style>"
+    );
+    printWindow?.document.write("</head><body>");
+    printWindow?.document.write(receiptElement.innerHTML);
+    printWindow?.document.write("</body></html>");
+    printWindow?.document.close();
+
+    printWindow?.print();
+
+    // Clean up after rendering
+    root.unmount();
   };
 
   useEffect(() => {
@@ -385,7 +447,7 @@ export default function StripeTerminalComponent({ countryCode }: StripeTerminalC
       fetchConnectionToken();
       fetchReaders();
     }
-  }, []);
+  });
 
   const handleNumberClick = (num: string) => {
     if (num === "backspace") {
@@ -465,10 +527,10 @@ export default function StripeTerminalComponent({ countryCode }: StripeTerminalC
   };
 
   return (
-    <Card className="w-full space-y-4 p-6">
+    <Card className="w-full md:w-full space-y-4 p-6 md:h-full">
       <CardTitle className="mb-6 text-primary">Point of Sale</CardTitle>
-      <div className="flex flex-col">
-        <div className="flex h-full items-center justify-center">
+      <div className="flex flex-col w-full md:w-full">
+        <div className="flex md:h-full md:w-full items-center justify-center">
           <div className="flex flex-row gap-4 items-start h-full w-full">
             <Tabs
               value={activeTab}
@@ -556,7 +618,8 @@ export default function StripeTerminalComponent({ countryCode }: StripeTerminalC
                                           {result.name}
                                         </h3>
                                         <p className="text-sm text-gray-500">
-                                          {currencySymbol}{result.ourPrice.toString()}
+                                          {currencySymbol}
+                                          {result.ourPrice.toString()}
                                         </p>
                                       </div>
                                       <div className="flex flex-row gap-2 text-end items-center w-full">
@@ -690,7 +753,7 @@ export default function StripeTerminalComponent({ countryCode }: StripeTerminalC
                       <>
                         <Select
                           onValueChange={setSelectedReader}
-                          value={selectedReader || ""} 
+                          value={selectedReader || ""}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Select a reader" />
@@ -750,7 +813,8 @@ export default function StripeTerminalComponent({ countryCode }: StripeTerminalC
                             disabled={!selectedReader || !amount}
                             className="w-full"
                           >
-                            Create Payment ({currencySymbol}{amount})
+                            Create Payment ({currencySymbol}
+                            {amount})
                           </Button>
                         ) : (
                           <>
@@ -823,14 +887,10 @@ export default function StripeTerminalComponent({ countryCode }: StripeTerminalC
                   <>
                     {!isPaymentCaptured ? (
                       // Show order summary if payment is not yet captured
-                      <>
-                        <DialogHeader>
-                          <DialogTitle>Order Summary</DialogTitle>
-                        </DialogHeader>
-
-                        <Card className="w-full">
+                      <div className="w-full justify-center items-center text-center">
+                        <Card className="w-full justify-center items-center text-center">
                           <CardHeader>
-                            <CardTitle className="text-2xl font-bold">
+                            <CardTitle className="text-2xl font-bold justify-center items-center text-center">
                               Order Summary
                             </CardTitle>
                           </CardHeader>
@@ -847,7 +907,8 @@ export default function StripeTerminalComponent({ countryCode }: StripeTerminalC
                                         {product.name}
                                       </span>
                                       <span className="text-sm font-medium">
-                                        {currencySymbol}{Number(product.ourPrice).toFixed(2)}
+                                        {currencySymbol}
+                                        {Number(product.ourPrice).toFixed(2)}
                                       </span>
                                     </div>
                                   ))}
@@ -858,7 +919,8 @@ export default function StripeTerminalComponent({ countryCode }: StripeTerminalC
                                     Total
                                   </span>
                                   <span className="text-lg font-bold">
-                                    {currencySymbol}{amount}
+                                    {currencySymbol}
+                                    {amount}
                                   </span>
                                 </div>
                               </>
@@ -875,7 +937,8 @@ export default function StripeTerminalComponent({ countryCode }: StripeTerminalC
                               disabled={!selectedReader || !amount}
                               className="w-full"
                             >
-                              Create Payment ({currencySymbol}{amount})
+                              Create Payment ({currencySymbol}
+                              {amount})
                             </Button>
                           ) : (
                             <>
@@ -896,7 +959,7 @@ export default function StripeTerminalComponent({ countryCode }: StripeTerminalC
                             </>
                           )}
                         </DialogFooter>
-                      </>
+                      </div>
                     ) : (
                       // Show payment success message and print options if payment is captured
                       <>
@@ -927,11 +990,11 @@ export default function StripeTerminalComponent({ countryCode }: StripeTerminalC
           </div>
         ) : amount.length > 0 ? (
           <div className="flex justify-center items-center w-full p-2">
-            <Card className="w-2/3 h-[200px]">
+            <Card className="w-full h-[200px] justify-center items-center text-center">
               <CardHeader>
-                <CardTitle className="text-2xl font-bold">
+                <div className="text-2xl font-bold w-full justify-center items-center">
                   Order Summary
-                </CardTitle>
+                </div>
                 <CardContent className="grid gap-4">
                   {selectedProducts.length > 0 && (
                     <>
@@ -945,7 +1008,8 @@ export default function StripeTerminalComponent({ countryCode }: StripeTerminalC
                               {product.name}
                             </span>
                             <span className="text-sm font-medium">
-                              {currencySymbol}{Number(product.ourPrice).toFixed(2)}
+                              {currencySymbol}
+                              {Number(product.ourPrice).toFixed(2)}
                             </span>
                           </div>
                         ))}
@@ -953,7 +1017,10 @@ export default function StripeTerminalComponent({ countryCode }: StripeTerminalC
                       <Separator />
                       <div className="flex justify-between">
                         <span className="text-lg font-bold">Total</span>
-                        <span className="text-lg font-bold">{currencySymbol}{amount}</span>
+                        <span className="text-lg font-bold">
+                          {currencySymbol}
+                          {amount}
+                        </span>
                       </div>
                     </>
                   )}
@@ -963,9 +1030,9 @@ export default function StripeTerminalComponent({ countryCode }: StripeTerminalC
           </div>
         ) : (
           <div className="flex justify-center items-center w-full p-2">
-            <Card className="w-2/3 h-[80px]">
+            <Card className="w-full h-[80px] justify-center items-center text-center">
               <CardHeader>
-                <CardTitle className="text-2xl font-bold">
+                <CardTitle className="text-2xl font-bold justify-center items-center text-center">
                   Order Summary
                 </CardTitle>
               </CardHeader>

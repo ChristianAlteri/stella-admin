@@ -23,7 +23,6 @@ model Store {
   our_platform_fee Int     @default(5) // just incase we wana offer the servce at a discount rate
   email            String?
 
-  // Address relation
   address   StoreAddress? @relation(fields: [addressId], references: [id])
   addressId String?
 
@@ -39,16 +38,10 @@ model Store {
   gender      Gender[]      @relation("StoreToStyle")
   subcategory Subcategory[] @relation("StoreToSubcategory")
   orders      Order[]       @relation("StoreToOrder")
+  orderitem   OrderItem[]   @relation("StoreToOrderItem")
+  payouts     Payout[]      @relation("StoreToPayout")
 
-  stripe_connect_unique_id String?  @default("")
-  payouts                  Payout[]
-
-  // orderItems  OrderItem[]   @relation("StoreToOrderItem")
-  // payouts     Payout[]      @relation("StoreToPayout")
-
-  // users       User[]        @relation("StoreToUser")
-  // accounts    Account[]     @relation("StoreToAccount")
-  // charities   Charity[]     @relation("StoreToCharity")
+  stripe_connect_unique_id String? @default("")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -68,19 +61,74 @@ model StoreAddress {
   Store Store[]
 }
 
-model Billboard {
-  id         String     @id @default(uuid())
-  storeId    String
-  store      Store      @relation("StoreToBillboard", fields: [storeId], references: [id])
-  label      String
-  imageUrl   String
-  categories Category[]
-  designers  Designer[]
-  sellers    Seller[]
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+model OrderItem {
+  id        String  @id @default(uuid())
+  storeId   String // Foreign Key to Store
+  store     Store   @relation("StoreToOrderItem", fields: [storeId], references: [id])
+  orderId   String? // Foreign Key to Order
+  order     Order?  @relation(fields: [orderId], references: [id])
+  productId String // Foreign Key to Product
+  product   Product @relation(fields: [productId], references: [id])
+  sellerId  String  @default("") // Foreign Key to Seller
+  seller    Seller  @relation(fields: [sellerId], references: [id])
 
+  productAmount            Decimal? @default(0.0)
+  stripe_connect_unique_id String?  @default("")
+  Payout                   Payout[]
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  @@index([orderId])
+  @@index([productId])
+  @@index([sellerId])
   @@index([storeId])
+}
+
+model Order {
+  id                String      @id @default(uuid())
+  storeId           String // Foreign Key to Store
+  store             Store       @relation("StoreToOrder", fields: [storeId], references: [id])
+  orderItems        OrderItem[] // Relation to OrderItem model
+  isPaid            Boolean     @default(false)
+  hasBeenDispatched Boolean     @default(false)
+  totalAmount       Decimal
+
+  phone     String   @default("")
+  address   String   @default("")
+  email     String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String? // Foreign Key to User
+  user   User?    @relation("OrderToUser", fields: [userId], references: [id])
+  Payout Payout[]
+
+  @@index([userId])
+  @@index([storeId])
+}
+
+model Payout {
+  id          String     @id @default(uuid())
+  storeId     String? // Foreign Key to store
+  store       Store?     @relation("StoreToPayout", fields: [storeId], references: [id])
+  sellerId    String? // Foreign Key to Seller
+  seller      Seller?    @relation(fields: [sellerId], references: [id])
+  orderItemId String? // Foreign Key to OrderItem
+  orderItem   OrderItem? @relation(fields: [orderItemId], references: [id])
+  orderId     String? // Foreign Key to Order
+  order       Order?     @relation(fields: [orderId], references: [id])
+
+  amount           Decimal? @default(0.0)
+  transferGroupId  String?  @default("")
+  stripeTransferId String?  @default("")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sellerId])
+  @@index([storeId])
+  @@index([orderItemId])
+  @@index([orderId])
 }
 
 model Seller {
@@ -89,7 +137,7 @@ model Seller {
   storeId    String
   sellerType String?  @default("re-seller")
 
-  instagramHandle String     @default("https://www.instagram.com/anon.drobe")
+  instagramHandle String     @default("")
   firstName       String?    @default("")
   lastName        String?    @default("")
   email           String?    @default("")
@@ -129,45 +177,6 @@ model Seller {
 
   @@index([billboardId])
   @@index([storeId])
-}
-
-model Category {
-  id          String     @id @default(uuid())
-  storeId     String // Foreign Key to Store
-  store       Store      @relation("StoreToCategory", fields: [storeId], references: [id])
-  billboardId String? // Foreign Key to Billboard
-  billboard   Billboard? @relation(fields: [billboardId], references: [id])
-
-  name     String
-  clicks   Int?      @default(0)
-  products Product[] @relation("CategoryToProduct")
-  sellers  Seller[]  @relation("SellerToCategory")
-
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  isArchived Boolean  @default(false)
-
-  @@index([storeId])
-  @@index([billboardId])
-}
-
-model Designer {
-  id          String     @id @default(uuid())
-  storeId     String // Foreign Key to Store
-  store       Store      @relation("StoreToDesigner", fields: [storeId], references: [id])
-  billboardId String? // Foreign Key to Billboard
-  billboard   Billboard? @relation(fields: [billboardId], references: [id])
-
-  name     String
-  products Product[] @relation("DesignerToProduct")
-  seller   Seller[]  @relation("SellerToDesigner")
-
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  isArchived Boolean  @default(false)
-
-  @@index([storeId])
-  @@index([billboardId])
 }
 
 model Product {
@@ -222,114 +231,154 @@ model Product {
   @@index([subcategoryId])
 }
 
+model Category {
+  id          String     @id @default(uuid())
+  storeId     String // Foreign Key to Store
+  store       Store      @relation("StoreToCategory", fields: [storeId], references: [id])
+  billboardId String? // Foreign Key to Billboard
+  billboard   Billboard? @relation(fields: [billboardId], references: [id])
+
+  name     String
+  clicks   Int?      @default(0)
+  products Product[] @relation("CategoryToProduct")
+  sellers  Seller[]  @relation("SellerToCategory")
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  isArchived Boolean  @default(false)
+
+  @@index([storeId])
+  @@index([billboardId])
+}
+
+model Designer {
+  id          String     @id @default(uuid())
+  storeId     String // Foreign Key to Store
+  store       Store      @relation("StoreToDesigner", fields: [storeId], references: [id])
+  billboardId String? // Foreign Key to Billboard
+  billboard   Billboard? @relation(fields: [billboardId], references: [id])
+
+  name     String
+  products Product[] @relation("DesignerToProduct")
+  seller   Seller[]  @relation("SellerToDesigner")
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  isArchived Boolean  @default(false)
+
+  @@index([storeId])
+  @@index([billboardId])
+}
+
 model Size {
-  id        String    @id @default(uuid())
-  storeId   String // Foreign Key to Store
-  store     Store     @relation("StoreToSize", fields: [storeId], references: [id])
-  name      String
-  value     String?
-  products  Product[] // Relation to Product model
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  isArchived      Boolean    @default(false)
+  id         String    @id @default(uuid())
+  storeId    String // Foreign Key to Store
+  store      Store     @relation("StoreToSize", fields: [storeId], references: [id])
+  name       String
+  value      String?
+  products   Product[] // Relation to Product model
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  isArchived Boolean   @default(false)
 
   @@index([storeId])
 }
 
 model Color {
-  id        String    @id @default(uuid())
-  storeId   String // Foreign Key to Store
-  store     Store     @relation("StoreToColor", fields: [storeId], references: [id])
-  name      String
-  value     String?
-  products  Product[] // Relation to Product model
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  isArchived      Boolean    @default(false)
+  id         String    @id @default(uuid())
+  storeId    String // Foreign Key to Store
+  store      Store     @relation("StoreToColor", fields: [storeId], references: [id])
+  name       String
+  value      String?
+  products   Product[] // Relation to Product model
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  isArchived Boolean   @default(false)
 
   @@index([storeId])
 }
 
 model Gender {
-  id        String    @id @default(uuid())
-  storeId   String // Foreign Key to Store
-  store     Store     @relation("StoreToStyle", fields: [storeId], references: [id])
-  name      String
-  value     String?
-  products  Product[] // Relation to Product model
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  isArchived      Boolean    @default(false)
+  id         String    @id @default(uuid())
+  storeId    String // Foreign Key to Store
+  store      Store     @relation("StoreToStyle", fields: [storeId], references: [id])
+  name       String
+  value      String?
+  products   Product[] // Relation to Product model
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  isArchived Boolean   @default(false)
 
   @@index([storeId])
 }
 
 model Subcategory {
-  id        String    @id @default(uuid())
-  storeId   String // Foreign Key to Store
-  store     Store     @relation("StoreToSubcategory", fields: [storeId], references: [id])
-  name      String
-  value     String?
-  products  Product[] // Relation to Product model
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  isArchived      Boolean    @default(false)
+  id         String    @id @default(uuid())
+  storeId    String // Foreign Key to Store
+  store      Store     @relation("StoreToSubcategory", fields: [storeId], references: [id])
+  name       String
+  value      String?
+  products   Product[] // Relation to Product model
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  isArchived Boolean   @default(false)
 
   @@index([storeId])
 }
 
-// TODO: Add a Charity model
-// model Charity {
-//   id         String     @id @default(uuid())
-//   storeId    String
-//   store      Store      @relation("StoreToCharity", fields: [storeId], references: [id])
-//   name      String
-//   url   String
-//   sellers    Seller[]
-//   createdAt  DateTime   @default(now())
-//   updatedAt  DateTime   @updatedAt
-
-//   @@index([storeId])
-// }
-
 model Material {
-  id        String    @id @default(uuid())
-  storeId   String // Foreign Key to Store
-  store     Store     @relation("StoreToMaterial", fields: [storeId], references: [id])
-  name      String
-  value     String?
-  products  Product[] // Relation to Product model
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  isArchived      Boolean    @default(false)
+  id         String    @id @default(uuid())
+  storeId    String // Foreign Key to Store
+  store      Store     @relation("StoreToMaterial", fields: [storeId], references: [id])
+  name       String
+  value      String?
+  products   Product[] // Relation to Product model
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  isArchived Boolean   @default(false)
 
   @@index([storeId])
 }
 
 model Condition {
-  id        String    @id @default(uuid())
-  storeId   String // Foreign Key to Store
-  store     Store     @relation("StoreToCondition", fields: [storeId], references: [id])
-  name      String
-  value     String?
-  products  Product[] // Relation to Product model
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  isArchived      Boolean    @default(false)
+  id         String    @id @default(uuid())
+  storeId    String // Foreign Key to Store
+  store      Store     @relation("StoreToCondition", fields: [storeId], references: [id])
+  name       String
+  value      String?
+  products   Product[] // Relation to Product model
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  isArchived Boolean   @default(false)
 
   @@index([storeId])
 }
 
 model Image {
-  id        String   @id @default(uuid())
-  productId String // Foreign Key to Product
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  url       String // URL of the image
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  isArchived      Boolean    @default(false)
+  id         String   @id @default(uuid())
+  productId  String // Foreign Key to Product
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url        String // URL of the image
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  isArchived Boolean  @default(false)
 
   @@index([productId])
+}
+
+model Billboard {
+  id         String     @id @default(uuid())
+  storeId    String
+  store      Store      @relation("StoreToBillboard", fields: [storeId], references: [id])
+  label      String
+  imageUrl   String
+  categories Category[]
+  designers  Designer[]
+  sellers    Seller[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  @@index([storeId])
 }
 
 model User {
@@ -354,7 +403,6 @@ model User {
   //    followingSeller // array of seller ids
 }
 
-// This is google account ect
 model Account {
   id                String  @id @default(uuid())
   userId            String? @unique // Foreign Key to User
@@ -378,62 +426,4 @@ model Account {
   //  followingSeller // array of seller ids
 
   @@index([userId])
-}
-
-model OrderItem {
-  id        String  @id @default(uuid())
-  orderId   String // Foreign Key to Order
-  order     Order   @relation(fields: [orderId], references: [id])
-  productId String // Foreign Key to Product
-  product   Product @relation(fields: [productId], references: [id])
-  sellerId  String  @default("") // Foreign Key to Seller
-  seller    Seller  @relation(fields: [sellerId], references: [id])
-
-  productAmount            Decimal? @default(0.0)
-  stripe_connect_unique_id String?  @default("")
-  // TODO: would be good to have Payuot relation here
-
-  @@index([orderId])
-  @@index([productId])
-  @@index([sellerId])
-}
-
-model Order {
-  id                String      @id @default(uuid())
-  storeId           String // Foreign Key to Store
-  store             Store       @relation("StoreToOrder", fields: [storeId], references: [id])
-  orderItems        OrderItem[] // Relation to OrderItem model
-  isPaid            Boolean     @default(false)
-  hasBeenDispatched Boolean     @default(false)
-  totalAmount       Decimal
-
-  phone     String   @default("")
-  address   String   @default("")
-  email     String   @default("")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  userId String? // Foreign Key to User
-  user   User?   @relation("OrderToUser", fields: [userId], references: [id])
-
-  @@index([userId])
-  @@index([storeId])
-}
-
-model Payout {
-  id       String  @id @default(uuid())
-  sellerId String? // Foreign Key to Seller
-  seller   Seller? @relation(fields: [sellerId], references: [id])
-  storeId  String? // Foreign Key to Seller
-  store    Store?  @relation(fields: [storeId], references: [id])
-
-  amount           Decimal? @default(0.0)
-  transferGroupId  String?  @default("")
-  stripeTransferId String?  @default("")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([sellerId])
-  @@index([storeId])
 }

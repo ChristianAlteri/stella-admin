@@ -59,7 +59,7 @@ export default function SellerActions({ data }: { data: SellerColumn }) {
   const onConfirm = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/${params.storeId}/sellers/${data.id}`); //TODO: add a delete flag
+      await axios.delete(`/api/${params.storeId}/sellers/${data.id}`);
       toastSuccess("Seller deleted.");
       router.refresh();
     } catch (error) {

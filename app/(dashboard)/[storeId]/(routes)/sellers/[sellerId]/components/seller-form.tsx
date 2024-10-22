@@ -659,6 +659,22 @@ export const SellerForm: React.FC<SellerFormProps> = ({
           </Button>
         </form>
       </Form>
+      <div className="mt-4">
+
+          {initialData && (
+            <Button
+              disabled={loading}
+              className="w-full"
+              onClick={() =>
+                router.push(
+                  `/${params.storeId}/stripe-connect?sellerId=${initialData.id}`
+                )
+              }
+            >
+              Edit Stripe Connect
+            </Button>
+          )}
+      </div>
     </Card>
   );
 };

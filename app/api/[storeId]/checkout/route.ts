@@ -17,6 +17,9 @@ export async function POST(
   { params }: { params: { storeId: string } }
 ) {
   const { productIds } = await req.json();
+  const store = await prismadb.store.findUnique({
+    where: { id: params.storeId },
+  })
 
   if (!productIds || productIds.length === 0) {
     return new NextResponse("CHECKOUT Product ids are required", {
@@ -48,12 +51,17 @@ export async function POST(
           productAmount: product.ourPrice,
           product: {
             connect: {
-              id: product.id, // Connect the product to the orderItem
+              id: product.id, 
             },
           },
           seller: {
             connect: {
-              id: product.seller.id, // Connect the seller to the orderItem
+              id: product.seller.id, 
+            },
+          },
+          store: {
+            connect: {
+              id: params.storeId,
             },
           },
         })),
@@ -67,7 +75,7 @@ export async function POST(
     line_items.push({
       quantity: 1,
       price_data: {
-        currency: "GBP", //TODO: This needs to be dynamic based on the stores currency
+        currency: store?.currency?.toString() || "GBP",
         product_data: {
           name: product.name,
         },

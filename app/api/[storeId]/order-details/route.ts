@@ -38,7 +38,7 @@ export async function GET(
       where: { orderId: orderId },
     });
     const order = await prismadb.order.findUnique({
-      where: { id: orderItemsAssociatedWithOrder[0]?.orderId },
+      where: { id: orderItemsAssociatedWithOrder[0]?.orderId || undefined },
     });
     const uniqueProductIds = Array.from(new Set(orderItemsAssociatedWithOrder.map(item => item.productId)));
     const products = await prismadb.product.findMany({

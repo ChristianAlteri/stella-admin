@@ -290,7 +290,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     fetchSubcategories();
     fetchCategories();
     fetchDesigners();
-  }, []);
+  });
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),

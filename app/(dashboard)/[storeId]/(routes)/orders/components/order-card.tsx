@@ -19,6 +19,7 @@ import {
   ChevronUpIcon,
 } from "lucide-react";
 import { OrderColumn } from "./columns";
+import Image from "next/image";
 
 const ImageModal = ({
   imageUrl,
@@ -43,7 +44,7 @@ const ImageModal = ({
         >
           Close
         </button>
-        <img
+        <Image
           src={imageUrl}
           alt="Enlarged product"
           className="w-full h-auto object-cover rounded-lg"
@@ -162,7 +163,7 @@ export default function OrderCard({ row }: { row: OrderColumn }) {
               {row.productIds.map((productId, index) => (
                 <div key={productId} className="flex flex-col items-center">
                   {" "}
-                  <img
+                  <Image
                     src={row.productImageUrls[index]}
                     alt={row.products[index]}
                     className="w-full h-32 object-cover rounded-md shadow-md mb-2 cursor-pointer"

@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 
 import { CellAction } from "./cell-action"
+import Image from "next/image"
 
 export type DesignerColumn = {
   id: string
@@ -31,7 +32,9 @@ export const columns: ColumnDef<DesignerColumn>[] = [
     cell: ({ row }) => 
       <>
         <a className="hover:underline" href={row.original.imageUrl}>
-          <img src={row.original.imageUrl} alt="Image" style={{ width: '100px', height: 'auto' }}></img> 
+          {row.original.imageUrl && (
+            <Image src={row.original.imageUrl} alt="Image" style={{ width: '100px', height: 'auto' }} />
+          )}
         </a>
       </>,
   },

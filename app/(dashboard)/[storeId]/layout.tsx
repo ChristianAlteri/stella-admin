@@ -33,12 +33,6 @@ export default async function DashboardLayout({
   }
 
   return (
-    // <div className="min-h-screen flex flex-col bg-secondary ">
-    //   <NavBar storeId={params.storeId} />
-    //   <div className="flex flex-1 p-2">
-    //     <main className="flex-1 ml-[50px] w-full ">{children}</main>
-    //   </div>
-    // </div>
     <div className="min-h-screen flex flex-col bg-secondary">
       <NavBar storeId={params.storeId} />
       <div className="flex flex-1 p-2">

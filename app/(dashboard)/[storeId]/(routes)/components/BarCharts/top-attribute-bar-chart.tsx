@@ -54,10 +54,10 @@ const TopAttributeBarChart = ({
   const chartConfig = {
     count: {
       label: "Count",
-      color: "hsl(var(--secondary-foreground))",
+      color: "hsl(var(--primary))",
     },
     label: {
-      color: "hsl(var(--primary-foreground))",
+      color: "hsl(var(--muted-foreground))",
     },
   } satisfies ChartConfig;
 

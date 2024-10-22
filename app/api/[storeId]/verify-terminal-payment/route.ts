@@ -61,6 +61,7 @@ export async function POST(request: Request) {
     // Create Order Items (split products into order items)
     await prismadb.orderItem.createMany({
       data: products.map((product: any) => ({
+        storeId: storeId,
         orderId: newOrder.id,
         productId: product.id,
         sellerId: product.seller.id,
@@ -116,6 +117,7 @@ export async function POST(request: Request) {
           currency: store?.currency?.toString() || "GBP",
           destination: stripe_connect_unique_id,
           transfer_group: `order_${newOrder.id}`,
+          
         });
         console.log("stripeTransfer: ", stripeTransfer);
 

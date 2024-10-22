@@ -71,6 +71,7 @@ export async function POST(request: Request) {
     // Create Order Items (split products into order items)
     const orderItems = await prismadb.orderItem.createMany({
       data: products.map((product: any) => ({
+        storeId: metadata.storeId,
         orderId: newOrder.id,
         productId: product.id,
         sellerId: product.seller.id || "",
@@ -166,11 +167,12 @@ export async function POST(request: Request) {
           console.log("stripeTransfer for seller: ", stripeTransferForSeller);
           const payout = await prismadb.payout.create({
             data: {
-              sellerId: sellerWhoSoldId,
               storeId: metadata.storeId,
-              amount: new Prisma.Decimal(sellerNetPayout), // Amount after fees
+              sellerId: sellerWhoSoldId,
+              amount: new Prisma.Decimal(sellerNetPayout), 
               transferGroupId: `order_${newOrder.id}`,
               stripeTransferId: stripeTransferForSeller.id,
+              orderId: newOrder.id,
             },
           });
           // console.log("payout: ", payout);
@@ -209,11 +211,12 @@ export async function POST(request: Request) {
       });
       const storePayoutRecord = await prismadb.payout.create({
         data: {
-          sellerId: metadata.storeId || "",
           storeId: metadata.storeId || "",
+          sellerId: metadata.storeId || "",
           amount: new Prisma.Decimal(storeCut), // Amount after fees
           transferGroupId: `order_${newOrder.id}`,
           stripeTransferId: stripeTransferForStore.id,
+          orderId: newOrder.id,
         },
       });
       console.log("stripeTransferForStore: ", stripeTransferForStore);

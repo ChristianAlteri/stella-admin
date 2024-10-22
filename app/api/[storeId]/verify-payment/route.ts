@@ -23,6 +23,9 @@ export async function POST(request: Request) {
 
   try {
     const session = await stripe.checkout.sessions.retrieve(session_id);
+    const store = await prismadb.store.findUnique({
+      where: { id: session.metadata?.storeId },
+    })
 
     if (session.payment_status === "paid") {
       const orderId = session.metadata?.orderId;
@@ -92,9 +95,7 @@ export async function POST(request: Request) {
       )) {
         const stripeTransfer = await stripe.transfers.create({
           amount: Math.round(totalAmount * 0.70 * 100), // Stripe needs * 100 this equals 70% to sellers
-          currency: "GBP",
-          // TODO: fetch the store id then set the config variables 
-          // currency: store?.currency?.toString() || "GBP",
+          currency: store?.currency?.toString() || "GBP",
           destination: stripe_connect_unique_id,
           transfer_group: `order_${orderId}`,
         });
