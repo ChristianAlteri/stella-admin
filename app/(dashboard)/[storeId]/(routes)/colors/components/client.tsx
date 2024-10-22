@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { columns, ColorColumn } from "./columns";
-import { TopSellingColorsGraph } from "@/components/ui/top-selling-color-graph";
+
 
 interface ColorClientProps {
   data: ColorColumn[];
@@ -46,9 +46,6 @@ export const ColorClient: React.FC<ColorClientProps> = ({
         <CardHeader>
           <CardTitle>Top Sellers</CardTitle>
         </CardHeader>
-        <CardContent className="pl-2">
-          <TopSellingColorsGraph data={topSellingData} />
-        </CardContent>
       </Card>
     </>
   );
