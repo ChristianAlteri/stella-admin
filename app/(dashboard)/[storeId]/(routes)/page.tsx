@@ -166,15 +166,7 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
   return (
     <div className="flex-col bg-secondary md:w-full w-1/2">
       <div className="flex-1 space-y-4 p-3">
-        {/* <Heading title="Dashboard" description="Overview of your store" /> */}
-        {/* <CardHeader className="text-2xl text-black font-bold flex items-start w-full text-start flex-col">
-          Dashboard
-          <span className="text-xs text-black">
-          Overview of your store
-          </span>
-        </CardHeader> */}
-        <Separator />
-
+        {/* <Separator /> */}
 
         <div className="grid gap-4 grid-cols-2">
           <RevenueSplits

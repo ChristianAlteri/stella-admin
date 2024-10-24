@@ -51,4 +51,20 @@ export async function POST(req: NextRequest) {
     }
   }
   
+  export async function DELETE(req: NextRequest) {
+    const data: { locationId: string } = await req.json();
   
+    try {
+      const { locationId } = data;
+  
+      // Delete the terminal location using the provided locationId
+      const deletedLocation = await stripe.terminal.locations.del(locationId);
+  
+      console.log("Location deleted:", deletedLocation);
+      return NextResponse.json({ success: true, deletedLocation });
+    } catch (error) {
+      console.error("Error deleting location:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      return NextResponse.json({ error: errorMessage }, { status: 500 });
+    }
+  }

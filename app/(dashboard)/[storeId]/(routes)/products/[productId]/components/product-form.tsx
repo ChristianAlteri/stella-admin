@@ -281,16 +281,33 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     }
   };
 
+  // useEffect(() => {
+  //   fetchSizes();
+  //   fetchColors();
+  //   fetchConditions();
+  //   fetchMaterials();
+  //   fetchGenders();
+  //   fetchSubcategories();
+  //   fetchCategories();
+  //   fetchDesigners();
+  // });
   useEffect(() => {
-    fetchSizes();
-    fetchColors();
-    fetchConditions();
-    fetchMaterials();
-    fetchGenders();
-    fetchSubcategories();
-    fetchCategories();
-    fetchDesigners();
-  });
+    // Fetch all field data when component mounts
+    const fetchAllFieldData = async () => {
+      await Promise.all([
+        fetchSizes(),
+        fetchColors(),
+        fetchConditions(),
+        fetchMaterials(),
+        fetchGenders(),
+        fetchSubcategories(),
+        fetchCategories(),
+        fetchDesigners(),
+      ]);
+    };
+  
+    fetchAllFieldData();
+  }, [params.storeId]);
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),

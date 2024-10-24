@@ -6,19 +6,22 @@ import { Separator } from "@/components/ui/separator";
 import { columns, PayoutColumn } from "./columns";
 import { DataTable } from "@/components/ui/data-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, Users, ArrowUpDown, Calendar } from "lucide-react";
+import { DollarSign, Users, ArrowUpDown, Calendar, Badge } from "lucide-react";
+import { currencyConvertor } from "@/lib/utils";
 
 interface PayoutClientProps {
   data: PayoutColumn[];
+  countryCode: string;
 }
 
-export const PayoutClient: React.FC<PayoutClientProps> = ({ data }) => {
+export const PayoutClient: React.FC<PayoutClientProps> = ({ data ,countryCode }) => {
   const [analytics, setAnalytics] = useState({
     totalPayouts: 0,
     payoutCount: 0,
     averagePayout: 0,
     latestPayout: new Date(),
   });
+  const currencySymbol = currencyConvertor(countryCode)
 
   useEffect(() => {
     const totalPayouts = data.reduce((sum, payout) => sum + Number(payout.amount), 0);
@@ -45,10 +48,10 @@ export const PayoutClient: React.FC<PayoutClientProps> = ({ data }) => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Payouts</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <Badge className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${analytics.totalPayouts.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{currencySymbol}{analytics.totalPayouts.toLocaleString()}</div>
           </CardContent>
         </Card>
         <Card>
@@ -57,7 +60,7 @@ export const PayoutClient: React.FC<PayoutClientProps> = ({ data }) => {
             <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${analytics.averagePayout.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{currencySymbol}{analytics.averagePayout.toLocaleString()}</div>
           </CardContent>
         </Card>
         <Card>

@@ -268,6 +268,25 @@ export default function ReadersSettings() {
       toast.error(errorMessage);
     }
   };
+  const handleDeleteLocation = async (locationId: string) => {
+    try {
+      const response = await axios.delete(
+        `/api/${params.storeId}/stripe/locations`,
+        {
+          data: { locationId },
+        }
+      );
+      if (response.data.success) {
+        setLocations((prev) =>
+          prev.filter((location) => location.id !== locationId)
+        );
+        toast.success("Location deleted successfully");
+      }
+    } catch (error) {
+      console.error("Error deleting location:", error);
+      toast.error("Failed to delete location");
+    }
+  };
 
   if (loading) {
     return (
@@ -643,6 +662,16 @@ export default function ReadersSettings() {
                     </div>
                   </dl>
                 </CardContent>
+                <CardFooter className="flx flex-row justify-end items-end">
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDeleteLocation(location.id)}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete Location
+                  </Button>
+                </CardFooter>
               </Card>
             ))}
           </div>
@@ -674,7 +703,7 @@ export default function ReadersSettings() {
               variant="destructive"
               onClick={() => {
                 handleDeleteReader(readerBeingEdited as string);
-                closeEditLocationDialog(); 
+                closeEditLocationDialog();
               }}
             >
               Delete Reader

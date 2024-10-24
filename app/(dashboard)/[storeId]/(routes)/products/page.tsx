@@ -26,6 +26,7 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
     },
   });
   const sellers = await prismadb.seller.findMany({
+    where: { storeId: params.storeId },
     select: {
       id: true,
       instagramHandle: true,
@@ -33,6 +34,7 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
     },
   });
   const categories = await prismadb.category.findMany({
+    where: { storeId: params.storeId },
     select: {
       id: true,
       name: true,
