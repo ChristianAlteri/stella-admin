@@ -87,6 +87,8 @@ const SingleS3Upload: React.FC<SingleS3UploadProps> = ({
               alt={`Media from ${url}`}
               fill
               className="object-cover rounded-md transition-opacity duration-200 ease-in-out"
+              width={100}
+                    height={0}
             />
           )}
         </div>

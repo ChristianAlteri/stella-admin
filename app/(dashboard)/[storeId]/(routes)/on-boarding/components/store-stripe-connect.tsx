@@ -88,7 +88,7 @@ const StoreStripeConnect = () => {
             <ConnectAccountOnboarding
               onExit={() => {
                 setOnboardingExited(true)
-                router.push(`/${params.storeId}/settings`)
+                router.push(`/${params.storeId}/manage-readers`)
               }}
             />
           </ConnectComponentsProvider>

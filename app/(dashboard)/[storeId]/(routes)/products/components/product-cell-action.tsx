@@ -10,7 +10,7 @@ import { FaRegEdit } from "react-icons/fa";
 import { IoAnalyticsSharp, IoInformationOutline } from "react-icons/io5";
 
 
-import { AlertModal } from "@/components/modals/alert-modal";
+import { AlertModal } from "@/components/ui/alert-modal";
 import { Button } from "@/components/ui/button";
 
 interface ProductActionsProps {

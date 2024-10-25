@@ -48,6 +48,8 @@ const ImageModal = ({
           src={imageUrl}
           alt="Enlarged product"
           className="w-full h-auto object-cover rounded-lg"
+          width={100}
+          height={0}
         />
       </div>
     </div>
@@ -164,6 +166,8 @@ export default function OrderCard({ row }: { row: OrderColumn }) {
                 <div key={productId} className="flex flex-col items-center">
                   {" "}
                   <Image
+                  width={100}
+                  height={0}
                     src={row.productImageUrls[index]}
                     alt={row.products[index]}
                     className="w-full h-32 object-cover rounded-md shadow-md mb-2 cursor-pointer"

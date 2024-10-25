@@ -9,12 +9,12 @@ import {
   getPayoutSums,
   totalRevenue,
 } from "@/lib/utils";
-import TopSellersCard from "./components/Cards/top-sellers-card";
-import TopDesignersCard from "./components/Cards/top-designers-card";
-import TopUsersCard from "./components/Cards/top-users-card";
-import { StoreRevenueVsOrderAreaChart } from "./components/AreaCharts/store-revenue-vs-orders-area-chart";
-import StoreClicksAndLikesChart from "./components/LineCharts/clicks-and-likes-by-month-line-chart";
-import TopColorBarChart from "./components/BarCharts/top-attribute-bar-chart";
+import TopSellersCard from "@/components/analytic-components/Cards/top-sellers-card";
+import TopDesignersCard from "@/components/analytic-components/Cards/top-designers-card";
+import TopUsersCard from "@/components/analytic-components/Cards/top-users-card";
+import { StoreRevenueVsOrderAreaChart } from "@/components/analytic-components/AreaCharts/store-revenue-vs-orders-area-chart";
+import StoreClicksAndLikesChart from "@/components/analytic-components/LineCharts/clicks-and-likes-by-month-line-chart";
+import TopColorBarChart from "@/components/analytic-components/BarCharts/top-attribute-bar-chart";
 import {
   getTopSellingSizeCount,
   getTopSellingColorCount,
@@ -23,10 +23,10 @@ import {
   getTopSellingSubcategoryCount,
   getTopSellingConditionCount,
 } from "@/actions/TopSelling/get-top-selling-attribute";
-import RevenueSplits from "./components/RadialCharts/revenue-splits";
-import TopCategoriesCard from "./components/Cards/top-categories-card";
-import StockCard from "./components/Cards/stock-card";
-import PayoutsAndOrdersCard from "./components/Cards/payouts-and-orders-card";
+import RevenueSplits from "@/components/analytic-components/RadialCharts/revenue-splits";
+import TopCategoriesCard from "@/components/analytic-components/Cards/top-categories-card";
+import StockCard from "@/components/analytic-components/Cards/stock-card";
+import PayoutsAndOrdersCard from "@/components/analytic-components/Cards/payouts-and-orders-card";
 import { CardHeader } from "@/components/ui/card";
 
 interface DashboardPageProps {

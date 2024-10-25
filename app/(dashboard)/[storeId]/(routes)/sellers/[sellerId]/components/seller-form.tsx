@@ -43,7 +43,7 @@ import {
 } from "@/components/ui/command";
 import { Separator } from "@/components/ui/separator";
 import { Heading } from "@/components/ui/heading";
-import { AlertModal } from "@/components/modals/alert-modal";
+import { AlertModal } from "@/components/ui/alert-modal";
 import { TbFaceId, TbFaceIdError } from "react-icons/tb";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";

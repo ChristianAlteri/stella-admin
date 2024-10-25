@@ -1,8 +1,8 @@
 import { UserButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { redirect, useParams } from "next/navigation";
-import { MainNav } from "@/components/main-nav";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { MainNav } from "@/components/main-components/main-nav";
+import { ThemeToggle } from "@/components/main-components/theme-toggle";
 import prismadb from "@/lib/prismadb";
 import StoreSwitcher from "./store-switcher";
 import Sidebar from "./side-bar";

@@ -175,7 +175,7 @@ export async function POST(request: Request) {
               orderId: newOrder.id,
             },
           });
-          // console.log("payout: ", payout);
+          console.log("payout: ", payout);
         } else {
           console.error(
             `Seller with Stripe Connect ID ${stripe_connect_unique_id} not found.`

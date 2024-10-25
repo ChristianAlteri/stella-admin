@@ -2,7 +2,7 @@
 
 import {
   TbAdjustmentsCog,
-  TbCash,
+  TbCreditCard,
   TbDeviceAnalytics,
   TbSettings,
 } from "react-icons/tb";
@@ -25,7 +25,7 @@ export default function Component({ storeId = '' }: { storeId?: string }) {
 
   const menuItems = [
     { icon: TbDeviceAnalytics, href: `/${params.storeId}`, label: "Dashboard" },
-    { icon: TbCash, href: `/${params.storeId}/point-of-sale`, label: "POS" },
+    { icon: TbCreditCard, href: `/${params.storeId}/point-of-sale`, label: "POS" },
     { icon: Package, href: `/${params.storeId}/products`, label: "Products" },
     { icon: Users, href: `/${params.storeId}/sellers`, label: "Sellers" },
   ];

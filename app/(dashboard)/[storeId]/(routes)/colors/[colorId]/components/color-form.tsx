@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { Heading } from "@/components/ui/heading";
-import { AlertModal } from "@/components/modals/alert-modal";
+import { AlertModal } from "@/components/ui/alert-modal";
 
 const formSchema = z.object({
   name: z.string().min(2),

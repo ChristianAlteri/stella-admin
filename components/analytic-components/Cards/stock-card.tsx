@@ -87,7 +87,6 @@ export default function StockCard({
     const itemsCount = order.orderItems.length;
 
     const averagePerOrder = Number(totalAmount) / Number(itemsCount);
-    console.log(`Order ${order.id} - Average: ${averagePerOrder}`);
 
     return averagePerOrder;
   });
@@ -96,7 +95,6 @@ export default function StockCard({
     averageItemsSoldPerOrder.reduce((sum, avg) => sum + avg, 0) /
     averageItemsSoldPerOrder.length;
 
-  // const averageTransactionValue = todaysOrders.reduce((sum, order) => sum + order.totalAmount, 0) / todaysOrders.length;
   const averageTransactionValue = todaysRevenue / todaysOrders.length;
 
   return (

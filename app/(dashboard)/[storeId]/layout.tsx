@@ -1,8 +1,6 @@
-import NavBar from "@/components/NavBar";
-import Sidebar from "@/components/side-bar";
+import NavBar from "@/components/main-components/nav-bar";
 import prismadb from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
-import { HomeIcon } from "lucide-react";
 import { redirect } from "next/navigation";
 
 export default async function DashboardLayout({

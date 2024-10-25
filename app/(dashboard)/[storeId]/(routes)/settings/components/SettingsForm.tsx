@@ -22,7 +22,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Separator } from "@/components/ui/separator"
-import { AlertModal } from "@/components/modals/alert-modal"
+import { AlertModal } from "@/components/ui/alert-modal"
 import {
   Card,
   CardContent,

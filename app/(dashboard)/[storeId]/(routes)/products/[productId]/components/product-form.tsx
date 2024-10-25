@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Heading } from "@/components/ui/heading";
-import { AlertModal } from "@/components/modals/alert-modal";
+import { AlertModal } from "@/components/ui/alert-modal";
 import { Input } from "@/components/ui/input";
 import { AddFieldDialog } from "./dialog-to-directly-add-product-field";
 import { currencyConvertor, getFieldTypeSingular } from "@/lib/utils";
