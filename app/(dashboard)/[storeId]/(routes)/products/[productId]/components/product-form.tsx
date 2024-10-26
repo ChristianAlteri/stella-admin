@@ -281,16 +281,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     }
   };
 
-  // useEffect(() => {
-  //   fetchSizes();
-  //   fetchColors();
-  //   fetchConditions();
-  //   fetchMaterials();
-  //   fetchGenders();
-  //   fetchSubcategories();
-  //   fetchCategories();
-  //   fetchDesigners();
-  // });
   useEffect(() => {
     // Fetch all field data when component mounts
     const fetchAllFieldData = async () => {
