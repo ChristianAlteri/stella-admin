@@ -2,6 +2,8 @@ import prismadb from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
+const logKey = "API_STORES";
+
 export async function PATCH(
   req: Request,
   { params }: { params: { storeId: string } }
@@ -9,6 +11,9 @@ export async function PATCH(
   try {
     const { userId } = auth();
     const body = await req.json();
+    console.group(`[ENTERING_${logKey}_PATCH]`);
+    console.log(`%c[INFO] ${logKey}_PATCH body: `, JSON.stringify(body));
+    console.groupEnd();
 
     const {
       name,
@@ -71,7 +76,7 @@ export async function PATCH(
       storeData.stripe_connect_unique_id = stripe_connect_unique_id;
     if (countryCode) storeData.countryCode = countryCode;
     if (addressId) storeData.addressId = addressId;
-    console.log("stripe_connect_unique_id", stripe_connect_unique_id);
+    console.log(`[INFO] storeData ${logKey}_PATCH`, JSON.stringify(storeData));
 
     // Update the store with only the fields that were provided
     const store = await prismadb.store.update({
@@ -94,6 +99,7 @@ export async function PATCH(
     if (countryCode) {
       sellerUpdateData.country = countryCode;
     }
+    console.log(`[INFO] sellerUpdateData ${logKey}_PATCH`, JSON.stringify(sellerUpdateData));
 
     const seller = await prismadb.seller.update({
       where: {
@@ -103,10 +109,13 @@ export async function PATCH(
       data: sellerUpdateData,
     });
 
-    console.log("[STORE_PATCH]", store, "seller", seller);
+    console.group(`[${logKey}_PATCH]`);
+    console.log(`%c[INFO] ${logKey}_PATCH Store: `, store);
+    console.log(`%c[INFO] ${logKey}_PATCH Seller: `,seller);
+    console.groupEnd();
     return NextResponse.json(store);
   } catch (error) {
-    console.log("[STORE_PATCH]", error);
+    console.log(`[STORE_${logKey}_PATCH]`, error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
@@ -132,10 +141,12 @@ export async function DELETE(
         userId,
       },
     });
-
+    console.group(`[${logKey}_DELETE]`);
+    console.log(`%c[INFO] ${logKey}_DELETE Store: `, store);
+    console.groupEnd();
     return NextResponse.json(store);
   } catch (error) {
-    console.log("[STORE_DELETE]", error);
+    console.log(`[${logKey}_DELETE]`, error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }

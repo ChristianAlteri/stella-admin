@@ -5,13 +5,16 @@ import { auth } from "@clerk/nextjs/server"
 import prismadb from '@/lib/prismadb';
 import { convertDecimalFields } from '@/lib/utils';
 
+const logKey = "API_STORES";
+
 export async function POST(req: Request) {
 
   try {
     const { userId } = auth();
     const body = await req.json();
-    console.log("body", body);
-    console.log("userId", userId);
+    console.group(`[ENTERING_${logKey}_POST]`);
+    console.log(`%c[INFO] ${logKey}_POST body: `, JSON.stringify(body));
+    console.groupEnd();
 
     const { name, address, consignmentRate, currency, countryCode } = body;
 
@@ -79,12 +82,14 @@ export async function POST(req: Request) {
       },
     });
   
-    console.log("New store created:", store);
-    console.log("New seller created:", seller);
-    console.log("New location created:", location);
+    console.group(`[${logKey}_POST]`);
+    console.log("%c[INFO] New Store Created:", store);
+    console.log("%c[INFO] New Seller Created:",seller);
+    console.log("%c[INFO] New Location Created:", location);
+    console.groupEnd();
     return NextResponse.json(store);
   } catch (error) {
-    console.log('[API_STORES_POST]', error);
+    console.log(`[${logKey}_POST]`, error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
@@ -94,6 +99,10 @@ export async function GET(req: Request) {
     const { userId } = auth();
     const url = new URL(req.url);
     const storeId = url.searchParams.get('storeId');
+    console.group(`[ENTERING_${logKey}_GET]`);
+    console.log(`%c[INFO] ${logKey}_GET url: `, url);
+    console.log(`%c[INFO] ${logKey}_GET storeId: `, storeId);
+    console.groupEnd();
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 403 });
@@ -115,8 +124,11 @@ export async function GET(req: Request) {
     console.log("store", store);
     // Convert Decimal fields to numbers
     const storeWithConvertedDecimals = convertDecimalFields(store);
-    console.log("storeWithConvertedDecimals", storeWithConvertedDecimals);
 
+
+    console.group(`[${logKey}_GET]`);
+    console.log("%c[INFO] Store Get: ", store);
+    console.groupEnd();
     return NextResponse.json(store);
   } catch (error) {
     console.log('[API_STORE_GET]', error);
