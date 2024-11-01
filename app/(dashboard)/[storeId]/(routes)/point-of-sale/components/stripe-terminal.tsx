@@ -89,11 +89,13 @@ interface Reader {
 interface StripeTerminalComponentProps {
   countryCode: string;
   storeName: string;
+  taxRate: number;
 }
 
 export default function StripeTerminalComponent({
   countryCode,
   storeName,
+  taxRate,
 }: StripeTerminalComponentProps) {
   const currencySymbol = currencyConvertor(countryCode);
   const router = useRouter();
@@ -105,8 +107,9 @@ export default function StripeTerminalComponent({
   const hasFetchedToken = useRef(false);
   const [selectedReader, setSelectedReader] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
+  const [taxAmount, setTaxAmount] = useState<string>("");
+  const [totalAmount, setTotalAmount] = useState<string>("");
   const [isPaymentCaptured, setIsPaymentCaptured] = useState<boolean>(false);
-  // const [isSelected, setIsSelected] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -230,7 +233,48 @@ export default function StripeTerminalComponent({
     }, 0);
 
     setAmount(updatedAmount.toFixed(2)); // Format the amount to 2 decimal places
+
+    // Calculate tax amount and update total amount
+    const calculatedTax = (updatedAmount * (taxRate / 100)).toFixed(2);
+    setTaxAmount(calculatedTax);
+
+    const calculatedTotal = (updatedAmount + parseFloat(calculatedTax)).toFixed(
+      2
+    );
+    setTotalAmount(calculatedTotal);
   };
+  // const handleSelect = (product: Product) => {
+  //   const isAlreadySelected = selectedProducts.some(
+  //     (selectedProduct) => selectedProduct.id === product.id
+  //   );
+
+  //   let updatedProducts;
+  //   if (isAlreadySelected) {
+  //     updatedProducts = selectedProducts.filter(
+  //       (selectedProduct) => selectedProduct.id !== product.id
+  //     );
+  //   } else {
+  //     updatedProducts = [...selectedProducts, product];
+  //   }
+
+  //   setSelectedProducts(updatedProducts);
+
+  //   const updatedAmount = updatedProducts.reduce((acc, currProduct) => {
+  //     return acc + parseFloat(currProduct.ourPrice.toString());
+  //   }, 0);
+
+  //   console.log("updatedAmount", updatedAmount);
+  //   setAmount(updatedAmount.toFixed(2));
+
+  //   // Calculate tax amount and update total amount
+  //   const calculatedTax = (updatedAmount * (taxRate / 100)).toFixed(2);
+  //   setTaxAmount(calculatedTax);
+
+  //   const calculatedTotal = (updatedAmount + parseFloat(calculatedTax)).toFixed(
+  //     2
+  //   );
+  //   setTotalAmount(calculatedTotal);
+  // };
 
   const fetchConnectionToken = async () => {
     try {
@@ -260,13 +304,14 @@ export default function StripeTerminalComponent({
     if (!selectedReader || !amount || !storeId) {
       return;
     }
-    const amountInCents = Math.round(parseFloat(amount) * 100);
+    // const amountInCents = Math.round(parseFloat(amount) * 100);
+    const totalAmountInCents = Math.round(parseFloat(totalAmount) * 100);
     try {
       const { data, status } = await axios.post(
         `/api/${storeId}/stripe/create_payment_intent`,
         {
           //Send metadata to the back end so we can process the payments and payouts after a terminal triggers a webhook
-          amount: amountInCents,
+          amount: totalAmountInCents,
           readerId: selectedReader,
           storeId: storeId,
           productIds: selectedProducts.map((product) => product.id),
@@ -814,7 +859,7 @@ export default function StripeTerminalComponent({
                             className="w-full"
                           >
                             Create Payment ({currencySymbol}
-                            {amount})
+                            {totalAmount})
                           </Button>
                         ) : (
                           <>
@@ -912,17 +957,38 @@ export default function StripeTerminalComponent({
                                       </span>
                                     </div>
                                   ))}
+                                  <Separator />
+                                  <div className="flex flex-col p-2">
+                                    <div className="flex justify-between">
+                                      <span className="text-lg font-bold">
+                                        Subtotal
+                                      </span>
+                                      <span className="text-lg font-bold">
+                                        {currencySymbol}
+                                        {amount}
+                                      </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span className="text-lg font-bold">
+                                        Tax
+                                      </span>
+                                      <span className="text-lg font-bold">
+                                        {currencySymbol}
+                                        {taxAmount}
+                                      </span>
+                                    </div>
+                                    <Separator />
+                                    <div className="flex justify-between">
+                                      <span className="text-lg font-bold">
+                                        Total
+                                      </span>
+                                      <span className="text-lg font-bold">
+                                        {currencySymbol}
+                                        {totalAmount}
+                                      </span>
+                                    </div>
+                                  </div>
                                 </ScrollArea>
-                                <Separator />
-                                <div className="flex justify-between">
-                                  <span className="text-lg font-bold">
-                                    Total
-                                  </span>
-                                  <span className="text-lg font-bold">
-                                    {currencySymbol}
-                                    {amount}
-                                  </span>
-                                </div>
                               </>
                             )}
                           </CardContent>
@@ -1013,15 +1079,32 @@ export default function StripeTerminalComponent({
                             </span>
                           </div>
                         ))}
+                        <Separator />
+                        <div className="flex flex-col p-2">
+                          <div className="flex justify-between">
+                            <span className="text-lg font-bold">Subtotal</span>
+                            <span className="text-lg font-bold">
+                              {currencySymbol}
+                              {amount}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-lg font-bold">Tax</span>
+                            <span className="text-lg font-bold">
+                              {currencySymbol}
+                              {taxAmount}
+                            </span>
+                          </div>
+                          <Separator />
+                          <div className="flex justify-between">
+                            <span className="text-lg font-bold">Total</span>
+                            <span className="text-lg font-bold">
+                              {currencySymbol}
+                              {totalAmount}
+                            </span>
+                          </div>
+                        </div>
                       </ScrollArea>
-                      <Separator />
-                      <div className="flex justify-between">
-                        <span className="text-lg font-bold">Total</span>
-                        <span className="text-lg font-bold">
-                          {currencySymbol}
-                          {amount}
-                        </span>
-                      </div>
                     </>
                   )}
                 </CardContent>

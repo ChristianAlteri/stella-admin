@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Store" ADD COLUMN     "taxRate" INT4 NOT NULL DEFAULT 20;

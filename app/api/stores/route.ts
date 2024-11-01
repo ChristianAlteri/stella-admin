@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     console.log(`%c[INFO] ${logKey}_POST body: `, JSON.stringify(body));
     console.groupEnd();
 
-    const { name, address, consignmentRate, currency, countryCode } = body;
+    const { name, address, consignmentRate, currency, countryCode, taxRate } = body;
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 403 });
@@ -45,6 +45,7 @@ export async function POST(req: Request) {
         consignmentRate,
         currency,
         countryCode,
+        taxRate,
         address: {
           create: {
             ...address
@@ -81,11 +82,22 @@ export async function POST(req: Request) {
         ...(address.state ? { state: address.state } : {}),
       },
     });
+
+    // TODO: add all the fields as a part of the store creation
+    // Make sure its different if the seller selects clothing, art dealer or furniture
+    const sizes = await prismadb.size.createMany({
+      data: [
+        { name: "Small", storeId: store.id },
+        { name: "Medium", storeId: store.id },
+        { name: "Large", storeId: store.id },
+      ]
+    })
   
     console.group(`[${logKey}_POST]`);
-    console.log("%c[INFO] New Store Created:", store);
-    console.log("%c[INFO] New Seller Created:",seller);
-    console.log("%c[INFO] New Location Created:", location);
+    console.log("[INFO] New Store Created:", store);
+    console.log("[INFO] New template Created:", sizes);
+    console.log("[INFO] New Seller Created:",seller);
+    console.log("[INFO] New Location Created:", location);
     console.groupEnd();
     return NextResponse.json(store);
   } catch (error) {

@@ -321,6 +321,23 @@ export const SellerForm: React.FC<SellerFormProps> = ({
                     </FormItem>
                   )}
                 />
+                <FormField
+                    control={form.control}
+                    name="phoneNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone Number</FormLabel>
+                        <FormControl>
+                          <Input
+                            disabled={loading}
+                            placeholder="Phone Number"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
                 {/* <FormField
                   control={form.control}
@@ -465,23 +482,7 @@ export const SellerForm: React.FC<SellerFormProps> = ({
                             onChange={(e) =>
                               field.onChange(e.target.valueAsNumber)
                             }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="phoneNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
-                        <FormControl>
-                          <Input
-                            disabled={loading}
-                            placeholder="Phone Number"
-                            {...field}
+                            defaultValue={"Store rate or custom rate"}
                           />
                         </FormControl>
                         <FormMessage />

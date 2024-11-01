@@ -42,7 +42,7 @@ const OrdersPage = async ({
 
   const formattedOrders: OrderColumn[] = orders.map((item) => {
     const uniqueSellers = Array.from(
-      new Set(item.orderItems.map((orderItem) => orderItem.seller?.instagramHandle || 'No Seller'))
+      new Set(item.orderItems.map((orderItem) => orderItem.seller?.storeName || 'No Seller'))
     );
     const uniqueSellerIds = Array.from(
       new Set(item.orderItems.map((orderItem) => orderItem.seller?.id))

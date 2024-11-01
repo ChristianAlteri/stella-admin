@@ -19,6 +19,7 @@ model Store {
   consignmentRate Int    @default(50)
   currency        String @default("GBP")
   countryCode     String @default("GB")
+  taxRate         Int    @default(20)
 
   our_platform_fee Int     @default(5) // just incase we wana offer the servce at a discount rate
   email            String?

@@ -116,7 +116,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const toggleOpen = () => {
     setIsOpen(!isOpen);
   };
-  const [isOptionalFieldsOpen, setOptionalFieldsOpen] = useState(false);
+  const [isOptionalFieldsOpen, setOptionalFieldsOpen] = useState(true);
 
   const toggleOptionalFieldsOpen = () => {
     setOptionalFieldsOpen(!isOptionalFieldsOpen);
@@ -319,6 +319,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           name: "",
           images: [],
           ourPrice: 0,
+          retailPrice: 0,
           designerId: "",
           sellerId: "",
           categoryId: "",
@@ -610,7 +611,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                         />
                       </FormControl>
                       <FormDescription>
-                        Enter the price to sell at. Minimum value is $0.01.
+                        Enter the price to sell at.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -709,8 +710,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                           />
                         </FormControl>
                         <FormDescription>
-                          Enter a price it has sold for or retails for. Minimum
-                          value is $0.01.
+                          Enter a price it has sold for or retails for.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -1430,7 +1430,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 //                       />
 //                     </FormControl>
 //                     <FormMessage>
-//                       Enter the price to sell at. Minimum value is $0.01.
+//                       Enter the price to sell at.
 //                     </FormMessage>
 //                   </FormItem>
 //                 )}

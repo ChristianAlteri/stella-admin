@@ -19,6 +19,7 @@ const formSchema = z.object({
   currency: z.enum(["AUD", "GBP"]),
   consignmentRate: z.number().min(0).max(100),
   countryCode: z.enum(["AU", "GB"]),
+  taxRate: z.number().min(0).max(100),
   address: z.object({
     line1: z.string().min(1),
     line2: z.string().optional(),
@@ -43,6 +44,7 @@ export default function SimplifiedStoreModal() {
       currency: "GBP",
       consignmentRate: 50,
       countryCode: "GB",
+      taxRate: 20,
       address: {
         line1: "",
         line2: "",
@@ -143,6 +145,18 @@ export default function SimplifiedStoreModal() {
             />
             {form.formState.errors.consignmentRate && (
               <p className="text-sm text-red-500">{form.formState.errors.consignmentRate.message}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Tax Rate (%)</label>
+            <Input
+              type="number"
+              {...form.register("taxRate", { valueAsNumber: true })}
+              disabled={loading}
+              placeholder="Tax Rate"
+            />
+            {form.formState.errors.taxRate && (
+              <p className="text-sm text-red-500">{form.formState.errors.taxRate.message}</p>
             )}
           </div>
         </div>

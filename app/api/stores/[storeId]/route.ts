@@ -22,6 +22,7 @@ export async function PATCH(
       currency,
       stripe_connect_unique_id,
       countryCode,
+      taxRate,
     } = body;
 
     if (!userId) {
@@ -75,6 +76,7 @@ export async function PATCH(
     if (stripe_connect_unique_id)
       storeData.stripe_connect_unique_id = stripe_connect_unique_id;
     if (countryCode) storeData.countryCode = countryCode;
+    if (taxRate) storeData.taxRate = taxRate;
     if (addressId) storeData.addressId = addressId;
     console.log(`[INFO] storeData ${logKey}_PATCH`, JSON.stringify(storeData));
 

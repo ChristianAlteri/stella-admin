@@ -182,6 +182,7 @@ export async function GET(
         isArchived: false,
         OR: [
           { id: productName },
+          { id: { endsWith: productName } },
           { designerId: { in: designerIds } },
           { sellerId: { in: sellerIds } },
           { categoryId: { in: categoryIds } },

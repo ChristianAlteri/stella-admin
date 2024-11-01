@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { ImagePlus, Trash, Trash2 } from "lucide-react";
 import ReactPlayer from "react-player";
+import heic2any from "heic2any";
 
 interface S3UploadProps {
   disabled?: boolean;
@@ -18,7 +19,6 @@ const S3Upload: React.FC<S3UploadProps> = ({
   onRemove,
   value,
 }) => {
-  
   const s3Client = new S3Client({
     region: "eu-west-2",
     credentials: {
@@ -34,11 +34,33 @@ const S3Upload: React.FC<S3UploadProps> = ({
     setUploading(true);
     const newUrls = await Promise.all(
       Array.from(files).map(async (file) => {
-        const fileName = file.name.replace(/\s/g, "_");
+        let processedFile = file;
+        // Convert HEIC to JPEG if necessary
+        if (file.type === "image/heic" || file.name.endsWith(".heic")) {
+          try {
+            const convertedBlob = await heic2any({
+              blob: file,
+              toType: "image/jpeg",
+            });
+            processedFile = new File(
+              [convertedBlob as Blob],
+              file.name.replace(/\.(heic|HEIC)$/, ".jpg"),
+              {
+                type: "image/jpeg",
+              }
+            );
+          } catch (error) {
+            console.error("Error converting HEIC to JPEG:", error);
+            return null;
+          }
+        }
+        console.log("Processed file type:", processedFile.type);
+        const fileName = processedFile.name.replace(/\s/g, "_");
         const uploadParams = {
           Bucket: process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME,
           Key: `uploads/${fileName}`,
-          Body: file,
+          Body: processedFile,
+          ContentType: processedFile.type || "image/jpeg",
         };
 
         try {
@@ -55,8 +77,8 @@ const S3Upload: React.FC<S3UploadProps> = ({
     // Filter out any null values to ensure all elements are strings
     const validUrls = newUrls.filter((url): url is string => url !== null);
     const updatedUrls = [...value, ...validUrls];
-    if (updatedUrls.length === 1){
-      onChange([updatedUrls[0]])
+    if (updatedUrls.length === 1) {
+      onChange([updatedUrls[0]]);
     }
     onChange(updatedUrls);
     setUploading(false);

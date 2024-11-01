@@ -19,6 +19,7 @@ const PointOfSalePage: React.FC<PointOfSalePageProps> = async ({ params }) => {
         <StripeTerminal
           countryCode={store?.countryCode || "GB"}
           storeName={store?.name || "CONSIGN_MATE"}
+          taxRate={store?.taxRate || 20}
         />
       </div>
     </div>
