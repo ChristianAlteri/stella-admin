@@ -180,7 +180,8 @@ export async function POST(request: Request) {
         if (sellerWhoSoldId) {
           console.log("DEBUG STRIPE AMOUNT PAYING OUT", Math.round(sellerNetPayout * 100));
           const stripeTransferForSeller = await stripe.transfers.create({
-            amount: Math.round(sellerNetPayout * 100), // Stripe requires amounts in pence (smallest currency unit)
+            // amount: Math.round(sellerNetPayout * 100), // Stripe requires amounts in pence (smallest currency unit)
+            amount: Math.round(sellerNetPayout), // Stripe requires amounts in pence (smallest currency unit)
             currency: store?.currency?.toString() || "GBP",
             destination: stripe_connect_unique_id,
             transfer_group: `order_${newOrder.id}`,
@@ -230,7 +231,8 @@ export async function POST(request: Request) {
     try {
       console.log("DEBUG STRIPE AMOUNT PAYING OUT TO STORE",Math.round(storeCut * 100));
       const stripeTransferForStore = await stripe.transfers.create({
-        amount: Math.round(storeCut * 100), // Stripe requires amounts in pence (smallest currency unit)
+        // amount: Math.round(storeCut * 100), // Stripe requires amounts in pence (smallest currency unit)
+        amount: Math.round(storeCut), // Stripe requires amounts in pence (smallest currency unit)
         currency: store?.currency?.toString() || "GBP",
         destination: store?.stripe_connect_unique_id || "",
         transfer_group: `order_${newOrder.id}`,
