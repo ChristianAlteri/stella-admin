@@ -21,6 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ProductActions from "./product-cell-action";
 import { ProductColumn } from "./columns";
 import { useRouter } from "next/navigation";
+import { currencyConvertor } from "@/lib/utils";
 
 interface ProductDetailsComponentProps {
   data: ProductColumn;
@@ -29,6 +30,7 @@ interface ProductDetailsComponentProps {
 export default function ProductDetailsComponent({
   data,
 }: ProductDetailsComponentProps) {
+  const currencySymbol = currencyConvertor(data.countryCode)
   const router = useRouter();
   const ProductBadge = ({
     condition,
@@ -134,10 +136,10 @@ export default function ProductDetailsComponent({
                 <span>{data.category}</span>
               </div>
               <div className="flex items-center">
-                <span>{data.ourPrice}</span>
+                <span>{currencySymbol}{data.ourPrice}</span>
               </div>
               <div className="flex items-center">
-                <span>RRP: {data.retailPrice}</span>
+                <span>RRP: {currencySymbol}{data.retailPrice}</span>
               </div>
               <div
                 onClick={() => {

@@ -235,7 +235,7 @@ export default function StockCard({
           <ScrollArea className="flex-grow w-full flex-col h-[200px]">
             {sortedProducts.length === 0 ? (
               <div className="text-sm text-muted-foreground w-full">
-                No products older than 3 months found
+                No products older than 4 weeks found
               </div>
             ) : (
               <table className="w-full text-sm text-left text-muted-foreground">

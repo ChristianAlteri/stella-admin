@@ -465,7 +465,7 @@ export const SellerForm: React.FC<SellerFormProps> = ({
                       </FormItem>
                     )}
                   />
-                  <FormField
+                  {/* <FormField
                     control={form.control}
                     name="consignmentRate"
                     render={({ field }) => (
@@ -488,7 +488,7 @@ export const SellerForm: React.FC<SellerFormProps> = ({
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  /> */}
                   <FormField
                     control={form.control}
                     name="shippingAddress"

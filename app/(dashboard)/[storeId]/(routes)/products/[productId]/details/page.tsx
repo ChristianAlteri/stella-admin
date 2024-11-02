@@ -45,6 +45,11 @@ export default async function ProductDetailsPage({
       images: true,
     },
   });
+  const store = await prismadb.store.findUnique({
+    where: {
+      id: params.storeId,
+    },
+  })
 
   if (!product) {
     return <div>Product not found</div>;
@@ -80,6 +85,7 @@ export default async function ProductDetailsPage({
     sellerId: product.sellerId,
     sellerStoreName: product.seller.storeName || "",
     consignmentRate: product.seller.consignmentRate || product.store.consignmentRate || 0,
+    countryCode: store?.countryCode || "GB"
   };
 
   return (

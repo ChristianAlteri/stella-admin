@@ -55,9 +55,9 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
     isOnSale: item.isOnSale,
     isCharity: item.isCharity,
     isHidden: item.isHidden,
-    ourPrice: formatter.format(item.ourPrice.toNumber()),
+    ourPrice: (item.ourPrice.toString()),
     retailPrice: item.retailPrice
-      ? formatter.format(item.retailPrice.toNumber())
+      ? (item.retailPrice.toString())
       : "",
     likes: item.likes,
     clicks: item.clicks,
@@ -78,6 +78,7 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
     sellerId: item.seller?.id || "",
     storeId: item.storeId,
     consignmentRate: item.seller.consignmentRate || store?.consignmentRate || 0,
+    countryCode: store?.countryCode || "GB",
   }));
 
   return (
