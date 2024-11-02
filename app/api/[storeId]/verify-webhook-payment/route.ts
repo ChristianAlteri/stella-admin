@@ -14,9 +14,8 @@ const logKey = "VERIFY_WEBHOOK_PAYMENT";
 export async function POST(request: Request) {
   const body = await request.json();
   const { metadata } = body; // Array of product objects sent from the frontend to our webhook who sends it to this endpoint
-  console.group(`[ENTERING_${logKey}]`);
-  console.log("%c[INFO] POST body:", JSON.stringify(body));
-  console.groupEnd();
+  console.log(`[ENTERING_${logKey}]`);
+  console.log("[INFO] POST body:", JSON.stringify(body));
 
   if (!metadata.storeId || typeof metadata.storeId !== "string") {
     return NextResponse.json(
@@ -157,7 +156,7 @@ export async function POST(request: Request) {
       },
       {}
     );
-    // console.log("sellerPayouts", sellerPayouts);
+    console.log(`[INFO] ${logKey} sellerPayouts: `, sellerPayouts);
 
     for (const [stripe_connect_unique_id, sellerNetPayout] of Object.entries(
       sellerPayouts

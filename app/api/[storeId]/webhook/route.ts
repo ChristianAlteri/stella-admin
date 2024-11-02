@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
                 const url = convertUrl(paymentIntent.metadata.urlFrom);
                 console.log("Converted URL:", url);
 
-              // Make a POST request to your /api/verify-terminal-payment route
+              // Make a POST request to your /api/verify-webhook-payment route
               const response = await fetch(`${url}`, {
                 method: "POST",
                 headers: {
@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
               });
 
               const data = await response.json();
-              console.log("response data", data);
+              console.log("response from sending to verify-webhook-payment from [API_WEBHOOK]", data);
 
               if (response.ok) {
                 console.log("Metadata successfully passed to API", data);
