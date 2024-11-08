@@ -83,6 +83,17 @@ export async function POST(req: Request) {
       },
     });
 
+    const defaultStaff = await prismadb.staff.create({
+      data: {
+        id: store.id, 
+        storeId: store.id,
+        name: store.name,
+        staffType: "Store", 
+      },
+    });
+    
+    console.log("[INFO] Default Staff Created:", defaultStaff);
+
     // TODO: add all the fields as a part of the store creation
     // Make sure its different if the seller selects clothing, art dealer or furniture
     const sizes = await prismadb.size.createMany({
@@ -92,6 +103,7 @@ export async function POST(req: Request) {
         { name: "Large", storeId: store.id },
       ]
     })
+
   
     console.group(`[${logKey}_POST]`);
     console.log("[INFO] New Store Created:", store);

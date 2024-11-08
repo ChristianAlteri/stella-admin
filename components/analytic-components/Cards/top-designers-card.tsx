@@ -96,7 +96,7 @@ const TopDesignersCard: React.FC<TopDesignersCardProps> = ({ products, countryCo
             onCheckedChange={setSortByValue}
           />
           <Label htmlFor="sort-toggle" className="text-sm">
-            {sortByValue ? "Products Sold" : "Total Value"}
+            {sortByValue ? "Volume" : "Value"}
           </Label>
         </div>
       </CardHeader>

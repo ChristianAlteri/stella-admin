@@ -75,7 +75,7 @@ export default function SellerCard({ row }: { row: SellerColumn }) {
             passHref
           >
             <Button variant="outline" size="sm">
-              <Package className="w-4 h-4 " />
+              <TbTag className="w-4 h-4 " />
             </Button>
           </Link>
         </div> */}

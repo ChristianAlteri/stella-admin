@@ -38,14 +38,14 @@ export async function POST(req: Request) {
         hashedPassword,
       },
     });
-    const promoCode = user.name.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    const promoCode = user.name?.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
     const headers = new Headers();
     headers.set("Access-Control-Allow-Origin", "*");
 
     const userKlaviyoProfile = await createProfileInKlaviyo(
-      user.name,
+      user.name || '',
       user.email,
-      promoCode
+      promoCode || ''
     );
     const userKlaviyoProfileId = userKlaviyoProfile.data.id;
     console.log("KLAVIYO_RESPONSEPROFILE", userKlaviyoProfile);
@@ -53,7 +53,7 @@ export async function POST(req: Request) {
 
 
     const klaviyoResponseList = await postUserToKlaviyoWelcomeList(
-      user.name,
+      user.name || '',
       user.email,
       userKlaviyoProfileId,
       "WPxyeH"

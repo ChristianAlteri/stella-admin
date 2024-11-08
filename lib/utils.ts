@@ -362,3 +362,25 @@ export function sanitiseAddress(address: StoreAddress | null) {
     state: address.state ?? undefined,
   };
 }
+
+
+// export function cleanDecimals(object: any) {
+//   return JSON.parse(
+//     JSON.stringify(object, (key, value) => {
+//       if (value instanceof Decimal) {
+//         return value.toNumber().toLocaleString("en-GB", { minimumFractionDigits: 2 });
+//       }
+//       return value;
+//     })
+//   );
+// }
+export function cleanDecimals(object: any) {
+  return JSON.parse(
+    JSON.stringify(object, (key, value) => {
+      if (value instanceof Decimal) {
+        return value.toNumber(); 
+      }
+      return value;
+    })
+  );
+}

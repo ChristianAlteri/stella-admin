@@ -331,6 +331,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           isOnSale: false,
           isCharity: false,
           isHidden: false,
+          // isOnline: false, TODO: Make this happen
         },
   });
 
@@ -764,6 +765,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             {isOpen && (
               <div className="mt-4">
                 {renderCheckbox(
+                  "isOnline",
+                  "Online",
+                  "This product will appear on your website."
+                )}
+                {renderCheckbox(
                   "isArchived",
                   "Archived",
                   "This product will not appear anywhere in the store."
@@ -788,6 +794,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   "Hidden",
                   "This product will appear blurred until changed to false, defaults to false."
                 )}
+              
               </div>
             )}
           </Card>

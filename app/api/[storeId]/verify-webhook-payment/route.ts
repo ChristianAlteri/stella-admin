@@ -6,7 +6,9 @@ import { stripe } from "@/lib/stripe";
 interface Metadata {
   storeId: string;
   urlFrom: string;
-  [key: string]: string; // Product IDs
+  soldByStaffId: string;
+  userId: string;
+  [key: string]: string;
 }
 
 const logKey = "VERIFY_WEBHOOK_PAYMENT";
@@ -14,7 +16,7 @@ const logKey = "VERIFY_WEBHOOK_PAYMENT";
 export async function POST(request: Request) {
   const body = await request.json();
   const { metadata } = body; // Array of product objects sent from the frontend to our webhook who sends it to this endpoint
-  console.log(`[ENTERING_${logKey}]`);
+  console.log(`[ENTERING_${logKey}] with metadata`, metadata);
   console.log("[INFO] POST body:", JSON.stringify(body));
 
   if (!metadata.storeId || typeof metadata.storeId !== "string") {
@@ -65,52 +67,105 @@ export async function POST(request: Request) {
       ? store.our_platform_fee / 100
       : 0.05;
 
-    console.log(
-      `[INFO] ${logKey} OUR_PLATFORM_FEE`,
-      OUR_PLATFORM_FEE
-    );
+    console.log(`[INFO] ${logKey} OUR_PLATFORM_FEE`, OUR_PLATFORM_FEE);
 
     const totalFees = totalSales * (STRIPE_FEE_PERCENTAGE + OUR_PLATFORM_FEE);
     const totalSalesAfterFees = totalSales - totalFees;
 
     console.log(`[INFO] ${logKey} totalFees`, totalFees);
-    console.log(
-      `[INFO] ${logKey} totalSalesAfterFees`,
-      totalSalesAfterFees
-    );
+    console.log(`[INFO] ${logKey} totalSalesAfterFees`, totalSalesAfterFees);
 
     // Create a new Order
     const newOrder = await prismadb.order.create({
       data: {
+        store: { connect: { id: metadata.storeId } },
         storeId: metadata.storeId,
         isPaid: true,
         totalAmount: new Prisma.Decimal(totalSalesAfterFees),
+        soldByStaff: { connect: { id: metadata.soldByStaffId || `${store?.id}` } }
       },
     });
 
     console.log(`[INFO] ${logKey} newOrder`, JSON.stringify(newOrder));
 
-    // Create Order Items (split products into order items)
-    const orderItems = await prismadb.orderItem.createMany({
-      data: products.map((product: any) => ({
-        storeId: metadata.storeId,
-        orderId: newOrder.id,
-        productId: product.id,
-        sellerId: product.seller.id || "",
-        productAmount: new Prisma.Decimal(product.ourPrice),
-      })),
-    });
+    // Create Order Items individually to capture each ID
+    const orderItems = await Promise.all(
+      products.map(async (product) => {
+        const orderItem = await prismadb.orderItem.create({
+          data: {
+            storeId: metadata.storeId,
+            orderId: newOrder.id,
+            productId: product.id,
+            sellerId: product.seller.id || "",
+            soldByStaffId: metadata.soldByStaffId || `${store?.id}`,
+            productAmount: new Prisma.Decimal(product.ourPrice),
+          },
+        });
+        return orderItem.id; // Return the ID of each created order item
+      })
+    );
 
-    console.log(`[INFO] ${logKey} orderItems`, JSON.stringify(orderItems));
+    console.log(`[INFO] ${logKey} orderItems`, orderItems);
 
     const sellerIds = products.map((product: any) => product.seller.id);
 
-    console.log(`[INFO] ${logKey} sellerIds`, JSON.stringify(sellerIds));
+    console.log(`[INFO] ${logKey} sellerIds`, sellerIds);
+
+    // Sum the total product amount for all items in this order
+    const totalProductAmount = products.reduce(
+      (acc, product) => acc + product.ourPrice.toNumber(),
+      0
+    );
+    console.log(
+      `[INFO] ${logKey} totalProductAmount total sales: ` + totalProductAmount
+    );
+
+    const staff = await prismadb.staff.update({
+      where: { id: metadata.soldByStaffId },
+      data: {
+        totalSales: { increment: totalProductAmount },
+        totalItemsSold: { increment: products.length },
+        totalTransactionCount: { increment: 1 },
+        orders: {
+          connect: { id: newOrder.id },
+        },
+        orderItems: {
+          connect: orderItems.map((id) => ({ id })),
+        },
+        customers: { connect: { id: metadata.userId } },
+      },
+    });
+    console.log(
+      `[INFO] ${logKey} Updated total sales for staff:`,
+      metadata.soldByStaffId
+    );
+    console.log(`[INFO] ${logKey} Updated staff member: `, staff);
+
+    console.log("User ID:", metadata.userId);
+
+    const updatedUser = await prismadb.user.update({
+      where: { id: metadata.userId }, // Assuming metadata contains userId
+      data: {
+        purchaseHistory: {
+          connect: products.map((product) => ({ id: product.id })),
+        },
+        orderHistory: {
+          connect: { id: newOrder.id },
+        },
+        totalPurchases: { increment: totalProductAmount },
+        totalItemsPurchased: { increment: products.length },
+        totalTransactionCount: { increment: 1 },
+        interactingStaff: { connect: { id: metadata.soldByStaffId } },
+      },
+    });
+
+    console.log(`[INFO] ${logKey} Updated metrics for user:`, metadata.userId);
+    console.log(`[INFO] ${logKey} Updated user details: `, updatedUser);
 
     // Mark products as archived
     await prismadb.product.updateMany({
       where: { id: { in: productIds } },
-      data: { isArchived: true },
+      data: { isArchived: true, staffId: metadata.soldByStaffId },
     });
 
     // Update seller sold count
@@ -146,10 +201,7 @@ export async function POST(request: Request) {
           consignmentRateToUse
         );
         console.log(`[INFO] ${logKey} storeCut`, storeCut);
-        console.log(
-          `[INFO] ${logKey} payoutAfterFees`,
-          payoutAfterFees
-        );
+        console.log(`[INFO] ${logKey} payoutAfterFees`, payoutAfterFees);
 
         acc[product.seller.stripe_connect_unique_id!] += sellerPayout;
         return acc;
@@ -173,12 +225,12 @@ export async function POST(request: Request) {
           (product) =>
             product.seller.stripe_connect_unique_id === stripe_connect_unique_id
         )?.seller.id;
-        console.log(
-          `[INFO] ${logKey} sellerWhoSoldId`,
-          sellerWhoSoldId
-        );
+        console.log(`[INFO] ${logKey} sellerWhoSoldId`, sellerWhoSoldId);
         if (sellerWhoSoldId) {
-          console.log("DEBUG STRIPE AMOUNT PAYING OUT", Math.round(sellerNetPayout * 100));
+          console.log(
+            "DEBUG STRIPE AMOUNT PAYING OUT",
+            Math.round(sellerNetPayout * 100)
+          );
           const stripeTransferForSeller = await stripe.transfers.create({
             amount: Math.round(sellerNetPayout * 100), // Stripe requires amounts in pence (smallest currency unit)
             currency: store?.currency?.toString() || "GBP",
@@ -228,7 +280,10 @@ export async function POST(request: Request) {
 
     // PAYOUT STORE
     try {
-      console.log("DEBUG STRIPE AMOUNT PAYING OUT TO STORE",Math.round(storeCut * 100));
+      console.log(
+        "DEBUG STRIPE AMOUNT PAYING OUT TO STORE",
+        Math.round(storeCut * 100)
+      );
       const stripeTransferForStore = await stripe.transfers.create({
         amount: Math.round(storeCut * 100), // Stripe requires amounts in pence (smallest currency unit)
         currency: store?.currency?.toString() || "GBP",
@@ -261,17 +316,20 @@ export async function POST(request: Request) {
         `[INFO] ${logKey} stripeTransferForStore: `,
         stripeTransferForStore
       );
-      console.log(
-        `[INFO] ${logKey} storePayoutRecord: `,
-        storePayoutRecord
-      );
+      console.log(`[INFO] ${logKey} storePayoutRecord: `, storePayoutRecord);
     } catch (error) {
-      console.error(`[ERROR] ${logKey} Error creating Stripe transfer for store:`, error);
+      console.error(
+        `[ERROR] ${logKey} Error creating Stripe transfer for store:`,
+        error
+      );
     }
 
     return NextResponse.json({ status: 200 });
   } catch (error) {
-    console.error(`[ERROR] ${logKey} Error verifying terminal payment: `, error);
+    console.error(
+      `[ERROR] ${logKey} Error verifying terminal payment: `,
+      error
+    );
 
     // Check for Stripe balance_insufficient error
     if (

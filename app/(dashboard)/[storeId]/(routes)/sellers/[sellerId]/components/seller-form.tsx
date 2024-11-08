@@ -64,7 +64,7 @@ export const SellerForm: React.FC<SellerFormProps> = ({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [sellerType, setSellerType] = useState<string>("re-seller");
-  const [isOptionalFieldsOpen, setOptionalFieldsOpen] = useState(false);
+  const [isOptionalFieldsOpen, setOptionalFieldsOpen] = useState(true);
 
   const toggleOptionalFieldsOpen = () => {
     setOptionalFieldsOpen(!isOptionalFieldsOpen);

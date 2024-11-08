@@ -85,7 +85,9 @@ export default async function ProductDetailsPage({
     sellerId: product.sellerId,
     sellerStoreName: product.seller.storeName || "",
     consignmentRate: product.seller.consignmentRate || product.store.consignmentRate || 0,
-    countryCode: store?.countryCode || "GB"
+    countryCode: store?.countryCode || "GB",
+    staffId: product.staffId || "",
+    userId: product.userId || "",
   };
 
   return (

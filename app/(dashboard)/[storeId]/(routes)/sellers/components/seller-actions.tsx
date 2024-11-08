@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { Package, Trash2 } from "lucide-react";
-import { TbFaceId, TbFaceIdError } from "react-icons/tb";
+import { TbFaceId, TbFaceIdError, TbTag } from "react-icons/tb";
 import { FaRegEdit } from "react-icons/fa";
 import { IoAnalyticsSharp, IoInformationOutline } from "react-icons/io5";
 
@@ -86,7 +86,7 @@ export default function SellerActions({ data }: { data: SellerColumn }) {
             passHref
           >
             <Button variant="outline" size="icon">
-              <Package className="w-4 h-4 " />
+            <TbTag className="w-4 h-4 " />
             </Button>
           </Link>
         </div>

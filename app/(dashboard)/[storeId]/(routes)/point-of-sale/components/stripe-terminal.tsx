@@ -19,10 +19,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Product } from "@prisma/client";
+import { Product, Staff } from "@prisma/client";
 import { toast } from "react-hot-toast";
 import { TbFaceIdError, TbFaceId } from "react-icons/tb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Plus } from "lucide-react";
 
 import {
   Dialog,
@@ -119,6 +120,10 @@ export default function StripeTerminalComponent({
   const [loadingSellers, setLoadingSellers] = useState<boolean>(false);
   const [loadingDesigners, setLoadingDesigners] = useState<boolean>(false);
   const [loadingCategories, setLoadingCategories] = useState<boolean>(false);
+  const [staffMembers, setStaffMembers] = useState<Staff[]>([]);
+  const [selectedStaffId, setSelectedStaffId] = useState<string>("");
+  const [users, setUsers] = useState<Staff[]>([]);
+  const [selectedUserId, setSelectedUserId] = useState<string>("");
   useEffect(() => {
     if (readers.length > 0) {
       setSelectedReader(readers[0].id);
@@ -307,15 +312,18 @@ export default function StripeTerminalComponent({
     // const amountInCents = Math.round(parseFloat(amount) * 100);
     const totalAmountInCents = Math.round(parseFloat(totalAmount) * 100);
     try {
+      console.log("selectedUserId: ", selectedUserId);
       const { data, status } = await axios.post(
         `/api/${storeId}/stripe/create_payment_intent`,
         {
-          //Send metadata to the back end so we can process the payments and payouts after a terminal triggers a webhook
+          // Send metadata to the back end so we can process the payments and payouts after a terminal triggers a webhook
           amount: totalAmountInCents,
           readerId: selectedReader,
           storeId: storeId,
           productIds: selectedProducts.map((product) => product.id),
           urlFrom: urlFrom,
+          soldByStaffId: selectedStaffId || `${storeId}`,
+          userId: `${selectedUserId}` || "",
         }
       );
       setPaymentIntentId(data?.paymentIntent?.id);
@@ -424,33 +432,6 @@ export default function StripeTerminalComponent({
 
     window.location.reload();
   };
-  // const printReceipt = () => {
-
-  //   const receiptElement = document.createElement('div');
-  //   ReactDOM.render(
-  //     <PrintableReceipt
-  //       storeName={storeName}
-  //       selectedProducts={selectedProducts.map(product => ({
-  //         ...product,
-  //         ourPrice: Number(product.ourPrice)
-  //       }))}
-  //       total={parseFloat(amount)}
-  //       currencySymbol={currencySymbol}
-  //     />,
-  //     receiptElement
-  //   );
-
-  //   const printWindow = window.open('', '_blank');
-  //   printWindow?.document.write('<html><head><title>Print Receipt</title>');
-
-  //   printWindow?.document.write('<style>body { font-family: Arial, sans-serif; }</style>');
-  //   printWindow?.document.write('</head><body>');
-  //   printWindow?.document.write(receiptElement.innerHTML);
-  //   printWindow?.document.write('</body></html>');
-  //   printWindow?.document.close();
-
-  //   printWindow?.print();
-  // };
 
   const printReceipt = () => {
     const receiptElement = document.createElement("div");
@@ -565,6 +546,39 @@ export default function StripeTerminalComponent({
       setLoadingCategories(false);
     }
   };
+  useEffect(() => {
+    const fetchStaffMembers = async () => {
+      try {
+        const { data } = await axios.get(`/api/${storeId}/staff`);
+        setStaffMembers(data);
+        // console.log("STAFF from stripe terminal", data[0]);
+      } catch (error) {
+        console.error("Error fetching staff members:", error);
+        toastError("Failed to fetch staff.");
+      }
+    };
+    const fetchUsers = async () => {
+      try {
+        const { data } = await axios.get(`/api/${storeId}/users`);
+        setUsers(data);
+        // console.log("USERS from stripe terminal", data[0]);
+      } catch (error) {
+        console.error("Error fetching Users :", error);
+        toastError("Failed to fetch Users.");
+      }
+    };
+
+    fetchStaffMembers();
+    fetchUsers();
+  }, [storeId]);
+  console.log("users", users);
+
+  const handleStaffSelect = (value: string) => {
+    setSelectedStaffId(value);
+  };
+  const handleUserSelect = (value: string) => {
+    setSelectedUserId(value);
+  };
 
   const handleSearchProductByIDClick = (passedInId: string) => {
     console.log("handleSearchProductByIDClick", passedInId);
@@ -614,7 +628,7 @@ export default function StripeTerminalComponent({
                       ))}
                     </div>
                   ) : (
-                    <Card className="w-full  h-[500px]">
+                    <Card className="w-full  h-[400px]">
                       <CardContent className="p-4 h-full flex flex-col">
                         <div className="flex flex-col gap-2 mb-4">
                           <Input
@@ -632,7 +646,7 @@ export default function StripeTerminalComponent({
                             Create a product
                           </Button> */}
                         </div>
-                        <ScrollArea className="flex-grow">
+                        <ScrollArea className="flex-grow ">
                           {searchResults.length > 0 && (
                             <div className="space-y-4">
                               {searchResults.map((result: any) => (
@@ -720,7 +734,7 @@ export default function StripeTerminalComponent({
 
                 return (
                   <TabsContent key={tab} value={tab} className="mt-0">
-                    <Card className="h-[500px]">
+                    <Card className="h-[400px]">
                       <CardHeader>
                         <CardTitle>
                           {tab === "category"
@@ -769,7 +783,7 @@ export default function StripeTerminalComponent({
               })}
             </Tabs>
 
-            <div className="w-full h-[550px]">
+            <div className="w-full h-[400px]">
               {loadingReaders ? (
                 <div className="flex flex-col space-y-4">
                   <div className="w-full h-full">
@@ -791,25 +805,72 @@ export default function StripeTerminalComponent({
                   </div>
                 </div>
               ) : (
-                <Card className="w-full h-full">
+                <Card className="w-full h-[400px] mt-[50px]">
                   <CardHeader></CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-6">
                     {!isPaymentCaptured ? (
                       <>
+                        <div className="flex flex-row gap-2">
+                          <Select
+                            onValueChange={handleStaffSelect}
+                            value={selectedStaffId}
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Staff member" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {staffMembers.map((staff) => (
+                                <SelectItem key={staff.id} value={staff.id}>
+                                  <div className="flex items-center gap-2">
+                                    {staff.name}
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Select
+                            onValueChange={handleUserSelect}
+                            value={selectedUserId}
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Customer account" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {users.map((user) => (
+                                <SelectItem key={user.id} value={user.id}>
+                                  <div className="flex items-center gap-2">
+                                    {user.email}
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => {
+                              //TODO: Handle create customer account with a dialog
+                            }}
+                            className="flex-shrink-0"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
                         <Select
                           onValueChange={setSelectedReader}
-                          value={selectedReader || ""}
+                          value={selectedReader}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select a reader" />
                           </SelectTrigger>
                           <SelectContent>
                             {readers.map((reader) => (
                               <SelectItem key={reader.id} value={reader.id}>
-                                <div className="flex gap-2 flex-row justify-center items-center">
-                                  {reader.label}
+                                <div className="flex items-center justify-between w-full gap-1">
+                                  <span>{reader.label}</span>
                                   <Wifi
-                                    className={`h-4 w-4 flex justify-center items-center  ${
+                                    className={`h-4 w-4 ${
                                       reader.status === "online"
                                         ? "text-green-500"
                                         : "text-gray-300"
@@ -820,33 +881,28 @@ export default function StripeTerminalComponent({
                             ))}
                           </SelectContent>
                         </Select>
+
+                        <Separator />
                         <Input
                           type="text"
-                          placeholder="Amount"
+                          placeholder="Enter amount"
                           value={amount}
                           onChange={handleInputChange}
                           className="text-2xl font-bold text-center"
                         />
-                        <div className="grid grid-cols-3 gap-2">
-                          {keypadButtons.map((num, index) => (
-                            <Button
-                              key={index}
-                              variant="outline"
-                              onClick={() => handleNumberClick(num)}
-                              className="h-12 text-lg"
-                            >
-                              {num === "backspace" ? "Back" : num}
-                            </Button>
-                          ))}
-                        </div>
                       </>
                     ) : (
-                      <p className="text-xl font-semibold text-center">
-                        Payment successfully captured!
-                      </p>
+                      <div className="text-center">
+                        <div className="text-5xl font-bold text-green-500 mb-4">
+                          ✓
+                        </div>
+                        <p className="text-xl font-semibold">
+                          Payment successfully captured!
+                        </p>
+                      </div>
                     )}
                   </CardContent>
-                  <CardFooter className="flex flex-col gap-2">
+                  <CardFooter className="flex flex-col gap-4">
                     {!isPaymentCaptured ? (
                       <>
                         {!paymentIntentId ? (
@@ -858,21 +914,19 @@ export default function StripeTerminalComponent({
                             disabled={!selectedReader || !amount}
                             className="w-full"
                           >
-                            Create Payment ({currencySymbol}
-                            {totalAmount})
+                            Create Payment (${amount})
                           </Button>
                         ) : (
                           <>
                             <Button
                               onClick={cancelPayment}
-                              disabled={!selectedReader}
+                              variant="destructive"
                               className="w-full"
                             >
                               Cancel Payment
                             </Button>
                             <Button
                               onClick={() => setIsPaymentCaptured(true)}
-                              disabled={!selectedReader}
                               className="w-full"
                             >
                               Approve Card Payment
@@ -885,13 +939,156 @@ export default function StripeTerminalComponent({
                         <Button onClick={resetComponent} className="w-full">
                           New Payment
                         </Button>
-                        <Button onClick={printReceipt} className="w-full">
+                        <Button
+                          onClick={printReceipt}
+                          variant="outline"
+                          className="w-full"
+                        >
                           Print Receipt
                         </Button>
                       </>
                     )}
                   </CardFooter>
                 </Card>
+                // <Card className="w-full h-full">
+                //   <CardHeader></CardHeader>
+                //   <CardContent className="space-y-4">
+                //     {!isPaymentCaptured ? (
+                //       <>
+                //         <Select onValueChange={handleStaffSelect} value={selectedStaffId}>
+                //           <SelectTrigger>
+                //             <SelectValue placeholder="Select a staff member" />
+                //           </SelectTrigger>
+                //           <SelectContent>
+                //             {staffMembers.map((staff) => (
+                //               <SelectItem key={staff.id} value={staff.id}>
+                //                 <div className="flex gap-2 flex-row justify-center items-center">
+                //                   {staff.name}
+                //                 </div>
+                //               </SelectItem>
+                //             ))}
+                //           </SelectContent>
+                //         </Select>
+                //         <Select onValueChange={handleUserSelect} value={selectedUserId}>
+                //           <SelectTrigger>
+                //             <SelectValue placeholder="Select a customer account" />
+                //           </SelectTrigger>
+                //           <SelectContent>
+                //             {users.map((user) => (
+                //               <SelectItem key={user.id} value={user.id}>
+                //                 <div className="flex gap-2 flex-row justify-center items-center">
+                //                   {user.email}
+                //                 </div>
+                //               </SelectItem>
+                //             ))}
+                //           </SelectContent>
+                //         </Select>
+
+                //         <Button
+                //             onClick={() => {
+
+                //             }}
+                //             className="w-full"
+                //           >
+                //             Create Customer Account
+                //           </Button>
+
+                //         <Select
+                //           onValueChange={setSelectedReader}
+                //           value={selectedReader || ""}
+                //         >
+                //           <SelectTrigger>
+                //             <SelectValue placeholder="Select a reader" />
+                //           </SelectTrigger>
+                //           <SelectContent>
+                //             {readers.map((reader) => (
+                //               <SelectItem key={reader.id} value={reader.id}>
+                //                 <div className="flex gap-2 flex-row justify-center items-center">
+                //                   {reader.label}
+                //                   <Wifi
+                //                     className={`h-4 w-4 flex justify-center items-center  ${
+                //                       reader.status === "online"
+                //                         ? "text-green-500"
+                //                         : "text-gray-300"
+                //                     }`}
+                //                   />
+                //                 </div>
+                //               </SelectItem>
+                //             ))}
+                //           </SelectContent>
+                //         </Select>
+                //         <Input
+                //           type="text"
+                //           placeholder="Amount"
+                //           value={amount}
+                //           onChange={handleInputChange}
+                //           className="text-2xl font-bold text-center"
+                //         />
+                //         {/* <div className="grid grid-cols-3 gap-2">
+                //           {keypadButtons.map((num, index) => (
+                //             <Button
+                //               key={index}
+                //               variant="outline"
+                //               onClick={() => handleNumberClick(num)}
+                //               className="h-12 text-lg"
+                //             >
+                //               {num === "backspace" ? "Back" : num}
+                //             </Button>
+                //           ))}
+                //         </div> */}
+                //       </>
+                //     ) : (
+                //       <p className="text-xl font-semibold text-center">
+                //         Payment successfully captured!
+                //       </p>
+                //     )}
+                //   </CardContent>
+                //   <CardFooter className="flex flex-col gap-2">
+                //     {!isPaymentCaptured ? (
+                //       <>
+                //         {!paymentIntentId ? (
+                //           <Button
+                //             onClick={() => {
+                //               createPendingPayment();
+                //               setIsDialogOpen(true);
+                //             }}
+                //             disabled={!selectedReader || !amount}
+                //             className="w-full"
+                //           >
+                //             Create Payment ({currencySymbol}
+                //             {totalAmount})
+                //           </Button>
+                //         ) : (
+                //           <>
+                //             <Button
+                //               onClick={cancelPayment}
+                //               disabled={!selectedReader}
+                //               className="w-full"
+                //             >
+                //               Cancel Payment
+                //             </Button>
+                //             <Button
+                //               onClick={() => setIsPaymentCaptured(true)}
+                //               disabled={!selectedReader}
+                //               className="w-full"
+                //             >
+                //               Approve Card Payment
+                //             </Button>
+                //           </>
+                //         )}
+                //       </>
+                //     ) : (
+                //       <>
+                //         <Button onClick={resetComponent} className="w-full">
+                //           New Payment
+                //         </Button>
+                //         <Button onClick={printReceipt} className="w-full">
+                //           Print Receipt
+                //         </Button>
+                //       </>
+                //     )}
+                //   </CardFooter>
+                // </Card>
               )}
             </div>
           </div>
@@ -1056,7 +1253,7 @@ export default function StripeTerminalComponent({
           </div>
         ) : amount.length > 0 ? (
           <div className="flex justify-center items-center w-full p-2">
-            <Card className="w-full h-[200px] justify-center items-center text-center">
+            <Card className="w-full h-[250px] justify-center items-center text-center">
               <CardHeader>
                 <div className="text-2xl font-bold w-full justify-center items-center">
                   Order Summary
@@ -1064,7 +1261,7 @@ export default function StripeTerminalComponent({
                 <CardContent className="grid gap-4">
                   {selectedProducts.length > 0 && (
                     <>
-                      <ScrollArea className="h-[50px] pr-4">
+                      <ScrollArea className="h-[200px] pr-4">
                         {selectedProducts.map((product) => (
                           <div
                             key={product.id}

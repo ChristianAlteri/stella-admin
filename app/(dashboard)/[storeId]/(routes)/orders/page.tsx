@@ -30,6 +30,7 @@ const OrdersPage = async ({
             }
           },
           seller: true,
+          soldByStaff: true,
         }
       }
     },
@@ -37,6 +38,8 @@ const OrdersPage = async ({
       createdAt: 'asc'
     }
   });
+
+  console.log("ORDERSSSS", orders[0]);
 
 
 

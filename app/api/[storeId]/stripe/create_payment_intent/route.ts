@@ -6,7 +6,7 @@ import Stripe from "stripe";  // Import Stripe types
 export async function POST(req: NextRequest) {
   if (req.method === "POST") {
     try {
-      const { amount, readerId, storeId, productIds, urlFrom } = await req.json();
+      const { amount, readerId, storeId, productIds, urlFrom, soldByStaffId, userId } = await req.json();
 
       if (!amount || !readerId || !storeId) {
         return NextResponse.json(
@@ -50,6 +50,8 @@ export async function POST(req: NextRequest) {
           ...productIdMetadata, 
           storeId: storeId,
           urlFrom: urlFrom,
+          soldByStaffId: soldByStaffId,
+          userId: userId
         }
       });
 

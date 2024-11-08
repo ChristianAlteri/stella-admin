@@ -87,7 +87,7 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
   });
 
   const users = await prismadb.user.findMany({
-    include: { orders: true },
+    // include: { orders: true }, // TODO: Make tab and staff and users display when switch
     orderBy: { name: "desc" },
   });
 
@@ -247,7 +247,9 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
         </div>
         <div className="flex flex-row gap-4">
           <div className="flex flex-row w-full gap-4 justify-between">
-            <TopUsersCard users={users} />
+            <TopUsersCard users={users} sortBy={"totalPurchases"} />
+            {/* <TopUsersCard users={users} sortBy={"totalItemsPurchased"} /> */}
+            {/* <TopUsersCard users={users} sortBy={"totalTransactionCount"} /> */}
           </div>
         </div>
       </div>

@@ -36,6 +36,7 @@ import { CellAction } from "../../components/cell-action";
 import { SellerColumn } from "../../components/columns";
 import RevenueByMonthChart from "./components/revenue-by-month-chart";
 import { FaStripe } from "react-icons/fa6";
+import { TbTag } from "react-icons/tb";
 
 const SellerDetailsPage = async ({
   params,
@@ -232,7 +233,7 @@ const SellerDetailsPage = async ({
               <CardTitle className="text-sm font-medium">
                 Products Sold
               </CardTitle>
-              <Package className="h-4 w-4 text-muted-foreground" />
+              <TbTag className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{itemsSold}</div>

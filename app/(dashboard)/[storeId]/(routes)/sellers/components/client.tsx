@@ -91,26 +91,3 @@ export const SellerClient: React.FC<SellerClientProps> = ({ data }) => {
     </Card>
   );
 };
-//   export const SellerClient: React.FC<SellerClientProps> = ({
-//     data
-//   }) => {
-//     const params = useParams();
-//     const router = useRouter();
-//   return (
-//     <>
-//       <div className="flex items-center justify-between">
-//         <Heading
-//           title={`Sellers (${data.length})`}
-//           description="Manage your Sellers"
-//         />
-//         <Button onClick={() => router.push(`/${params.storeId}/sellers/new`)} size="sm">
-//           <PlusCircle className="mr-2 h-4 w-4" />
-//           Create New
-//         </Button>
-//       </div>
-//       <Separator />
-//       <DataTable columns={columns} data={data}  />
-//       <Separator />
-//     </>
-//   );
-// };

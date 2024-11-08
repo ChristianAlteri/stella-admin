@@ -79,6 +79,8 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
     storeId: item.storeId,
     consignmentRate: item.seller.consignmentRate || store?.consignmentRate || 0,
     countryCode: store?.countryCode || "GB",
+    staffId: item.staffId || "",
+    userId: item.userId || "",
   }));
 
   return (

@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TbTag } from "react-icons/tb";
 
 interface Seller {
   id: string;
@@ -48,34 +49,42 @@ export const ProductClient: React.FC<ProductClientProps> = ({
   const [searchTerm, setSearchTerm] = useState("");
 
   const sellerId = searchParams.get("sellerId");
+  const staffId = searchParams.get("staffId");
   const categoryId = searchParams.get("categoryId");
+  const userId = searchParams.get("userId");
 
   useEffect(() => {
     if (sellerId) {
       setValue(sellerId);
+    } else if (staffId) {
+      setValue(staffId);
+    } else if (userId) {
+      setValue(userId);
     } else if (categoryId) {
       setValue(categoryId);
     } else {
       setValue("");
     }
-  }, [sellerId, categoryId]);
+  }, [sellerId, categoryId, staffId, userId]);
 
   const filteredData = data.filter((product) => {
     const sellerMatch = sellerId ? product.sellerId === sellerId : true;
+    const staffMatch = staffId ? product.staffId === staffId : true;
+    const userMatch = userId ? product.userId === userId : true;
     const categoryMatch = categoryId ? product.categoryId === categoryId : true;
     const searchMatch = Object.values(product).some(
       (value) =>
         typeof value === "string" &&
         value.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    return sellerMatch && categoryMatch && searchMatch;
+    return sellerMatch && categoryMatch && staffMatch && userMatch && searchMatch;
   });
 
   const archivedProducts = filteredData.filter((product) => product.isArchived);
   const liveProducts = filteredData.filter((product) => !product.isArchived);
 
   const handleFilterSelect = (
-    type: "sellerId" | "categoryId",
+    type: "sellerId" | "categoryId" | "staffId" | "userId",
     newValue: string
   ) => {
     setValue(newValue);
@@ -94,6 +103,8 @@ export const ProductClient: React.FC<ProductClientProps> = ({
     const newSearchParams = new URLSearchParams(searchParams.toString());
     newSearchParams.delete("sellerId");
     newSearchParams.delete("categoryId");
+    newSearchParams.delete("staffId");
+    newSearchParams.delete("userId");
     router.replace(`${window.location.pathname}?${newSearchParams.toString()}`);
     setValue("");
     setSearchTerm("");
@@ -104,7 +115,7 @@ export const ProductClient: React.FC<ProductClientProps> = ({
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-2xl font-bold flex items-center">
-            <Package className="mr-2 h-6 w-6" />
+            <TbTag className="mr-2 h-6 w-6" />
             Products ({filteredData.length})
           </CardTitle>
           <Button
