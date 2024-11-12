@@ -233,7 +233,7 @@ model Product {
   isArchived   Boolean    @default(false)
   isCharity    Boolean    @default(false)
   isHidden     Boolean    @default(false)
-  isOnline     Boolean    @default(false)
+  // isOnline     Boolean    @default(false)
   retailPrice  Decimal?   @default(0.0)
   likes        Int?       @default(0)
   clicks       Int?       @default(0)

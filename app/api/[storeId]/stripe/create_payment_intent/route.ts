@@ -46,6 +46,9 @@ export async function POST(req: NextRequest) {
         //   destination: '{{CONNECTED_ACCOUNT_ID}}',
         // },
         // application_fee_amount: amount * 0.3,
+        // automatic_tax: {
+        //   enabled: false, // We'll handle GST manually
+        // },
         metadata: {
           ...productIdMetadata, 
           storeId: storeId,

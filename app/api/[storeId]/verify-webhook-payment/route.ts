@@ -62,7 +62,7 @@ export async function POST(request: Request) {
 
     console.log(`[INFO] ${logKey} totalSales`, JSON.stringify(totalSales));
 
-    const STRIPE_FEE_PERCENTAGE = 0.03;
+    const STRIPE_FEE_PERCENTAGE = 0.02;
     const OUR_PLATFORM_FEE = store?.our_platform_fee
       ? store.our_platform_fee / 100
       : 0.05;
@@ -162,11 +162,16 @@ export async function POST(request: Request) {
     console.log(`[INFO] ${logKey} Updated metrics for user:`, metadata.userId);
     console.log(`[INFO] ${logKey} Updated user details: `, updatedUser);
 
-    // Mark products as archived
+    // Mark products as archived, attach a user and staff who sold
     await prismadb.product.updateMany({
       where: { id: { in: productIds } },
-      data: { isArchived: true, staffId: metadata.soldByStaffId },
+      data: {
+        isArchived: true,
+        staffId: metadata.soldByStaffId,
+        ...(metadata.soldByUserId ? { userId: metadata.soldByUserId } : {})
+      },
     });
+
 
     // Update seller sold count
     await prismadb.seller.updateMany({

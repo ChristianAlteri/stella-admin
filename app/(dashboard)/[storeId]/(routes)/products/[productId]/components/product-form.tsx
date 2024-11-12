@@ -764,11 +764,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             </div>
             {isOpen && (
               <div className="mt-4">
-                {renderCheckbox(
+                {/* {renderCheckbox(
                   "isOnline",
                   "Online",
                   "This product will appear on your website."
-                )}
+                )} */}
                 {renderCheckbox(
                   "isArchived",
                   "Archived",

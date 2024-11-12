@@ -112,7 +112,7 @@ export async function PATCH(
       isCharity, 
       isOnSale, 
       isHidden,
-      isOnline,
+      // isOnline,
       measurements,
       likes,
       clicks } = body;
