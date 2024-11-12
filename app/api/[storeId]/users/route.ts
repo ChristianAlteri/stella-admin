@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prismadb from "@/lib/prismadb";
 import { Prisma } from "@prisma/client";
+import { createProfileInKlaviyo } from "@/actions/klaviyo/create-profile-in-klaviyo";
 
 // POST route to create a new user
 export async function POST(
@@ -17,19 +18,9 @@ export async function POST(
       postalCode,
       phoneNumber,
       name,
-      // hashedPassword,
-      
     } = body;
 
-    // // Basic validation
-    // if (!email) {
-    //   return new NextResponse("Email and password are required", {
-    //     status: 400,
-    //   });
-    // }
-
     const hashedPassword = await bcrypt.hash(email, 12);
-    // const hashedPassword = email;
 
     // Create the new user
     const user = await prismadb.user.create({
@@ -42,8 +33,15 @@ export async function POST(
         storeId: params.storeId,
       },
     });
+    const promoCode = user.name?.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    const userKlaviyoProfile = await createProfileInKlaviyo(
+      user.name || '',
+      user.email,
+      promoCode || ''
+    );
 
-    console.log("API_USER_POST", user);
+    console.log("API_USER_POST user", user);
+    console.log("API_USER_POST userKlaviyoProfile", userKlaviyoProfile);
     return NextResponse.json(user);
   } catch (error) {
     console.error("[USER_POST] Internal error:", error);

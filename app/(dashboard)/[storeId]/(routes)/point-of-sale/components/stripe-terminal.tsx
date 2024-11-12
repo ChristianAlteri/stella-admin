@@ -42,6 +42,7 @@ import Image from "next/image";
 import { currencyConvertor } from "@/lib/utils";
 import PrintableReceipt from "./printable-receipt";
 import { createRoot } from "react-dom/client";
+import CreateUserDialog from "./create-user-dialog";
 
 // Custom Toast Error
 const toastError = (message: string) => {
@@ -846,7 +847,7 @@ export default function StripeTerminalComponent({
                               ))}
                             </SelectContent>
                           </Select>
-                          <Button
+                          {/* <Button
                             type="button"
                             variant="outline"
                             size="icon"
@@ -856,7 +857,8 @@ export default function StripeTerminalComponent({
                             className="flex-shrink-0"
                           >
                             <Plus className="h-4 w-4" />
-                          </Button>
+                          </Button> */}
+                          <CreateUserDialog />
                         </div>
                         <Select
                           onValueChange={setSelectedReader}
@@ -1166,7 +1168,7 @@ export default function StripeTerminalComponent({
                                         {amount}
                                       </span>
                                     </div>
-                                    <div className="flex justify-between">
+                                    {/* <div className="flex justify-between">
                                       <span className="text-lg font-bold">
                                         Tax
                                       </span>
@@ -1174,7 +1176,7 @@ export default function StripeTerminalComponent({
                                         {currencySymbol}
                                         {taxAmount}
                                       </span>
-                                    </div>
+                                    </div> */}
                                     <Separator />
                                     <div className="flex justify-between">
                                       <span className="text-lg font-bold">

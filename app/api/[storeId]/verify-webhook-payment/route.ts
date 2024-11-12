@@ -8,6 +8,7 @@ interface Metadata {
   urlFrom: string;
   soldByStaffId: string;
   userId: string;
+  userEmail: string
   [key: string]: string;
 }
 
@@ -79,10 +80,11 @@ export async function POST(request: Request) {
     const newOrder = await prismadb.order.create({
       data: {
         store: { connect: { id: metadata.storeId } },
-        storeId: metadata.storeId,
+        // storeId: metadata.storeId,
         isPaid: true,
         totalAmount: new Prisma.Decimal(totalSalesAfterFees),
-        soldByStaff: { connect: { id: metadata.soldByStaffId || `${store?.id}` } }
+        soldByStaff: { connect: { id: metadata.soldByStaffId || `${store?.id}` } },
+        userId: metadata.userId
       },
     });
 
@@ -357,212 +359,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
-// import { NextResponse } from "next/server";
-// import prismadb from "@/lib/prismadb";
-// import { Prisma, Product } from "@prisma/client";
-// import { stripe } from "@/lib/stripe";
-
-// interface Metadata {
-//   storeId: string;
-//   urlFrom: string;
-//   [key: string]: string;
-// }
-
-// export async function POST(request: Request) {
-//   const body = await request.json();
-//   const { metadata } = body; // Array of product objects sent from the frontend to our webhook who sends it to this endpoint
-
-//   if (!metadata.storeId || typeof metadata.storeId !== "string") {
-//     return NextResponse.json(
-//       { success: false, message: "Invalid store ID" },
-//       { status: 400 }
-//     );
-//   }
-
-//   if (!metadata || Object.keys(metadata).length === 0) {
-//     return NextResponse.json(
-//       { success: false, message: "No metadata provided" },
-//       { status: 400 }
-//     );
-//   }
-
-//   try {
-//     const store = await prismadb.store.findFirst({
-//       where: { id: metadata.storeId },
-//       include: { address: true },
-//     });
-//     // Now you have the stripe_unique_id of the store
-//     // Split the funds into
-//     const productIds = Object.keys(metadata)
-//       .filter((key) => key.startsWith("productId_"))
-//       .map((key) => metadata[key]);
-
-//     const products = await prismadb.product.findMany({
-//       where: { id: { in: productIds } },
-//       include: { seller: true },
-//     });
-//     console.log("[Products] ", products);
-
-//     // Create a new Order
-//     const newOrder = await prismadb.order.create({
-//       data: {
-//         storeId: metadata.storeId,
-//         isPaid: true,
-//       },
-//     });
-
-//     // Create Order Items (split products into order items)
-//     const orderItems = await prismadb.orderItem.createMany({
-//       data: products.map((product: any) => ({
-//         orderId: newOrder.id,
-//         productId: product.id,
-//         sellerId: product.seller.id || "",
-//         productAmount: new Prisma.Decimal(product.ourPrice),
-//       })),
-//     });
-//     console.log("orderItems", orderItems);
-//     console.log("newOrder", newOrder);
-
-//     const sellerIds = products.map((product: any) => product.seller.id);
-
-//     // Mark products as archived
-//     await prismadb.product.updateMany({
-//       where: { id: { in: productIds } },
-//       data: { isArchived: true },
-//     });
-
-//     // Update seller sold count
-//     await prismadb.seller.updateMany({
-//       where: { id: { in: sellerIds } },
-//       data: { soldCount: { increment: 1 } },
-//     });
-
-//     // Calculate the total amount of the order (all products combined)
-//     const totalSales = products.reduce(
-//       (acc, product) => acc + product.ourPrice.toNumber(),
-//       0
-//     );
-
-//     const STRIPE_FEE_PERCENTAGE = 0.03;
-
-//     // PAYOUT SELLERS
-//     // Group the order items by seller (stripe_connect_unique_id)
-//     const sellerPayouts = products.reduce<{ [key: string]: number }>(
-//       (acc, product) => {
-//         if (!acc[product.seller.stripe_connect_unique_id!]) {
-//           acc[product.seller.stripe_connect_unique_id!] = 0;
-//         }
-
-//         // Calculate payout for each seller after Stripe fee and platform fee deductions
-//         const productTotal = product.ourPrice.toNumber();
-
-//         // Seller gets their share based on consignment rate
-//         const sellerShare =
-//           productTotal * ((store?.consignmentRate ?? 50) / 100);
-
-//         // Deduct Stripe fee from the seller's share
-//         const payoutAfterFees = sellerShare * (1 - STRIPE_FEE_PERCENTAGE);
-
-//         acc[product.seller.stripe_connect_unique_id!] += payoutAfterFees;
-//         return acc;
-//       },
-//       {}
-//     );
-
-//     console.log("sellerPayouts after fee deductions: ", sellerPayouts);
-
-//     // Now proceed with the Stripe transfers for each seller
-//     for (const [stripe_connect_unique_id, adjustedAmount] of Object.entries(
-//       sellerPayouts
-//     )) {
-//       if (!stripe_connect_unique_id || stripe_connect_unique_id === "") {
-//         console.error(`Invalid Stripe Connect ID for seller. Skipping payout.`);
-//         continue; // Skip this payout and move to the next
-//       }
-
-//       try {
-//         // Use the adjustedAmount after fees have been deducted
-//         const stripeTransfer = await stripe.transfers.create({
-//           amount: Math.round(adjustedAmount * 100), // Stripe requires amounts in pence (smallest currency unit)
-//           currency: store?.currency?.toString() || "GBP",
-//           destination: stripe_connect_unique_id,
-//           transfer_group: `order_${newOrder.id}`,
-//         });
-//         console.log("stripeTransfer: ", stripeTransfer);
-
-//         const sellerWhoSoldId = products.find(
-//           (product) =>
-//             product.seller.stripe_connect_unique_id === stripe_connect_unique_id
-//         )?.seller.id;
-
-//         if (sellerWhoSoldId) {
-//           const payout = await prismadb.payout.create({
-//             data: {
-//               sellerId: sellerWhoSoldId,
-//               storeId: metadata.storeId,
-//               amount: new Prisma.Decimal(adjustedAmount), // Amount after fees
-//               transferGroupId: `order_${newOrder.id}`,
-//               stripeTransferId: stripeTransfer.id,
-//             },
-//           });
-//           console.log("payout: ", payout);
-//         } else {
-//           console.error(
-//             `Seller with Stripe Connect ID ${stripe_connect_unique_id} not found.`
-//           );
-//         }
-
-//         // PAYOUT STORE
-//         // Make sure you take the 3 percent of this to cover the stripe fee
-//         const stripeTransferForStore = await stripe.transfers.create({
-//           amount: Math.round(adjustedAmount * 100), // Stripe requires amounts in pence (smallest currency unit)
-//           currency: store?.currency?.toString() || "GBP",
-//           destination: store?.stripe_connect_unique_id || "",
-//           transfer_group: `order_${newOrder.id}`,
-//         });
-
-//         const storePayout = await prismadb.payout.create({
-//           data: {
-//             sellerId: store?.id || "",
-//             storeId: store?.id || "",
-//             amount: new Prisma.Decimal(adjustedAmount), // This needs to be the rest of the sale after the fees have been deducted
-//             transferGroupId: `order_${newOrder.id}`,
-//             stripeTransferId: stripeTransfer.id,
-//           },
-//         });
-//         console.log("Store payout: ", storePayout);
-//         console.log("stripeTransferForStore: ", stripeTransferForStore);
-//       } catch (error) {
-//         console.error(
-//           `Error creating Stripe transfer for seller ${stripe_connect_unique_id}:`,
-//           error
-//         );
-//       }
-//     }
-//     // console.log("[VERIFY_WEBHOOK_PAYMENT] ", store);
-//     return NextResponse.json({ status: 200 });
-//   } catch (error) {
-//     console.error("Error verifying terminal payment:", error);
-
-//     // Check for Stripe balance_insufficient error
-//     if (
-//       error instanceof stripe.errors.StripeInvalidRequestError &&
-//       error.code === "balance_insufficient"
-//     ) {
-//       return NextResponse.json(
-//         {
-//           success: false,
-//           message: "Insufficient funds in Stripe account or wrong currency",
-//           errorCode: error.code,
-//         },
-//         { status: 400 }
-//       );
-//     }
-
-//     return NextResponse.json(
-//       { success: false, message: "Internal server error" },
-//       { status: 500 }
-//     );
-//   }
-// }
