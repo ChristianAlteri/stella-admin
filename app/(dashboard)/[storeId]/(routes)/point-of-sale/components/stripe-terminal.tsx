@@ -309,21 +309,22 @@ export default function StripeTerminalComponent({
     if (!selectedReader || !amount || !storeId) {
       return;
     }
-    // const amountInCents = Math.round(parseFloat(amount) * 100);
-    const totalAmountInCents = Math.round(parseFloat(totalAmount) * 100);
+    const amountInCents = Math.round(parseFloat(amount) * 100);
+    // const totalAmountInCents = Math.round(parseFloat(totalAmount) * 100);
     try {
       console.log("selectedUserId: ", selectedUserId);
       const { data, status } = await axios.post(
         `/api/${storeId}/stripe/create_payment_intent`,
         {
           // Send metadata to the back end so we can process the payments and payouts after a terminal triggers a webhook
-          amount: totalAmountInCents,
+          amount: amountInCents,
           readerId: selectedReader,
           storeId: storeId,
           productIds: selectedProducts.map((product) => product.id),
           urlFrom: urlFrom,
           soldByStaffId: selectedStaffId || `${storeId}`,
           userId: `${selectedUserId}` || "",
+          userEmail: users.find((user) => user.id === selectedUserId)?.email || "",
         }
       );
       setPaymentIntentId(data?.paymentIntent?.id);
@@ -1285,19 +1286,19 @@ export default function StripeTerminalComponent({
                               {amount}
                             </span>
                           </div>
-                          <div className="flex justify-between">
+                          {/* <div className="flex justify-between">
                             <span className="text-lg font-bold">Tax</span>
                             <span className="text-lg font-bold">
                               {currencySymbol}
                               {taxAmount}
                             </span>
-                          </div>
+                          </div> */}
                           <Separator />
                           <div className="flex justify-between">
                             <span className="text-lg font-bold">Total</span>
                             <span className="text-lg font-bold">
                               {currencySymbol}
-                              {totalAmount}
+                              {amount}
                             </span>
                           </div>
                         </div>

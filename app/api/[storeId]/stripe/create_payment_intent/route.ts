@@ -6,7 +6,7 @@ import Stripe from "stripe";  // Import Stripe types
 export async function POST(req: NextRequest) {
   if (req.method === "POST") {
     try {
-      const { amount, readerId, storeId, productIds, urlFrom, soldByStaffId, userId } = await req.json();
+      const { amount, readerId, storeId, productIds, urlFrom, soldByStaffId, userId, userEmail } = await req.json();
 
       if (!amount || !readerId || !storeId) {
         return NextResponse.json(
@@ -14,6 +14,7 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
       }
+      console.log("[API_POST_PAYMENT_INTENT] userEmail", userEmail);
 
       // Fetch the store details to get the currency
       const store = await prismadb.store.findFirst({
@@ -49,12 +50,14 @@ export async function POST(req: NextRequest) {
         // automatic_tax: {
         //   enabled: false, // We'll handle GST manually
         // },
+        receipt_email: userEmail,
         metadata: {
           ...productIdMetadata, 
           storeId: storeId,
           urlFrom: urlFrom,
           soldByStaffId: soldByStaffId,
-          userId: userId
+          userId: userId,
+          userEmail: userEmail
         }
       });
 
@@ -64,7 +67,7 @@ export async function POST(req: NextRequest) {
         { payment_intent: paymentIntent.id }
       );
 
-      console.log("[PAYMENT INTENT]", {
+      console.log("[API_PAYMENT_INTENT_POST]", {
         reader: reader,
         paymentIntent: paymentIntent,
       });

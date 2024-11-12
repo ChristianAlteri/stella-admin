@@ -38,6 +38,7 @@ export async function createProfileInKlaviyo(
 
   try {
     const response = await axios(options);
+    console.log("[API_KLAVIYO_USER_POST] User posted to Klaviyo list", response.data);
     return response.data;
   } catch (error) {
     console.error("Error posting user to Klaviyo list", error);
