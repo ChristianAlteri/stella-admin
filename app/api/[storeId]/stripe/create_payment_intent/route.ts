@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
         // automatic_tax: {
         //   enabled: false, // We'll handle GST manually
         // },
-        receipt_email: userEmail,
+        receipt_email: userEmail || undefined,
         metadata: {
           ...productIdMetadata, 
           storeId: storeId,

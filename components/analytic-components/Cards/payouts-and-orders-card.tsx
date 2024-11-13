@@ -129,7 +129,7 @@ export default function PayoutsAndOrdersCard({
                     >
                       <td className="px-4 py-2">{payout.transferGroupId}</td>
                       <td className="px-4 py-2">
-                      {currencySymbol}{payout.amount?.toString()}
+                      {currencySymbol}{payout.amount?.toFixed(2)}
                       </td>
                       <td
                         className="px-4 py-2 hover:underline hover:cursor-pointer"
@@ -162,7 +162,7 @@ export default function PayoutsAndOrdersCard({
                     >
                       <td className="px-4 py-2">{order.id}</td>
                       <td className="px-4 py-2">
-                        {currencySymbol}{order.totalAmount.toString()}
+                        {currencySymbol}{order.totalAmount.toFixed(2)}
                       </td>
                       <td className="px-4 py-2">
                         {order.orderItems.length} {order.orderItems.length > 1 ? "items" : "item"}

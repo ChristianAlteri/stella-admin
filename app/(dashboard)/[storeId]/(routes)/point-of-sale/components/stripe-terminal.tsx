@@ -1184,7 +1184,7 @@ export default function StripeTerminalComponent({
                                       </span>
                                       <span className="text-lg font-bold">
                                         {currencySymbol}
-                                        {totalAmount}
+                                        {amount}
                                       </span>
                                     </div>
                                   </div>
