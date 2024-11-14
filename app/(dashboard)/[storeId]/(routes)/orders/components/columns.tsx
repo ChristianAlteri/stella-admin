@@ -19,6 +19,7 @@ export type OrderColumn = {
   productImageUrls: string[];
   sellers: string[];
   sellerIds: string[];
+  countryCode: string;
 };
 
 export const columns: ColumnDef<OrderColumn>[] = [

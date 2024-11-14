@@ -76,7 +76,7 @@ export default function SellerActions({ data }: { data: SellerColumn }) {
 
   return (
     <>
-      <div className="flex justify-end space-x-2 mb-4 text-muted-foreground">
+      <div className="flex justify-end space-x-2 text-muted-foreground">
         <div className="flex flex-data gap-2">
           <Button variant="outline" size="icon" onClick={handleCardClick}>
             <IoAnalyticsSharp className="w-4 h-4" />

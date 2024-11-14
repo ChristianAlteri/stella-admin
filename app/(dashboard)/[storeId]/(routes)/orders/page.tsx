@@ -2,15 +2,11 @@ import { format } from "date-fns";
 
 import prismadb from "@/lib/prismadb";
 
-import { OrderColumn } from "./components/columns"
+import { OrderColumn } from "./components/columns";
 import { OrderClient } from "./components/client";
 import { formatter } from "@/lib/utils";
 
-const OrdersPage = async ({
-  params
-}: {
-  params: { storeId: string }
-}) => {
+const OrdersPage = async ({ params }: { params: { storeId: string } }) => {
   const orders = await prismadb.order.findMany({
     where: {
       storeId: params.storeId,
@@ -18,40 +14,53 @@ const OrdersPage = async ({
         some: {
           sellerId: { not: "" },
           // stripe_connect_unique_id: { not: "" }
-        }
-      }
+        },
+      },
     },
-    include:{
+    include: {
       orderItems: {
         include: {
           product: {
             include: {
-              images: true 
-            }
+              images: true,
+            },
           },
           seller: true,
           soldByStaff: true,
-        }
-      }
+        },
+      },
     },
     orderBy: {
-      createdAt: 'asc'
-    }
+      createdAt: "asc",
+    },
+  });
+
+  const store = await prismadb.store.findUnique({
+    where: {
+      id: params.storeId,
+    },
   });
 
   console.log("ORDERSSSS", orders[0]);
 
-
-
   const formattedOrders: OrderColumn[] = orders.map((item) => {
     const uniqueSellers = Array.from(
-      new Set(item.orderItems.map((orderItem) => orderItem.seller?.storeName || 'No Seller'))
+      new Set(
+        item.orderItems.map(
+          (orderItem) => orderItem.seller?.storeName || "No Seller"
+        )
+      )
     );
     const uniqueSellerIds = Array.from(
       new Set(item.orderItems.map((orderItem) => orderItem.seller?.id))
     );
     const uniqueStripeConnectIds = Array.from(
-      new Set(item.orderItems.map((orderItem) => orderItem.seller.stripe_connect_unique_id || 'No Stripe ID'))
+      new Set(
+        item.orderItems.map(
+          (orderItem) =>
+            orderItem.seller.stripe_connect_unique_id || "No Stripe ID"
+        )
+      )
     );
     return {
       id: item.id,
@@ -60,27 +69,37 @@ const OrdersPage = async ({
       address: item.address,
       isPaid: item.isPaid,
       hasBeenDispatched: item.hasBeenDispatched,
-      products: item.orderItems.map((orderItem) => orderItem.product.name), 
-      productIds: item.orderItems.map((orderItem) => orderItem.product.id), 
+      products: item.orderItems.map((orderItem) => orderItem.product.name),
+      productIds: item.orderItems.map((orderItem) => orderItem.product.id),
       productImageUrls: item.orderItems.map((orderItem) =>
         orderItem.product.images.length > 0
           ? orderItem.product.images[0].url.replace(
               "stella-ecomm-media-bucket.s3.amazonaws.com",
               "d1t84xijak9ta1.cloudfront.net"
             )
-          : 'No Image'
+          : "No Image"
       ),
       sellers: uniqueSellers,
       sellerIds: uniqueSellerIds,
       stripe_connect_unique_id: uniqueStripeConnectIds,
-      totalPrice: formatter.format(item.orderItems.reduce((total, item) => {
-        return total + Number(item.product.ourPrice);
-      }, 0)),
-      totalRrpPrice: formatter.format(item.orderItems.reduce((total, item) => {
-        return total + Number(item.product.retailPrice);
-      }, 0)),
-      // createdAt: format(item.createdAt, 'MMMM do, yyyy'),
+      // totalPrice: formatter.format(item.orderItems.reduce((total, item) => {
+      //   return total + Number(item.product.ourPrice);
+      // }, 0)),
+      // totalRrpPrice: formatter.format(item.orderItems.reduce((total, item) => {
+      //   return total + Number(item.product.retailPrice);
+      // }, 0)),
+      totalPrice: item.orderItems
+        .reduce((total, item) => {
+          return total + Number(item.product.ourPrice);
+        }, 0)
+        .toFixed(2),
+      totalRrpPrice: item.orderItems
+        .reduce((total, item) => {
+          return total + Number(item.product.retailPrice);
+        }, 0)
+        .toFixed(2),
       createdAt: item.createdAt,
+      countryCode: store?.countryCode || "GB",
     };
   });
 

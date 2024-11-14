@@ -701,7 +701,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                       </FormItem>
                     )}
                   />
-                  <FormField
+                  {/* <FormField
                     control={form.control}
                     name="retailPrice"
                     render={({ field }) => (
@@ -723,7 +723,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  /> */}
                   {renderSelector(
                     "colorId",
                     "Color",

@@ -133,7 +133,7 @@ export async function POST(request: Request) {
         orderItems: {
           connect: orderItems.map((id) => ({ id })),
         },
-        customers: { connect: { id: metadata.userId } },
+        ...(metadata.userId && { customers: { connect: { id: metadata.userId } } }),
       },
     });
     console.log(

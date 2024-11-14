@@ -68,7 +68,7 @@ export default function ProductActions({ data }: ProductActionsProps) {
 
   return (
     <>
-      <div className="flex justify-end space-x-2 mb-4">
+      <div className="flex justify-end space-x-2 ">
         <Button
           variant="outline"
           size="icon"

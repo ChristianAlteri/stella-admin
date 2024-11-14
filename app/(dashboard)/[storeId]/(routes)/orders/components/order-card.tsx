@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { OrderColumn } from "./columns";
 import Image from "next/image";
+import { currencyConvertor } from "@/lib/utils";
 
 const ImageModal = ({
   imageUrl,
@@ -61,6 +62,7 @@ export default function OrderCard({ row }: { row: OrderColumn }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImageUrl, setModalImageUrl] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
+  const currencySymbol = currencyConvertor(row.countryCode)
 
   // useEffect(() => {
   //   return setClientCreatedAt(row.createdAt)
@@ -121,7 +123,6 @@ export default function OrderCard({ row }: { row: OrderColumn }) {
         <CardContent className="space-y-6">
           <div className="space-y-1">
             <h3 className="text-lg font-semibold">Customer Information</h3>
-
             <p>{row.phone}</p>
             <p className="text-sm text-muted-foreground">
               {`${parsedAddress.line1}, ${parsedAddress.city}, ${parsedAddress.country}, ${parsedAddress.postal_code}`}
@@ -130,8 +131,7 @@ export default function OrderCard({ row }: { row: OrderColumn }) {
           <Separator />
           <div className="space-y-2">
             <h3 className="text-lg font-semibold">Order Details</h3>
-            <p className="font-bold">Total Price: {row.totalPrice}</p>
-
+            <p className="font-bold">Total Price: {currencySymbol} {row.totalPrice}</p>
             <div className="flex flex-row gap-2">
               Sellers:{" "}
               {row.sellerIds.map((sellerId, index) => (
@@ -154,7 +154,7 @@ export default function OrderCard({ row }: { row: OrderColumn }) {
               {row.stripe_connect_unique_id.map((stripeId, index) => (
                 <span key={index} className="gap-2">
                   {stripeId}
-                </span> // Add key here, you can use index if no other unique identifier
+                </span> 
               ))}
             </p>
           </div>
