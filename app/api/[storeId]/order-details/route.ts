@@ -55,12 +55,24 @@ export async function GET(
       },
     });
 
+    // Replace S3 URLs with CDN URLs in products' images
+    const transformedProducts = products.map((product) => ({
+      ...product,
+      images: product.images.map((image) => ({
+        ...image,
+        url: image.url.replace(
+          "stella-ecomm-media-bucket.s3.amazonaws.com",
+          "d1t84xijak9ta1.cloudfront.net"
+        ),
+      })),
+    }));
+
     // Construct the response
     const responseData = {
       success: true,
       orderId: orderItemsAssociatedWithOrder[0]?.orderId,
       order,
-      products,
+      transformedProducts,
     };
 
     // console.log("responseData", responseData);

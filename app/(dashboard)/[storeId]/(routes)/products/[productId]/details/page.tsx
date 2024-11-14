@@ -78,7 +78,10 @@ export default async function ProductDetailsPage({
     material: product.material?.name,
     likes: product.likes,
     clicks: product.clicks,
-    imageUrl: product.images[0]?.url || "",
+    imageUrl: product.images[0].url.replace(
+      "stella-ecomm-media-bucket.s3.amazonaws.com",
+      "d1t84xijak9ta1.cloudfront.net"
+    ) || "", 
     designerId: product.designerId,
     categoryId: product.categoryId,
     storeId: product.storeId,
@@ -157,16 +160,22 @@ function ProductAnalytics({ product }: { product: any }) {
   );
 }
 
+
 function ProductImage({ product }: { product: any }) {
-  const isVideo = product.images[0]?.url.match(
-    /https:\/\/.*\.(video|mp4|MP4|mov).*/
-  );
+  const imageUrl = product.images[0]?.url
+    ? product.images[0].url.replace(
+        "stella-ecomm-media-bucket.s3.amazonaws.com",
+        "d1t84xijak9ta1.cloudfront.net"
+      )
+    : "/placeholder.png";
+
+  const isVideo = imageUrl.match(/https:\/\/.*\.(video|mp4|MP4|mov).*/);
 
   return (
     <div className="relative h-32 w-32">
       {isVideo ? (
         <video
-          src={product.images[0].url}
+          src={imageUrl}
           className="rounded-md object-cover"
           loop
           muted
@@ -175,7 +184,7 @@ function ProductImage({ product }: { product: any }) {
         />
       ) : (
         <Image
-          src={product.images[0]?.url || "/placeholder.png"}
+          src={imageUrl}
           alt={product.name}
           className="rounded-md object-cover"
           width={128}

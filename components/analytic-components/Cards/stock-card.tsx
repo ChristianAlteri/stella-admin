@@ -116,7 +116,7 @@ export default function StockCard({
                   </div>
                   <div className="text-2xl font-bold">
                     {todaysRevenue > 0 ? (
-                     `${currencySymbol}${todaysRevenue.toLocaleString()}`
+                     `${currencySymbol}${todaysRevenue.toFixed(2)}`
                     ) : (
                       <span className="flex text-xs text-muted-foreground">
                         No sales today
@@ -144,7 +144,7 @@ export default function StockCard({
                   </div>
                   {todaysOrders.length > 0 ? (
                     <div className="text-2xl font-bold">
-                      {currencySymbol}{averageTransactionValue.toLocaleString()}
+                      {currencySymbol}{averageTransactionValue.toFixed(2)}
                     </div>
                   ) : (
                     <div className="flex text-xs text-muted-foreground">
@@ -158,7 +158,7 @@ export default function StockCard({
                   </div>
                   {todaysOrders.length > 0 ? (
                     <div className="text-2xl font-bold">
-                      {currencySymbol}{totalAverageForOneUnitToday.toLocaleString()}
+                      {currencySymbol}{totalAverageForOneUnitToday.toFixed(2)}
                     </div>
                   ) : (
                     <div className="flex text-xs text-muted-foreground">
@@ -198,7 +198,7 @@ export default function StockCard({
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {currencySymbol}{averagePrice.toLocaleString()}
+                {currencySymbol}{averagePrice.toFixed(2)}
               </div>
               <p className="text-xs text-muted-foreground">Per item</p>
             </CardContent>
@@ -212,7 +212,7 @@ export default function StockCard({
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {currencySymbol}{totalStockWorth.toLocaleString()}
+                {currencySymbol}{totalStockWorth.toFixed(2)}
               </div>
               <p className="text-xs text-muted-foreground">Total value</p>
             </CardContent>

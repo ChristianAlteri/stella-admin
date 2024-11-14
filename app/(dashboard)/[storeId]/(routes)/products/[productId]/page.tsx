@@ -16,6 +16,19 @@ const ProductPage = async ({
     }
   });
 
+  // Replace S3 URLs with CDN URLs
+  const productWithCDN = product
+    ? {
+        ...product,
+        images: product.images.map((img) => ({
+          ...img,
+          url: img.url.replace("stella-ecomm-media-bucket.s3.amazonaws.com", "d1t84xijak9ta1.cloudfront.net"),
+        })),
+      }
+    : null;
+
+      console.log("productWithCDN", productWithCDN);
+
   const categories = await prismadb.category.findMany({
     where: {
       storeId: params.storeId,
@@ -89,7 +102,7 @@ const ProductPage = async ({
           conditions={conditions}
           materials={materials}
           sellers={sellers}
-          initialData={product}
+          initialData={productWithCDN}
           subcategories={subcategories}
           genders={genders}
         />

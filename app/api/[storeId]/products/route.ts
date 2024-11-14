@@ -257,8 +257,16 @@ export async function GET(
       orderBy,
     });
 
-    // console.log("API CALL products", products);
-    return NextResponse.json(products);
+    const productsWithCDN = products.map(product => ({
+      ...product,
+      images: product.images.map(image => ({
+        ...image,
+        url: image.url.replace("stella-ecomm-media-bucket.s3.amazonaws.com", "d1t84xijak9ta1.cloudfront.net"),
+      })),
+    }));
+
+    // console.log("API_GET_PRODUCTS products", productsWithCDN[0]);
+    return NextResponse.json(productsWithCDN);
   } catch (error) {
     console.log("[PRODUCTS_GET]", error);
     return new NextResponse("Internal error", { status: 500 });

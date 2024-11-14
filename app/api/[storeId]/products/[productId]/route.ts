@@ -29,8 +29,17 @@ export async function GET(
         subcategory: true,
       }
     });
-    // console.log('[PRODUCT_GET]', product);
-    return NextResponse.json(product);
+    // Replace S3 URLs with CDN URLs
+    const productWithCDN = {
+      ...product,
+      images: product?.images.map((img) => ({
+        ...img,
+        url: img.url.replace("stella-ecomm-media-bucket.s3.amazonaws.com", "d1t84xijak9ta1.cloudfront.net"),
+      })),
+    };
+
+    console.log("API_GET_PRODUCT_BY_ID", productWithCDN);
+    return NextResponse.json(productWithCDN);
   } catch (error) {
     // console.log('[PRODUCT_GET]', error);
     return new NextResponse("Internal error", { status: 500 });

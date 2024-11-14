@@ -214,7 +214,18 @@ export async function GET(
     });
 
     // console.log("PRODUCTS",products);
-    return NextResponse.json(products);
+    // Replace S3 URLs with CDN URLs
+    const productsWithCDN = products.map(product => ({
+      ...product,
+      images: product.images.map(image => ({
+        ...image,
+        url: image.url.replace("stella-ecomm-media-bucket.s3.amazonaws.com", "d1t84xijak9ta1.cloudfront.net"),
+      })),
+    }));
+
+    // console.log("API_MEGA_SEARCH products", productsWithCDN[0]);
+    // return NextResponse.json(products);
+    return NextResponse.json(productsWithCDN);
   } catch (error) {
     console.log("[PRODUCTS_GET]", error);
     return new NextResponse("Internal error", { status: 500 });

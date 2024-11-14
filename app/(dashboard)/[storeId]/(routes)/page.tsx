@@ -241,10 +241,10 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
 
         <Separator />
         <div className="mt-6"></div>
-        <Heading title="Web site stuff" description="if site connected" />
+        {/* <Heading title="Web site stuff" description="if site connected" />
         <div className="flex flex-row w-full gap-4 justify-between">
           <StoreClicksAndLikesChart products={plainProducts} />
-        </div>
+        </div> */}
         <div className="flex flex-row gap-4">
           <div className="flex flex-row w-full gap-4 justify-between">
             <TopUsersCard users={users} sortBy={"totalPurchases"} />

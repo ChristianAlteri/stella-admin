@@ -62,9 +62,12 @@ const OrdersPage = async ({
       hasBeenDispatched: item.hasBeenDispatched,
       products: item.orderItems.map((orderItem) => orderItem.product.name), 
       productIds: item.orderItems.map((orderItem) => orderItem.product.id), 
-      productImageUrls: item.orderItems.map((orderItem) => 
-        orderItem.product.images.length > 0 
-          ? orderItem.product.images[0].url 
+      productImageUrls: item.orderItems.map((orderItem) =>
+        orderItem.product.images.length > 0
+          ? orderItem.product.images[0].url.replace(
+              "stella-ecomm-media-bucket.s3.amazonaws.com",
+              "d1t84xijak9ta1.cloudfront.net"
+            )
           : 'No Image'
       ),
       sellers: uniqueSellers,

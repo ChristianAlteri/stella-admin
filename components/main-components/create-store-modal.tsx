@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,7 +11,13 @@ import { useStoreModal } from "@/hooks/use-store-modal";
 import { Modal } from "@/components/ui/modal";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useParams, useRouter } from "next/navigation";
 
 const formSchema = z.object({
@@ -98,14 +104,18 @@ export default function SimplifiedStoreModal() {
               placeholder="Store Name"
             />
             {form.formState.errors.name && (
-              <p className="text-sm text-red-500">{form.formState.errors.name.message}</p>
+              <p className="text-sm text-red-500">
+                {form.formState.errors.name.message}
+              </p>
             )}
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">Currency</label>
             <Select
               disabled={loading}
-              onValueChange={(value) => form.setValue("currency", value as "AUD" | "GBP")}
+              onValueChange={(value) =>
+                form.setValue("currency", value as "AUD" | "GBP")
+              }
               value={form.watch("currency")}
             >
               <SelectTrigger>
@@ -121,9 +131,15 @@ export default function SimplifiedStoreModal() {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">Country Code</label>
+            <p className="text-xs text-muted-foreground">
+              Consignmate can currently only support stores in the UK and
+              Australia
+            </p>
             <Select
               disabled={loading}
-              onValueChange={(value) => form.setValue("countryCode", value as "AU" | "GB")}
+              onValueChange={(value) =>
+                form.setValue("countryCode", value as "AU" | "GB")
+              }
               value={form.watch("countryCode")}
             >
               <SelectTrigger>
@@ -136,18 +152,30 @@ export default function SimplifiedStoreModal() {
             </Select>
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Consignment Rate (%)</label>
+            <label className="text-sm font-medium">Consignor rate (%)</label>
+            <p className="text-xs text-muted-foreground">
+              Enter the percentage that consignors will earn from each sale.
+            </p>
             <Input
               type="number"
-              {...form.register("consignmentRate", { valueAsNumber: true })}
+              {...form.register("consignmentRate", {
+                valueAsNumber: true,
+                max: {
+                  value: 100,
+                  message: "The rate cannot exceed 100%",
+                },
+                
+              })}
               disabled={loading}
-              placeholder="Consignment Rate"
+              placeholder="Earnings Rate for Consignors"
             />
             {form.formState.errors.consignmentRate && (
-              <p className="text-sm text-red-500">{form.formState.errors.consignmentRate.message}</p>
+              <p className="text-sm text-red-500">
+                {form.formState.errors.consignmentRate.message}
+              </p>
             )}
           </div>
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <label className="text-sm font-medium">Tax Rate (%)</label>
             <Input
               type="number"
@@ -156,9 +184,11 @@ export default function SimplifiedStoreModal() {
               placeholder="Tax Rate"
             />
             {form.formState.errors.taxRate && (
-              <p className="text-sm text-red-500">{form.formState.errors.taxRate.message}</p>
+              <p className="text-sm text-red-500">
+                {form.formState.errors.taxRate.message}
+              </p>
             )}
-          </div>
+          </div> */}
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Address Line 1</label>
@@ -169,7 +199,9 @@ export default function SimplifiedStoreModal() {
           />
         </div>
         <div className="space-y-2">
-          <label className="text-sm font-medium">Address Line 2 (optional)</label>
+          <label className="text-sm font-medium">
+            Address Line 2 (optional)
+          </label>
           <Input
             {...form.register("address.line2")}
             disabled={loading}
@@ -207,12 +239,35 @@ export default function SimplifiedStoreModal() {
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">Country</label>
+            <Select
+              disabled={loading}
+              onValueChange={(value) =>
+                form.setValue(
+                  "address.country",
+                  value as "Australia" | "United Kingdom"
+                )
+              }
+              value={
+                form.watch("address.country") as "Australia" | "United Kingdom"
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a country" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="United Kingdom">United Kingdom</SelectItem>
+                <SelectItem value="Australia">Australia</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          {/* <div className="space-y-2">
+            <label className="text-sm font-medium">Country</label>
             <Input
               {...form.register("address.country")}
               disabled={loading}
               placeholder="Country"
             />
-          </div>
+          </div> */}
         </div>
         <div className="flex justify-end space-x-2 pt-4">
           <Button
@@ -406,11 +461,11 @@ export default function SimplifiedStoreModal() {
 //                       <FormItem>
 //                         <FormLabel>Consignment Rate (%)</FormLabel>
 //                         <FormControl>
-//                           <Input 
-//                             type="number" 
-//                             disabled={loading} 
-//                             placeholder="Consignment Rate" 
-//                             {...field} 
+//                           <Input
+//                             type="number"
+//                             disabled={loading}
+//                             placeholder="Consignment Rate"
+//                             {...field}
 //                             onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
 //                           />
 //                         </FormControl>
@@ -461,7 +516,7 @@ export default function SimplifiedStoreModal() {
 //                       </FormItem>
 //                     )}
 //                   />
-                  
+
 //                   <FormField
 //                     control={form.control}
 //                     name="address.line2"
@@ -532,7 +587,6 @@ export default function SimplifiedStoreModal() {
 //                     Create Store
 //                   </Button>
 
-                
 //                 <Button
 //                   disabled={loading}
 //                   type="button"

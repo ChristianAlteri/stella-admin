@@ -909,16 +909,30 @@ export default function StripeTerminalComponent({
                     {!isPaymentCaptured ? (
                       <>
                         {!paymentIntentId ? (
-                          <Button
-                            onClick={() => {
-                              createPendingPayment();
-                              setIsDialogOpen(true);
-                            }}
-                            disabled={!selectedReader || !amount}
-                            className="w-full"
-                          >
-                            Create Payment (${amount})
-                          </Button>
+                          // <Button
+                          //   onClick={() => {
+                          //     createPendingPayment();
+                          //     setIsDialogOpen(true);
+                          //   }}
+                          //   disabled={!selectedReader || !amount}
+                          //   className="w-full"
+                          // >
+                          //   Create Payment (${amount})
+                          // </Button>
+                            <Button
+                              onClick={() => {
+                                if (!selectedStaffId) {
+                                  toastError("Please select a staff member.");
+                                } else {
+                                  createPendingPayment();
+                                  setIsDialogOpen(true);
+                                }
+                              }}
+                              disabled={!selectedReader || !amount || !selectedStaffId}
+                              className="w-full"
+                            >
+                              Create Payment (${amount})
+                            </Button>
                         ) : (
                           <>
                             <Button

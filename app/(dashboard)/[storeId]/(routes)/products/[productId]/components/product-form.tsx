@@ -305,6 +305,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       ? {
           // edit product
           ...initialData,
+          images: initialData?.images.map((image) => ({
+            ...image,
+            url: image.url.replace(
+              "stella-ecomm-media-bucket.s3.amazonaws.com",
+              "d1t84xijak9ta1.cloudfront.net"
+            ),
+          })),
           ourPrice: parseFloat(String(initialData?.ourPrice)), // TODO: i think entering product amount bug and it being wrong is from here, the parseFloat
           retailPrice: parseFloat(String(initialData?.retailPrice)),
           description: initialData.description ?? undefined,

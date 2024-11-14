@@ -80,10 +80,9 @@ export async function POST(request: Request) {
     const newOrder = await prismadb.order.create({
       data: {
         store: { connect: { id: metadata.storeId } },
-        // storeId: metadata.storeId,
         isPaid: true,
         totalAmount: new Prisma.Decimal(totalSalesAfterFees),
-        soldByStaff: { connect: { id: metadata.soldByStaffId || `${store?.id}` } },
+        soldByStaff: { connect: { id: metadata.soldByStaffId || metadata.storeId } },
         userId: metadata.userId
       },
     });

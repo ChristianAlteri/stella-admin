@@ -72,7 +72,11 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
     gender: item.gender?.name || "",
     subcategory: item.subcategory.name,
     createdAt: format(item.createdAt, "MMMM do, yyyy"),
-    imageUrl: item.images[0].url,
+    // CDN url
+    imageUrl: item.images[0].url.replace(
+      "stella-ecomm-media-bucket.s3.amazonaws.com",
+      "d1t84xijak9ta1.cloudfront.net"
+    ), 
     designerId: item.designerId,
     categoryId: item.categoryId,
     sellerId: item.seller?.id || "",
