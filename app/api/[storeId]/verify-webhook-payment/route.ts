@@ -176,7 +176,7 @@ export async function POST(request: Request) {
       data: {
         isArchived: true,
         staffId: metadata.soldByStaffId || metadata.storeId,
-        ...(metadata.userId ?? { userId: metadata.userId })
+        ...(metadata.userId && { userId: metadata.userId })
       },
     });
 
