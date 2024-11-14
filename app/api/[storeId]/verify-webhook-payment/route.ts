@@ -83,7 +83,7 @@ export async function POST(request: Request) {
         isPaid: true,
         totalAmount: new Prisma.Decimal(totalSalesAfterFees),
         soldByStaff: { connect: { id: metadata.soldByStaffId || metadata.storeId } },
-        userId: metadata.userId
+        ...(metadata.userId && { userId: metadata.userId })
       },
     });
 
@@ -98,7 +98,7 @@ export async function POST(request: Request) {
             orderId: newOrder.id,
             productId: product.id,
             sellerId: product.seller.id || "",
-            soldByStaffId: metadata.soldByStaffId || `${store?.id}`,
+            soldByStaffId: metadata.soldByStaffId || metadata.storeId,
             productAmount: new Prisma.Decimal(product.ourPrice),
           },
         });
@@ -142,37 +142,43 @@ export async function POST(request: Request) {
     );
     console.log(`[INFO] ${logKey} Updated staff member: `, staff);
 
-    console.log("User ID:", metadata.userId);
-
-    const updatedUser = await prismadb.user.update({
-      where: { id: metadata.userId }, // Assuming metadata contains userId
-      data: {
-        purchaseHistory: {
-          connect: products.map((product) => ({ id: product.id })),
-        },
-        orderHistory: {
-          connect: { id: newOrder.id },
-        },
-        totalPurchases: { increment: totalProductAmount },
-        totalItemsPurchased: { increment: products.length },
-        totalTransactionCount: { increment: 1 },
-        interactingStaff: { connect: { id: metadata.soldByStaffId } },
-      },
-    });
-
+    if (!metadata.userId) {
+      console.log(`[INFO] No userId in metadata: ${JSON.stringify(metadata)}`);
+    } else {
+      const userExists = await prismadb.user.findUnique({ where: { id: metadata.userId } });
+      if (userExists) {
+        // Proceed with update only if the user is valid
+        const updatedUser = await prismadb.user.update({
+          where: { id: metadata.userId },
+          data: {
+            purchaseHistory: {
+              connect: products.map((product) => ({ id: product.id })),
+            },
+            orderHistory: {
+              connect: { id: newOrder.id },
+            },
+            totalPurchases: { increment: totalProductAmount },
+            totalItemsPurchased: { increment: products.length },
+            totalTransactionCount: { increment: 1 },
+            interactingStaff: { connect: { id: metadata.soldByStaffId } },
+          },
+        });
+        console.log(`[INFO] ${logKey} Updated user details: `, updatedUser);
+      } else {
+        console.log(`[INFO] ${logKey} No existing user found for userId: ${metadata.userId}`);
+      }
+    }
     console.log(`[INFO] ${logKey} Updated metrics for user:`, metadata.userId);
-    console.log(`[INFO] ${logKey} Updated user details: `, updatedUser);
 
     // Mark products as archived, attach a user and staff who sold
     await prismadb.product.updateMany({
       where: { id: { in: productIds } },
       data: {
         isArchived: true,
-        staffId: metadata.soldByStaffId,
-        ...(metadata.soldByUserId ? { userId: metadata.soldByUserId } : {})
+        staffId: metadata.soldByStaffId || metadata.storeId,
+        ...(metadata.userId ?? { userId: metadata.userId })
       },
     });
-
 
     // Update seller sold count
     await prismadb.seller.updateMany({
