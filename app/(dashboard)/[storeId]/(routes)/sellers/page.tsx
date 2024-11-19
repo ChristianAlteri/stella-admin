@@ -51,7 +51,7 @@ const SellerPage = async ({
     sellerType: item.sellerType || '',
     description: item.description || '',
     storeName: item.storeName || '',
-    stripe_connect_unique_id: item.stripe_connect_unique_id || 'No Stripe ID',
+    stripe_connect_unique_id: item.stripe_connect_unique_id || '',
     consignmentRate: item.consignmentRate || undefined,
     isArchived: item.isArchived
   }));

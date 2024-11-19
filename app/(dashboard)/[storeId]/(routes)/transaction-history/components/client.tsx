@@ -8,9 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { DataTable } from "@/components/ui/data-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Search,
-} from "lucide-react";
+import { Search } from "lucide-react";
 import { columns, TransactionHistoryColumn } from "./columns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TbReceipt, TbTag } from "react-icons/tb";
@@ -31,6 +29,7 @@ type OrderWithItemsAndSeller = Order & {
       color: { name: string };
     };
   })[];
+  soldByStaff: { name: string; id: string } | null;
   Payout: {
     id: string;
     amount: number;
@@ -51,6 +50,8 @@ export const TransactionHistoryClient: React.FC<
   TransactionHistoryClientProps
 > = ({ orders, countryCode }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const transformedOrders = useMemo(() => {
     return orders.map((order) => ({
       order,
@@ -58,24 +59,67 @@ export const TransactionHistoryClient: React.FC<
     }));
   }, [orders, countryCode]);
 
-  const filteredOrders = useMemo(() => {
-    const lowercasedSearchTerm = searchTerm.toLowerCase();
-    return transformedOrders.filter((data) => {
-      const orderIdMatch = data.order.id
-        .toLowerCase()
-        .includes(lowercasedSearchTerm);
-      const sellerNameMatch = data.order.orderItems.some((item) =>
-        item.product.seller.storeName
-          .toLowerCase()
-          .includes(lowercasedSearchTerm)
-      );
-      const productNameMatch = data.order.orderItems.some((item) =>
-        item.product.name.toLowerCase().includes(lowercasedSearchTerm)
-      );
+  // const filteredOrders = useMemo(() => {
+  //   const lowercasedSearchTerm = searchTerm.toLowerCase();
+  //   return transformedOrders.filter((data) => {
+  //     const orderIdMatch = data.order.id
+  //       .toLowerCase()
+  //       .includes(lowercasedSearchTerm);
+  //     const sellerNameMatch = data.order.orderItems.some((item) =>
+  //       item.product.seller.storeName
+  //         .toLowerCase()
+  //         .includes(lowercasedSearchTerm)
+  //     );
+  //     const productNameMatch = data.order.orderItems.some((item) =>
+  //       item.product.name.toLowerCase().includes(lowercasedSearchTerm)
+  //     );
 
-      return orderIdMatch || sellerNameMatch || productNameMatch;
+  //     return orderIdMatch || sellerNameMatch || productNameMatch;
+  //   });
+  // }, [searchTerm, transformedOrders]);
+
+  
+
+  const filteredOrders = useMemo(() => {
+    return transformedOrders.filter((data) => {
+      const lowercasedSearchTerm = searchTerm.toLowerCase();
+      
+      // Strip time from `createdAt` to get only the date
+      const orderDate = new Date(data.order.createdAt);
+      const normalizedOrderDate = new Date(
+        orderDate.getFullYear(),
+        orderDate.getMonth(),
+        orderDate.getDate()
+      );
+  
+      // Normalize startDate and endDate to remove time
+      const startDateObj = startDate
+        ? new Date(new Date(startDate).getFullYear(), new Date(startDate).getMonth(), new Date(startDate).getDate())
+        : null;
+      const endDateObj = endDate
+        ? new Date(new Date(endDate).getFullYear(), new Date(endDate).getMonth(), new Date(endDate).getDate())
+        : null;
+  
+      const matchesSearchTerm =
+        data.order.id.toLowerCase().includes(lowercasedSearchTerm) ||
+        data.order.orderItems.some((item) =>
+          item.product.seller.storeName
+            .toLowerCase()
+            .includes(lowercasedSearchTerm)
+        ) ||
+        data.order.orderItems.some((item) =>
+          item.product.name.toLowerCase().includes(lowercasedSearchTerm)
+        );
+  
+      const matchesDateRange =
+        (!startDateObj || normalizedOrderDate >= startDateObj) &&
+        (!endDateObj || normalizedOrderDate <= endDateObj);
+  
+      return matchesSearchTerm && matchesDateRange;
     });
-  }, [searchTerm, transformedOrders]);
+  }, [searchTerm, startDate, endDate, transformedOrders]);
+  
+  
 
   // Calculate the average payout
   const averagePayout = useMemo(() => {
@@ -129,12 +173,34 @@ export const TransactionHistoryClient: React.FC<
             </div>
             <div className="flex gap-2">
               {/* TODO: Give me some good tools to zero in on an order */}
+              <Input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full sm:w-auto"
+                placeholder="Start Date"
+              />
+              <Input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full sm:w-auto"
+                placeholder="End Date"
+              />
+              <Button
+                onClick={() => {
+                  setStartDate("");
+                  setEndDate("");
+                }}
+              >
+                Clear Dates
+              </Button>
             </div>
           </div>
 
           <div className="flex flex-row w-full gap-2">
             {/* TODO: add these to dashboard not necessary here */}
-          {/* <Card>
+            {/* <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 Average Payout

@@ -20,6 +20,7 @@ type OrderWithItemsAndSeller = Order & {
       color: { name: string };
     };
   })[];
+  soldByStaff: {  name: string; id: string } | null;
   Payout: {
     id: string;
     amount: number;

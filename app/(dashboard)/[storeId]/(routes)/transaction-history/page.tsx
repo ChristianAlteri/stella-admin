@@ -13,6 +13,7 @@ const TransactionHistoryPage = async ({
     },
     include: {
       Payout: true,
+      soldByStaff: true,
       orderHistoryUsers: true,
       orderItems: {
         include: {

@@ -33,7 +33,7 @@ export default function TransactionHistoryComponent({
       <CardContent className="p-0">
         {isMinimized ? (
           <div className="flex flex-row items-center justify-between bg-white rounded-lg shadow-sm hover:shadow-md">
-            <div className="grid grid-cols-8 w-full items-center ml-3">
+            <div className="grid grid-cols-9 w-full items-center ml-3">
               <h3 className="font-semibold text-xs col-span-1 truncate">
                 {currencySymbol}
                 {data.order?.totalAmount?.toFixed(2)}
@@ -48,9 +48,9 @@ export default function TransactionHistoryComponent({
               <p className="font-semibold text-xs col-span-1 text-left truncate flex items-center">
                 {data.order && data.order.orderItems?.length > 0 && (
                   <>
-                    <span>{data.order.orderItems[0].product.name}</span>
+                    <span className="truncate">{data.order.orderItems[0].product.name}</span>
                     {data.order.orderItems.length > 1 && (
-                      <span className="ml-2 text-xs text-muted-foreground">
+                      <span className="ml-2 text-xs text-muted-foreground truncate">
                         + {data.order.orderItems.length - 1}
                       </span>
                     )}
@@ -105,6 +105,14 @@ export default function TransactionHistoryComponent({
                   <p className="text-xs ">No payout details</p>
                 )}
               </div>
+
+              <h3 className="font-semibold text-xs col-span-1 truncate">
+                {data.order?.soldByStaff 
+                  ? typeof data.order.soldByStaff === "string"
+                    ? data.order.soldByStaff
+                    : data.order.soldByStaff.name
+                  : "No staff details"}
+              </h3>
 
               {/* TODO: Attach the actual user object to the order modal */}
               <h3 className="font-semibold text-xs col-span-1 truncate">
@@ -245,16 +253,16 @@ export default function TransactionHistoryComponent({
                   </div>
 
                   <div className="space-y-1">
-                    <h3 className="font-semibold text-sm">Customer</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <h3 className="font-semibold text-xs">Customer</h3>
+                    <p className="text-xs text-muted-foreground">
                       {data.order?.userId
                         ? data.order.userId
-                        : "No customer details"}
+                        : "No Customer Details"}
                     </p>
                   </div>
                   <div className="space-y-1">
-                    <h3 className="font-semibold text-sm">Dispatch Status</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <h3 className="font-semibold text-xs">Dispatch Status</h3>
+                    <p className="text-xs text-muted-foreground">
                       {data.order?.address &&
                       data.order?.hasBeenDispatched === false
                         ? "Not Dispatched"
@@ -264,8 +272,8 @@ export default function TransactionHistoryComponent({
                     </p>
                   </div>
                   <div className="space-y-1">
-                    <h3 className="font-semibold text-sm">Order Date</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <h3 className="font-semibold text-xs">Order Date</h3>
+                    <p className="text-xs text-muted-foreground">
                       {data.order?.createdAt
                         ? new Date(data.order.createdAt).toLocaleString(
                             "en-GB",

@@ -322,22 +322,22 @@ export const SellerForm: React.FC<SellerFormProps> = ({
                   )}
                 />
                 <FormField
-                    control={form.control}
-                    name="phoneNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
-                        <FormControl>
-                          <Input
-                            disabled={loading}
-                            placeholder="Phone Number"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  control={form.control}
+                  name="phoneNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={loading}
+                          placeholder="Phone Number"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 {/* <FormField
                   control={form.control}
@@ -465,30 +465,34 @@ export const SellerForm: React.FC<SellerFormProps> = ({
                       </FormItem>
                     )}
                   />
-                  {/* <FormField
+                  <FormField
                     control={form.control}
                     name="consignmentRate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Consignment Rate (%)</FormLabel>
+                        <FormLabel>Consignor Rate (%)</FormLabel>
+                          <p className="text-xs text-muted-foreground mb-1">
+                            Enter the percentage that consignors will earn from
+                            each sale.
+                          </p>
                         <FormControl>
                           <Input
                             type="number"
                             min={0}
                             max={100}
                             disabled={loading}
-                            placeholder="Consignment rate"
+                            placeholder="Leave blank for default"
                             {...field}
                             onChange={(e) =>
                               field.onChange(e.target.valueAsNumber)
                             }
-                            defaultValue={"Store rate or custom rate"}
+                            defaultValue={"Leave blank for default"}
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
-                  /> */}
+                  />
                   <FormField
                     control={form.control}
                     name="shippingAddress"
@@ -661,20 +665,19 @@ export const SellerForm: React.FC<SellerFormProps> = ({
         </form>
       </Form>
       <div className="mt-4">
-
-          {initialData && (
-            <Button
-              disabled={loading}
-              className="w-full"
-              onClick={() =>
-                router.push(
-                  `/${params.storeId}/stripe-connect?sellerId=${initialData.id}`
-                )
-              }
-            >
-              Edit Stripe Connect
-            </Button>
-          )}
+        {initialData && (
+          <Button
+            disabled={loading}
+            className="w-full"
+            onClick={() =>
+              router.push(
+                `/${params.storeId}/stripe-connect?sellerId=${initialData.id}`
+              )
+            }
+          >
+            Edit Stripe Connect
+          </Button>
+        )}
       </div>
     </Card>
   );
