@@ -15,30 +15,32 @@ import { currencyConvertor } from "@/lib/utils";
 
 export default function RevenueSplits({
   countryCode,
-  revenue,
-  ourRevenue,
+  grossRevenue,
+  netRevenue,
   payoutRevenue,
+  totalFees,
   lastMonthRevenue,
   currentMonthRevenue,
 }: {
   countryCode: string;
-  revenue: number;
-  ourRevenue: number;
+  grossRevenue: number;
+  netRevenue: number;
   payoutRevenue: number;
+  totalFees: number;
   lastMonthRevenue: number;
   currentMonthRevenue: number;
 }) {
-  const currencySymbol = currencyConvertor(countryCode)
+  const currencySymbol = currencyConvertor(countryCode);
   // convert to fixed
-  revenue = Number(revenue.toFixed(2));
-  ourRevenue = Number(ourRevenue.toFixed(2));
+  grossRevenue = Number(grossRevenue.toFixed(2));
+  netRevenue = Number(netRevenue.toFixed(2));
   payoutRevenue = Number(payoutRevenue.toFixed(2));
 
   // calculate growth percentages
   const growthPercentage =
     lastMonthRevenue === 0
       ? 0
-      : ((revenue - lastMonthRevenue) / lastMonthRevenue) * 100;
+      : ((grossRevenue - lastMonthRevenue) / lastMonthRevenue) * 100;
 
   const growthForMonthPeriodPercentage =
     lastMonthRevenue === 0
@@ -48,7 +50,7 @@ export default function RevenueSplits({
   const chartData = [
     {
       sellerPayouts: payoutRevenue,
-      ourRevenue: ourRevenue,
+      netRevenue: netRevenue,
     },
   ];
 
@@ -57,7 +59,7 @@ export default function RevenueSplits({
       label: "Seller Payouts",
       color: "hsl(var(--primary))",
     },
-    ourRevenue: {
+    netRevenue: {
       label: "Our Revenue",
       color: "hsl(var(--accent))",
     },
@@ -66,7 +68,7 @@ export default function RevenueSplits({
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
-      const percentage = ((data.ourRevenue / revenue) * 100).toFixed(2);
+      const percentage = ((data.netRevenue / grossRevenue) * 100).toFixed(2);
       const dif = (100 - Number(percentage)).toFixed(2);
       return (
         <div className="custom-tooltip bg-background p-2 rounded shadow-md border border-border">
@@ -81,7 +83,9 @@ export default function RevenueSplits({
   return (
     <Card className="w-full">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-2xl font-semibold">Revenue</CardTitle>
+        <CardTitle className="text-2xl font-semibold">
+          Revenue Breakdown
+        </CardTitle>
         <BiCoinStack className="h-6 w-6 text-green-500" />
       </CardHeader>
       <div className="ml-6 flex items-center justify-start text-sm">
@@ -124,9 +128,9 @@ export default function RevenueSplits({
                             className="fill-foreground text-2xl font-bold"
                           >
                             {currencySymbol}
-                            {revenue.toLocaleString(undefined, {
-                              minimumFractionDigits: 0,
-                              maximumFractionDigits: 0,
+                            {grossRevenue.toLocaleString(undefined, {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
                             })}
                           </tspan>
                           <tspan
@@ -134,7 +138,7 @@ export default function RevenueSplits({
                             y={(viewBox.cy || 0) + 4}
                             className="fill-muted-foreground"
                           >
-                            Total Revenue
+                            Gross Revenue
                           </tspan>
                         </text>
                       );
@@ -151,8 +155,8 @@ export default function RevenueSplits({
                 className="stroke-transparent stroke-2"
               />
               <RadialBar
-                dataKey="ourRevenue"
-                fill="var(--color-ourRevenue)"
+                dataKey="netRevenue"
+                fill="var(--color-netRevenue)"
                 stackId="a"
                 cornerRadius={5}
                 opacity={0.9}
@@ -162,46 +166,56 @@ export default function RevenueSplits({
             </RadialBarChart>
           </ChartContainer>
         </div>
-        <div className="mt-6 grid grid-cols-2 gap-4">
-          <div className="flex flex-col items-center justify-center rounded-lg bg-muted p-2">
-            <div className="text-md font-medium">Store Revenue</div>
-            <div className="mt-1 text-xl font-semibold">
-              {currencySymbol}
-              {ourRevenue.toLocaleString(undefined, {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0,
-              })}
-            </div>
+        <div>
+          <div className="mt-2 flex items-center text-sm">
+            {growthForMonthPeriodPercentage >= 0 ? (
+              <>
+                <MdTrendingUp className="mr-1 h-4 w-4 text-green-500" />
+                <span className="text-green-500">
+                  {growthForMonthPeriodPercentage.toFixed(2)}% Gross increase
+                </span>
+              </>
+            ) : (
+              <>
+                <MdTrendingDown className="mr-1 h-4 w-4 text-red-500" />
+                <span className="text-red-500">
+                  {growthForMonthPeriodPercentage.toFixed(2)}% decrease
+                </span>
+              </>
+            )}
+            <span className="ml-1 text-muted-foreground">vs last month</span>
           </div>
+        </div>
+        <div className="mt-6 grid grid-cols-2 gap-4">
           <div className="flex flex-col items-center justify-center rounded-lg bg-muted p-2">
             <div className="text-md font-medium">Seller Payouts</div>
             <div className="mt-1 text-xl font-semibold">
-             {currencySymbol}
+              {currencySymbol}
               {payoutRevenue.toLocaleString(undefined, {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0,
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
               })}
             </div>
           </div>
-          <div className="flex flex-col justify-center">
-            <div className="mt-2 flex items-center text-sm">
-              {growthForMonthPeriodPercentage >= 0 ? (
-                <>
-                  <MdTrendingUp className="mr-1 h-4 w-4 text-green-500" />
-                  <span className="text-green-500">
-                    {growthForMonthPeriodPercentage.toFixed(2)}% increase
-                  </span>
-                </>
-              ) : (
-                <>
-                  <MdTrendingDown className="mr-1 h-4 w-4 text-red-500" />
-                  <span className="text-red-500">
-                    {growthForMonthPeriodPercentage.toFixed(2)}% decrease
-                  </span>
-                </>
-              )}
-              <span className="ml-1 text-muted-foreground">vs last month</span>
+          <div className="flex flex-col items-center justify-center rounded-lg bg-muted p-2">
+            <div className="text-md font-medium text-green-500">Net Revenue</div>
+            <div className="mt-1 text-xl font-semibold text-green-500">
+              {currencySymbol}
+              {netRevenue.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             </div>
+            <div className="flex flex-col justify-center"></div>
+          </div>
+          <div className="flex flex-col items-center justify-center rounded-lg bg-muted p-2 w-full col-span-2">
+            <p className="mt-1 text-xs text-muted-foreground">
+              Platform fees: {currencySymbol}
+              {totalFees.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </p>
           </div>
         </div>
       </CardContent>
@@ -226,29 +240,29 @@ export default function RevenueSplits({
 // import { BiCoinStack } from "react-icons/bi";
 
 // export default function RevenueSplits({
-//   revenue,
-//   ourRevenue,
+//   grossRevenue,
+//   netRevenue,
 //   payoutRevenue,
 //   lastMonthRevenue,
 
 //   currentMonthRevenue,
 // }: {
-//   revenue: number;
-//   ourRevenue: number;
+//   grossRevenue: number;
+//   netRevenue: number;
 //   payoutRevenue: number;
 //   lastMonthRevenue: number;
 
 //   currentMonthRevenue: number;
 // }) {
 //   // convert to fixed
-//   revenue.toFixed(2);
-//   ourRevenue.toFixed(2);
+//   grossRevenue.toFixed(2);
+//   netRevenue.toFixed(2);
 //   payoutRevenue.toFixed(2);
 //   // calculate growth percentages
 //   const growthPercentage =
 //     lastMonthRevenue === 0
 //       ? 0
-//       : ((revenue - lastMonthRevenue) / lastMonthRevenue) * 100;
+//       : ((grossRevenue - lastMonthRevenue) / lastMonthRevenue) * 100;
 
 //   const growthForMonthPeriodPercentage =
 //     lastMonthRevenue === 0
@@ -258,7 +272,7 @@ export default function RevenueSplits({
 //   const chartData = [
 //     {
 //       sellerPayouts: payoutRevenue,
-//       ourRevenue: ourRevenue,
+//       netRevenue: netRevenue,
 //     },
 //   ];
 //   const chartConfig = {
@@ -266,7 +280,7 @@ export default function RevenueSplits({
 //       label: "Seller Payouts",
 //       color: "hsl(var(--primary))",
 //     },
-//     ourRevenue: {
+//     netRevenue: {
 //       label: "Our Revenue",
 //       color: "hsl(var(--accent))",
 //     },
@@ -318,7 +332,7 @@ export default function RevenueSplits({
 //                             className="fill-foreground text-2xl font-bold"
 //                           >
 //                             £
-//                             {revenue.toLocaleString(undefined, {
+//                             {grossRevenue.toLocaleString(undefined, {
 //                               minimumFractionDigits: 0,
 //                               maximumFractionDigits: 0,
 //                             })}
@@ -345,8 +359,8 @@ export default function RevenueSplits({
 //                 className="stroke-transparent stroke-2"
 //               />
 //               <RadialBar
-//                 dataKey="ourRevenue"
-//                 fill="var(--color-ourRevenue)"
+//                 dataKey="netRevenue"
+//                 fill="var(--color-netRevenue)"
 //                 stackId="a"
 //                 cornerRadius={5}
 //                 opacity={0.9}
@@ -354,8 +368,8 @@ export default function RevenueSplits({
 //               />
 //               <Tooltip
 //                 formatter={() => {
-//                   const percentage = ((ourRevenue / revenue) * 100).toFixed(2);
-//                   return `${percentage}%`; // Show the percentage for ourRevenue
+//                   const percentage = ((netRevenue / grossRevenue) * 100).toFixed(2);
+//                   return `${percentage}%`; // Show the percentage for netRevenue
 //                 }}
 //               />
 //             </RadialBarChart>
@@ -366,7 +380,7 @@ export default function RevenueSplits({
 //             <div className="text-md font-medium">Store Revenue</div>
 //             <div className="mt-1 text-xl font-semibold">
 //               £
-//               {ourRevenue.toLocaleString(undefined, {
+//               {netRevenue.toLocaleString(undefined, {
 //                 minimumFractionDigits: 0,
 //                 maximumFractionDigits: 0,
 //               })}

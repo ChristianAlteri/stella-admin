@@ -2,13 +2,15 @@ import { NextResponse } from "next/server";
 import prismadb from "@/lib/prismadb";
 import { Prisma, Product } from "@prisma/client";
 import { stripe } from "@/lib/stripe";
+import { findProfileInKlaviyo } from "@/actions/klaviyo/find-profile-in-klaviyo";
+import { postConfirmationOfSaleToSeller } from "@/actions/klaviyo/post-confirmation-of-sale-to-seller";
 
 interface Metadata {
   storeId: string;
   urlFrom: string;
   soldByStaffId: string;
   userId: string;
-  userEmail: string
+  userEmail: string;
   [key: string]: string;
 }
 
@@ -76,37 +78,55 @@ export async function POST(request: Request) {
     console.log(`[INFO] ${logKey} totalFees`, totalFees);
     console.log(`[INFO] ${logKey} totalSalesAfterFees`, totalSalesAfterFees);
 
-    // Create a new Order
-    const newOrder = await prismadb.order.create({
-      data: {
-        store: { connect: { id: metadata.storeId } },
-        isPaid: true,
-        totalAmount: new Prisma.Decimal(totalSalesAfterFees),
-        soldByStaff: { connect: { id: metadata.soldByStaffId || metadata.storeId } },
-        ...(metadata.userId && { userId: metadata.userId })
-      },
-    });
-
+    let newOrder: any = null;
+    try {
+      // Create a new Order
+      newOrder = await prismadb.order.create({
+        data: {
+          store: { connect: { id: metadata.storeId } },
+          isPaid: true,
+          totalAmount: new Prisma.Decimal(totalSales),
+          soldByStaff: {
+            connect: { id: metadata.soldByStaffId || metadata.storeId },
+          },
+          ...(metadata.userId && { userId: metadata.userId }),
+        },
+      });
+    } catch (error) {
+      console.error(`[ERROR] ${logKey} Error creating new order: `, error);
+      return NextResponse.json(
+        { success: false, message: "Error creating new order" },
+        { status: 500 }
+      );
+    }
     console.log(`[INFO] ${logKey} newOrder`, JSON.stringify(newOrder));
 
-    // Create Order Items individually to capture each ID
-    const orderItems = await Promise.all(
-      products.map(async (product) => {
-        const orderItem = await prismadb.orderItem.create({
-          data: {
-            storeId: metadata.storeId,
-            orderId: newOrder.id,
-            productId: product.id,
-            sellerId: product.seller.id || "",
-            soldByStaffId: metadata.soldByStaffId || metadata.storeId,
-            productAmount: new Prisma.Decimal(product.ourPrice),
-          },
-        });
-        return orderItem.id; // Return the ID of each created order item
-      })
-    );
-
-    console.log(`[INFO] ${logKey} orderItems`, orderItems);
+    let orderItems: any = null;
+    try {
+      // Create Order Items individually to capture each ID
+      orderItems = await Promise.all(
+        products.map(async (product) => {
+          const orderItem = await prismadb.orderItem.create({
+            data: {
+              storeId: metadata.storeId,
+              orderId: newOrder.id,
+              productId: product.id,
+              sellerId: product.seller.id || "",
+              soldByStaffId: metadata.soldByStaffId || metadata.storeId,
+              productAmount: new Prisma.Decimal(product.ourPrice),
+            },
+          });
+          return orderItem.id; // Return the ID of each created order item
+        })
+      );
+      console.log(`[INFO] ${logKey} orderItems`, orderItems);
+    } catch (error) {
+      console.error(`[ERROR] ${logKey} Error creating order items: `, error);
+      return NextResponse.json(
+        { success: false, message: "Error creating order items" },
+        { status: 500 }
+      );
+    }
 
     const sellerIds = products.map((product: any) => product.seller.id);
 
@@ -121,31 +141,44 @@ export async function POST(request: Request) {
       `[INFO] ${logKey} totalProductAmount total sales: ` + totalProductAmount
     );
 
-    const staff = await prismadb.staff.update({
-      where: { id: metadata.soldByStaffId },
-      data: {
-        totalSales: { increment: totalProductAmount },
-        totalItemsSold: { increment: products.length },
-        totalTransactionCount: { increment: 1 },
-        orders: {
-          connect: { id: newOrder.id },
+    let staff: any = null;
+    try {
+      staff = await prismadb.staff.update({
+        where: { id: metadata.soldByStaffId },
+        data: {
+          totalSales: { increment: totalProductAmount },
+          totalItemsSold: { increment: products.length },
+          totalTransactionCount: { increment: 1 },
+          orders: {
+            connect: { id: newOrder.id },
+          },
+          orderItems: {
+            connect: orderItems.map((id: any) => ({ id })),
+          },
+          ...(metadata.userId && {
+            customers: { connect: { id: metadata.userId } },
+          }),
         },
-        orderItems: {
-          connect: orderItems.map((id) => ({ id })),
-        },
-        ...(metadata.userId && { customers: { connect: { id: metadata.userId } } }),
-      },
-    });
-    console.log(
-      `[INFO] ${logKey} Updated total sales for staff:`,
-      metadata.soldByStaffId
-    );
-    console.log(`[INFO] ${logKey} Updated staff member: `, staff);
+      });
+      console.log(
+        `[INFO] ${logKey} Updated total sales for staff:`,
+        metadata.soldByStaffId
+      );
+      console.log(`[INFO] ${logKey} Updated staff member: `, staff);
+    } catch (error) {
+      console.error(`[ERROR] ${logKey} Error updating staff: `, error);
+      return NextResponse.json(
+        { success: false, message: "Error updating staff" },
+        { status: 500 }
+      );
+    }
 
     if (!metadata.userId) {
       console.log(`[INFO] No userId in metadata: ${JSON.stringify(metadata)}`);
     } else {
-      const userExists = await prismadb.user.findUnique({ where: { id: metadata.userId } });
+      const userExists = await prismadb.user.findUnique({
+        where: { id: metadata.userId },
+      });
       if (userExists) {
         // Proceed with update only if the user is valid
         const updatedUser = await prismadb.user.update({
@@ -165,7 +198,9 @@ export async function POST(request: Request) {
         });
         console.log(`[INFO] ${logKey} Updated user details: `, updatedUser);
       } else {
-        console.log(`[INFO] ${logKey} No existing user found for userId: ${metadata.userId}`);
+        console.log(
+          `[INFO] ${logKey} No existing user found for userId: ${metadata.userId}`
+        );
       }
     }
     console.log(`[INFO] ${logKey} Updated metrics for user:`, metadata.userId);
@@ -176,7 +211,7 @@ export async function POST(request: Request) {
       data: {
         isArchived: true,
         staffId: metadata.soldByStaffId || metadata.storeId,
-        ...(metadata.userId && { userId: metadata.userId })
+        ...(metadata.userId && { userId: metadata.userId }),
       },
     });
 
@@ -187,7 +222,6 @@ export async function POST(request: Request) {
     });
 
     let storeCut = 0;
-
     // PAYOUT SELLERS
     const sellerPayouts = products.reduce<{ [key: string]: number }>(
       (acc, product) => {
@@ -239,10 +273,6 @@ export async function POST(request: Request) {
         )?.seller.id;
         console.log(`[INFO] ${logKey} sellerWhoSoldId`, sellerWhoSoldId);
         if (sellerWhoSoldId) {
-          console.log(
-            "DEBUG STRIPE AMOUNT PAYING OUT",
-            Math.round(sellerNetPayout * 100)
-          );
           const stripeTransferForSeller = await stripe.transfers.create({
             amount: Math.round(sellerNetPayout * 100), // Stripe requires amounts in pence (smallest currency unit)
             currency: store?.currency?.toString() || "GBP",
@@ -274,9 +304,51 @@ export async function POST(request: Request) {
               transferGroupId: `order_${newOrder.id}`,
               stripeTransferId: stripeTransferForSeller.id,
               orderId: newOrder.id,
+              // TODO: Add the seller.storeName here
             },
           });
           console.log(`[INFO] ${logKey} payout: `, payout);
+
+          // Send event to Klaviyo which sends them email saying they made a sale
+          const sellerEmailData = await prismadb?.seller.findUnique({
+            where: { id: sellerWhoSoldId },
+          });
+          const sellerEmail = sellerEmailData?.email;
+          console.log(`[INFO] ${logKey} sellerEmail: `, sellerEmail);
+          if (sellerEmail) {
+            // Find Klaviyo profile ID and send confirmation
+            const klaviyoProfile = await findProfileInKlaviyo(sellerEmail);
+            if (klaviyoProfile.data && klaviyoProfile.data.length > 0) {
+              const klaviyoProfileId = klaviyoProfile.data[0].id;
+              console.log(
+                `[INFO] ${logKey} klaviyoProfileId for ${sellerEmail}:`,
+                klaviyoProfileId
+              );
+              try {
+                const saleConfirmationEmail = await postConfirmationOfSaleToSeller(
+                  klaviyoProfileId,
+                  sellerEmail,
+                  sellerNetPayout.toString(),
+                  productIds.join(", ")
+                );
+                if (saleConfirmationEmail) {
+                  console.log(
+                    `[INFO] ${logKey} Sale confirmation email successfully sent for ${sellerEmail}. Response:`,
+                    saleConfirmationEmail
+                  );
+                } else {
+                  console.log(
+                    `[WARNING] ${logKey} Sale confirmation email not sent for ${sellerEmail}. Response was null or undefined.`
+                  );
+                }
+              } catch (error) {
+                console.log(
+                  `[ERROR] ${logKey} Failed to send sale confirmation email for ${sellerEmail}:`,
+                  error
+                );
+              }
+            }
+          }
         } else {
           console.error(
             `[ERROR] ${logKey} Seller with Stripe Connect ID ${stripe_connect_unique_id} not found.`

@@ -8,6 +8,7 @@ import {
   TbStar,
   TbTag,
   TbLego,
+  TbReceipt,
 } from "react-icons/tb";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
@@ -30,8 +31,9 @@ export default function Component({ storeId = "" }: { storeId?: string }) {
   }, [pathname, params.storeId]);
 
   const menuItems = [
-    { icon: TbDeviceAnalytics, href: `/${params.storeId}`, label: "Dashboard" },
     { icon: TbCreditCard, href: `/${params.storeId}/point-of-sale`, label: "POS" },
+    { icon: TbDeviceAnalytics, href: `/${params.storeId}`, label: "Dashboard" },
+    { icon: TbReceipt, href: `/${params.storeId}/transaction-history`, label: "Transactions" },
     { icon: TbTag, href: `/${params.storeId}/products`, label: "Products" },
     { icon: Users, href: `/${params.storeId}/sellers`, label: "Sellers" },
   ];

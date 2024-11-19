@@ -116,8 +116,8 @@ export default function StoreRevenueVsOrderVsPayoutAreaChart({
               ? (
                   totalRevenue / totalOrders
                 ).toLocaleString(undefined, {
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
                 })
               : "0.00"}
             )

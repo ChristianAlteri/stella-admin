@@ -43,6 +43,7 @@ export type SellerColumn = {
   sellerType: string;
   storeName: string;
   consignmentRate: number | undefined;
+  stripe_connect_unique_id: string;
 };
 
 export default function SellerCard({ row }: { row: SellerColumn }) {
@@ -56,16 +57,23 @@ export default function SellerCard({ row }: { row: SellerColumn }) {
   return (
     <Card className="w-full hover:shadow-md transition-shadow duration-300">
       {isMinimized ? (
-        <div className="flex flex-row items-center justify-between bg-white rounded-lg shadow-sm hover:shadow-md ml-4">
-          <div className="grid grid-cols-4 w-full items-center">
+        <div className="flex flex-row items-center justify-between bg-white rounded-lg shadow-sm hover:shadow-md ml-2">
+          <div className="grid grid-cols-5 w-full items-center">
             <p className="font-semibold text-sm col-span-1 truncate w-full text-left">
               {row.storeName}
             </p>
             <p className="font-semibold text-sm col-span-1 truncate w-full text-left">
               {row.email || "No Email"}
             </p>
-            <p className="flex justify-between items-center col-span-1 truncate w-full text-left">
+            <p className="flex justify-between items-start col-span-1 truncate w-full text-left">
               <Badge variant="default">{row.sellerType}</Badge>
+            </p>
+            <p className="flex justify-start items-center col-span-1 truncate text-left">
+              {row.stripe_connect_unique_id ? (
+                <Badge className="truncate" variant="default">Connected to stripe</Badge>
+              ) : (
+                <Badge variant="destructive">Not Connected to stripe</Badge>
+              )}
             </p>
             <div className="flex justify-end col-span-1 truncate w-full p-2">
               <SellerActions data={row} />
@@ -87,8 +95,8 @@ export default function SellerCard({ row }: { row: SellerColumn }) {
                 alt={`${row.storeName}`}
               />
               <AvatarFallback>
-                {row.storeName[0]}
-                {row.storeName[1]}
+                {row.storeName[0].toUpperCase()}
+                {row.storeName[1].toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
@@ -133,8 +141,15 @@ export default function SellerCard({ row }: { row: SellerColumn }) {
               </div>
             )}
           </CardContent>
-          <CardFooter className="flex justify-between items-center">
-            <Badge variant="default">{row.sellerType}</Badge>
+          <CardFooter className="flex justify-between items-center w-full gap-2">
+            <Badge className="flex justify-between items-center col-span-1 truncate text-left" variant="default">{row.sellerType}</Badge>
+            <p className="flex justify-between items-center col-span-1 truncate w-full text-left">
+              {row.stripe_connect_unique_id ? (
+                <Badge variant="default">Connected to stripe</Badge>
+              ) : (
+                <Badge variant="destructive">Not Connected to stripe</Badge>
+              )}
+            </p>
           </CardFooter>
         </CardContent>
       )}

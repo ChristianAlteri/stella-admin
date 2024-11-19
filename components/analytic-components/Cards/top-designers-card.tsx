@@ -123,8 +123,8 @@ const TopDesignersCard: React.FC<TopDesignersCardProps> = ({ products, countryCo
                 <Badge variant="secondary" className="ml-auto flex-shrink-0">
                   {sortByValue
                     ? `${currencySymbol}${designer.totalValue.toLocaleString(undefined, {
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
                       })}`
                     : `${designer.count} sold`}
                 </Badge>

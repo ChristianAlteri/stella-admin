@@ -3,6 +3,8 @@ import { auth } from "@clerk/nextjs/server";
 
 import prismadb from "@/lib/prismadb";
 import { Prisma } from "@prisma/client";
+import { createProfileInKlaviyo } from "@/actions/klaviyo/create-profile-in-klaviyo";
+import { findProfileInKlaviyo } from "@/actions/klaviyo/find-profile-in-klaviyo";
 
 export async function POST(
   req: Request,
@@ -31,7 +33,7 @@ export async function POST(
       sellerType,
       storeName,
       description,
-      consignmentRate
+      consignmentRate,
     } = body;
 
     if (!userId) {
@@ -70,13 +72,24 @@ export async function POST(
         bottomSize,
         storeId: params.storeId,
         stripe_connect_unique_id: connectedAccountId,
-        // stripe_connect_unique_id: connectedAccountId || "",
         sellerType,
         storeName,
         description,
-        consignmentRate
+        consignmentRate,
       },
     });
+
+    if (seller.email) {
+      const profileExists = await findProfileInKlaviyo(seller.email);
+      if (!profileExists) {
+        const userKlaviyoProfile = await createProfileInKlaviyo(
+          seller.storeName || "",
+          seller.email || ""
+        );
+        console.log("[CREATE_SELLER_KLAVIYO_PROFILE]", userKlaviyoProfile);
+      }
+    }
+
     console.log("[CREATE_SELLER]", seller);
     return NextResponse.json(seller);
   } catch (error) {

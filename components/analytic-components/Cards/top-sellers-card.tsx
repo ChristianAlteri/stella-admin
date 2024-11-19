@@ -95,14 +95,14 @@ const TopSellersCard: React.FC<TopSellersCardProps> = ({ sellers, countryCode })
                     {seller.storeName || seller.firstName}
                   </p>
                   <p className="text-xs text-muted-foreground truncate">
-                    @{seller.instagramHandle || seller.storeName}
+                    {seller.instagramHandle || seller.storeName}
                   </p>
                 </div>
                 <Badge variant="secondary" className="ml-auto flex-shrink-0">
                   {sortByPayouts
                     ? `${currencySymbol}${calculateTotalPayouts(seller.payouts).toLocaleString(undefined, {
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
                       })}`
                     : `${seller.soldCount} sold`}
                 </Badge>

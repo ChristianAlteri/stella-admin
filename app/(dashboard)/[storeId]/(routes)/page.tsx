@@ -101,12 +101,7 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
   const { storePayoutSum, sellerPayoutSum } = getPayoutSums(
     payouts,
     params.storeId
-  );
-
-  const revenue = storePayoutSum + sellerPayoutSum;
-  const ourRevenue = storePayoutSum;
-  const payoutRevenue = sellerPayoutSum;
-
+  );  
   // Cleaning up the data
   const plainOrders = convertDecimalsToNumbers(orders);
   const plainPayouts = convertDecimalsToNumbers(payouts);
@@ -116,16 +111,21 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
   const plainSellers = convertDecimalsToNumbers(sellers);
   const calculateAveragePrice = (products: { ourPrice: number }[]): number =>
     products.length
-      ? +(
-          products.reduce((acc, { ourPrice }) => acc + ourPrice, 0) /
-          products.length
-        ).toFixed(2)
-      : 0;
-
+  ? +(
+    products.reduce((acc, { ourPrice }) => acc + ourPrice, 0) /
+    products.length
+  ).toFixed(2)
+  : 0;
+  
   const lastMonthOrders = filterLastMonthOrders(plainOrders);
   const currentMonthOrders = filterThisMonthOrders(plainOrders);
   const lastMonthRevenue = totalRevenue(lastMonthOrders);
   const currentMonthRevenue = totalRevenue(currentMonthOrders);
+  
+  const grossRevenue = plainOrders.reduce((acc: any, order: { totalAmount: any; }) => acc + order.totalAmount, 0);
+  const netRevenue = storePayoutSum;
+  const payoutRevenue = sellerPayoutSum;
+  const totalFees = grossRevenue - (storePayoutSum + sellerPayoutSum);
 
   const todaysOrders = plainOrders.filter((order: any) => {
     const orderDate = new Date(order.createdAt);
@@ -134,6 +134,15 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
       orderDate.getDate() === today.getDate() &&
       orderDate.getMonth() === today.getMonth() &&
       orderDate.getFullYear() === today.getFullYear()
+    );
+  });
+  const todaysPayouts = plainPayouts.filter((payout: any) => {
+    const payoutDate = new Date(payout.createdAt);
+    const today = new Date();
+    return (
+      payoutDate.getDate() === today.getDate() &&
+      payoutDate.getMonth() === today.getMonth() &&
+      payoutDate.getFullYear() === today.getFullYear()
     );
   });
 
@@ -171,9 +180,10 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
         <div className="grid gap-4 grid-cols-2">
           <RevenueSplits
             countryCode={store?.countryCode || "GB"}
-            revenue={revenue}
-            ourRevenue={ourRevenue}
+            grossRevenue={grossRevenue}
+            netRevenue={netRevenue}
             payoutRevenue={payoutRevenue}
+            totalFees={totalFees}
             lastMonthRevenue={lastMonthRevenue}
             currentMonthRevenue={currentMonthRevenue}
           />
@@ -185,6 +195,7 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
             averagePrice={averagePrice}
             products={plainProducts}
             todaysOrders={todaysOrders}
+            todaysPayouts={todaysPayouts}
           />
 
           {/* <Card className="overflow-y-auto">
@@ -197,20 +208,20 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
         </div>
 
         <div className="flex flex-row w-full gap-4 justify-between">
-          <PayoutsAndOrdersCard
-            countryCode={store?.countryCode || "GB"}
-            latestPayouts={latestPayouts}
-            latestOrders={latestOrders}
-          />
-        </div>
-
-        <div className="flex flex-row w-full gap-4 justify-between">
           <StoreRevenueVsOrderAreaChart countryCode={store?.countryCode || "GB"} orders={plainOrders} />
           <div className="flex flex-col w-1/3 h-full gap-4 justify-between">
             <TopSellersCard countryCode={store?.countryCode || "GB"} sellers={topSellers} />
             <TopDesignersCard countryCode={store?.countryCode || "GB"} products={plainProducts} />
             <TopCategoriesCard countryCode={store?.countryCode || "GB"} products={plainProducts} />
           </div>
+        </div>
+
+        <div className="flex flex-row w-full gap-4 justify-between">
+          <PayoutsAndOrdersCard
+            countryCode={store?.countryCode || "GB"}
+            latestPayouts={latestPayouts}
+            latestOrders={latestOrders}
+          />
         </div>
 
         <div className="flex flex-row w-full gap-4 justify-between">

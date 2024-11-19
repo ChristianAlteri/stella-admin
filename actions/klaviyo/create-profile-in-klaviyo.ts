@@ -3,7 +3,7 @@ import axios from "axios";
 export async function createProfileInKlaviyo(
   name: string,
   email: string,
-  firstPurchasePromoCode: string
+  firstPurchasePromoCode?: string
 ) {
   const apiKey = process.env.NEXT_PUBLIC_KLAVIYO_API_KEY;
 

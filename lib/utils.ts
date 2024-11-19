@@ -17,8 +17,8 @@ export const formatCurrency = (value: number) => {
   return value.toLocaleString('en-GB', {
     style: 'currency',
     currency: 'GBP',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   })
 }
 
@@ -324,10 +324,9 @@ export const getPayoutSums = (payouts: any[], storeId: string) => {
       sellerPayoutSum = sellerPayoutSum.plus(payoutAmount);
     }
   });
-
   return {
-    storePayoutSum: storePayoutSum.toNumber(),  
-    sellerPayoutSum: sellerPayoutSum.toNumber(),  
+    storePayoutSum: Number(storePayoutSum.toFixed(2)), // Ensure 2 decimal places
+    sellerPayoutSum: Number(sellerPayoutSum.toFixed(2)),
   };
 };
 

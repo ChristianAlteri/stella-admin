@@ -259,8 +259,8 @@ export function StoreRevenueVsOrderAreaChart({
                   ? (filteredRevenue / filteredOrders).toLocaleString(
                       undefined,
                       {
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
                       }
                     )
                   : "0.00"}

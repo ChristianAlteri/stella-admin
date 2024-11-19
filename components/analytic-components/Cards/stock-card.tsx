@@ -9,18 +9,14 @@ import {
   Category,
   OrderItem,
   Order,
+  Payout,
 } from "@prisma/client";
 import { RiErrorWarningLine } from "react-icons/ri";
 import { useParams, useRouter } from "next/navigation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Badge,
-  Package,
-  ShoppingCart,
-  TrendingUp,
-} from "lucide-react";
+import { Badge, Package, ShoppingCart, TrendingUp } from "lucide-react";
 import { currencyConvertor } from "@/lib/utils";
 import { TbTag } from "react-icons/tb";
 
@@ -41,6 +37,7 @@ type StockCardProps = {
   averagePrice: number;
   products: ProductWithRelations[];
   todaysOrders: OrderWithItems[];
+  todaysPayouts: Payout[];
 };
 
 export default function StockCard({
@@ -50,8 +47,9 @@ export default function StockCard({
   averagePrice,
   products,
   todaysOrders,
+  todaysPayouts,
 }: StockCardProps) {
-  const currencySymbol = currencyConvertor(countryCode)
+  const currencySymbol = currencyConvertor(countryCode);
   const router = useRouter();
   const params = useParams();
 
@@ -79,9 +77,27 @@ export default function StockCard({
     return total;
   }, 0);
 
-  const todaysRevenue = todaysOrders.reduce((total, order) => {
+  const todaysGrossRevenue = todaysOrders.reduce((total, order) => {
     return total + (Number(order.totalAmount) || 0);
   }, 0);
+
+  const todaysNetRevenue = todaysPayouts.reduce((total, payout) => {
+    if (payout.sellerId === params.storeId) {
+      return total + (Number(payout.amount) || 0);
+    } else {
+      return total;
+    }
+  }, 0);
+
+  const todaysSellerPayouts = todaysPayouts.reduce((total, payout) => {
+    if (payout.sellerId !== params.storeId) {
+      return total + (Number(payout.amount) || 0);
+    } else {
+      return total;
+    }
+  }, 0);
+
+  console.log("FRONTEND_todaysSellerPayouts", todaysSellerPayouts);
 
   const averageItemsSoldPerOrder = todaysOrders.map((order) => {
     const totalAmount = order.totalAmount;
@@ -96,7 +112,7 @@ export default function StockCard({
     averageItemsSoldPerOrder.reduce((sum, avg) => sum + avg, 0) /
     averageItemsSoldPerOrder.length;
 
-  const averageTransactionValue = todaysRevenue / todaysOrders.length;
+  const averageTransactionValue = todaysGrossRevenue / todaysOrders.length;
 
   return (
     <Card className="h-full flex flex-col">
@@ -112,11 +128,34 @@ export default function StockCard({
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <div>
                   <div className="text-sm font-medium text-muted-foreground">
-                    Revenue
+                    Gross Revenue
                   </div>
                   <div className="text-2xl font-bold">
-                    {todaysRevenue > 0 ? (
-                     `${currencySymbol}${todaysRevenue.toFixed(2)}`
+                    {todaysGrossRevenue > 0 ? (
+                      <>
+                        {`${currencySymbol}${todaysGrossRevenue.toFixed(2)}`}
+                        <div className="flex flex-col justify-start">
+                            <p className="text-xs text-green-500">
+                              Net:{" "}
+                              {`${currencySymbol}${todaysNetRevenue.toFixed(
+                                2
+                              )}`}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Payout:{" "}
+                              {`${currencySymbol}${todaysSellerPayouts.toFixed(
+                                2
+                              )}`}
+                            </p>
+                          <p className="text-super-small text-muted-foreground">
+                            Fees:{" "}
+                            {`${currencySymbol}${(
+                              todaysGrossRevenue -
+                              (todaysNetRevenue + todaysSellerPayouts)
+                            ).toFixed(2)}`}
+                          </p>
+                        </div>
+                      </>
                     ) : (
                       <span className="flex text-xs text-muted-foreground">
                         No sales today
@@ -144,7 +183,8 @@ export default function StockCard({
                   </div>
                   {todaysOrders.length > 0 ? (
                     <div className="text-2xl font-bold">
-                      {currencySymbol}{averageTransactionValue.toFixed(2)}
+                      {currencySymbol}
+                      {averageTransactionValue.toFixed(2)}
                     </div>
                   ) : (
                     <div className="flex text-xs text-muted-foreground">
@@ -158,7 +198,8 @@ export default function StockCard({
                   </div>
                   {todaysOrders.length > 0 ? (
                     <div className="text-2xl font-bold">
-                      {currencySymbol}{totalAverageForOneUnitToday.toFixed(2)}
+                      {currencySymbol}
+                      {totalAverageForOneUnitToday.toFixed(2)}
                     </div>
                   ) : (
                     <div className="flex text-xs text-muted-foreground">
@@ -198,7 +239,8 @@ export default function StockCard({
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {currencySymbol}{averagePrice.toFixed(2)}
+                {currencySymbol}
+                {averagePrice.toFixed(2)}
               </div>
               <p className="text-xs text-muted-foreground">Per item</p>
             </CardContent>
@@ -212,7 +254,8 @@ export default function StockCard({
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {currencySymbol}{totalStockWorth.toFixed(2)}
+                {currencySymbol}
+                {totalStockWorth.toFixed(2)}
               </div>
               <p className="text-xs text-muted-foreground">Total value</p>
             </CardContent>
@@ -273,7 +316,8 @@ export default function StockCard({
                         {product.category?.name ?? "N/A"}
                       </td>
                       <td className="px-4 py-2">
-                      {currencySymbol}{product.ourPrice.toString()}
+                        {currencySymbol}
+                        {product.ourPrice.toString()}
                       </td>
                       {/* <td className="px-4 py-2">
                         {new Date(product.createdAt).toLocaleDateString()}
@@ -359,7 +403,7 @@ export default function StockCard({
 //     return total;
 //   }, 0);
 
-//   const todaysRevenue = todaysOrders.reduce((total, order) => {
+//   const todaysGrossRevenue = todaysOrders.reduce((total, order) => {
 //     return total + (Number(order.totalAmount) || 0);
 //   }, 0);
 
@@ -382,8 +426,8 @@ export default function StockCard({
 //                     Revenue
 //                   </div>
 //                   <div className="text-2xl font-bold">
-//                     {todaysRevenue > 0 ? (
-//                       {currencySymbol}(todaysRevenue)
+//                     {todaysGrossRevenue > 0 ? (
+//                       {currencySymbol}(todaysGrossRevenue)
 //                     ) : (
 //                       <span className="flex text-xs text-muted-foreground">No sales today</span>
 //                     )}

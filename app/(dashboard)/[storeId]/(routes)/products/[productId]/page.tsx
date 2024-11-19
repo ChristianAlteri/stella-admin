@@ -27,8 +27,6 @@ const ProductPage = async ({
       }
     : null;
 
-      console.log("productWithCDN", productWithCDN);
-
   const categories = await prismadb.category.findMany({
     where: {
       storeId: params.storeId,

@@ -909,16 +909,6 @@ export default function StripeTerminalComponent({
                     {!isPaymentCaptured ? (
                       <>
                         {!paymentIntentId ? (
-                          // <Button
-                          //   onClick={() => {
-                          //     createPendingPayment();
-                          //     setIsDialogOpen(true);
-                          //   }}
-                          //   disabled={!selectedReader || !amount}
-                          //   className="w-full"
-                          // >
-                          //   Create Payment (${amount})
-                          // </Button>
                             <Button
                               onClick={() => {
                                 if (!selectedStaffId) {
@@ -931,7 +921,7 @@ export default function StripeTerminalComponent({
                               disabled={!selectedReader || !amount || !selectedStaffId}
                               className="w-full"
                             >
-                              Create Payment (${amount})
+                             {selectedStaffId ? `Create Payment (${currencySymbol}${amount})` : "Select Staff Member"}
                             </Button>
                         ) : (
                           <>
@@ -967,145 +957,6 @@ export default function StripeTerminalComponent({
                     )}
                   </CardFooter>
                 </Card>
-                // <Card className="w-full h-full">
-                //   <CardHeader></CardHeader>
-                //   <CardContent className="space-y-4">
-                //     {!isPaymentCaptured ? (
-                //       <>
-                //         <Select onValueChange={handleStaffSelect} value={selectedStaffId}>
-                //           <SelectTrigger>
-                //             <SelectValue placeholder="Select a staff member" />
-                //           </SelectTrigger>
-                //           <SelectContent>
-                //             {staffMembers.map((staff) => (
-                //               <SelectItem key={staff.id} value={staff.id}>
-                //                 <div className="flex gap-2 flex-row justify-center items-center">
-                //                   {staff.name}
-                //                 </div>
-                //               </SelectItem>
-                //             ))}
-                //           </SelectContent>
-                //         </Select>
-                //         <Select onValueChange={handleUserSelect} value={selectedUserId}>
-                //           <SelectTrigger>
-                //             <SelectValue placeholder="Select a customer account" />
-                //           </SelectTrigger>
-                //           <SelectContent>
-                //             {users.map((user) => (
-                //               <SelectItem key={user.id} value={user.id}>
-                //                 <div className="flex gap-2 flex-row justify-center items-center">
-                //                   {user.email}
-                //                 </div>
-                //               </SelectItem>
-                //             ))}
-                //           </SelectContent>
-                //         </Select>
-
-                //         <Button
-                //             onClick={() => {
-
-                //             }}
-                //             className="w-full"
-                //           >
-                //             Create Customer Account
-                //           </Button>
-
-                //         <Select
-                //           onValueChange={setSelectedReader}
-                //           value={selectedReader || ""}
-                //         >
-                //           <SelectTrigger>
-                //             <SelectValue placeholder="Select a reader" />
-                //           </SelectTrigger>
-                //           <SelectContent>
-                //             {readers.map((reader) => (
-                //               <SelectItem key={reader.id} value={reader.id}>
-                //                 <div className="flex gap-2 flex-row justify-center items-center">
-                //                   {reader.label}
-                //                   <Wifi
-                //                     className={`h-4 w-4 flex justify-center items-center  ${
-                //                       reader.status === "online"
-                //                         ? "text-green-500"
-                //                         : "text-gray-300"
-                //                     }`}
-                //                   />
-                //                 </div>
-                //               </SelectItem>
-                //             ))}
-                //           </SelectContent>
-                //         </Select>
-                //         <Input
-                //           type="text"
-                //           placeholder="Amount"
-                //           value={amount}
-                //           onChange={handleInputChange}
-                //           className="text-2xl font-bold text-center"
-                //         />
-                //         {/* <div className="grid grid-cols-3 gap-2">
-                //           {keypadButtons.map((num, index) => (
-                //             <Button
-                //               key={index}
-                //               variant="outline"
-                //               onClick={() => handleNumberClick(num)}
-                //               className="h-12 text-lg"
-                //             >
-                //               {num === "backspace" ? "Back" : num}
-                //             </Button>
-                //           ))}
-                //         </div> */}
-                //       </>
-                //     ) : (
-                //       <p className="text-xl font-semibold text-center">
-                //         Payment successfully captured!
-                //       </p>
-                //     )}
-                //   </CardContent>
-                //   <CardFooter className="flex flex-col gap-2">
-                //     {!isPaymentCaptured ? (
-                //       <>
-                //         {!paymentIntentId ? (
-                //           <Button
-                //             onClick={() => {
-                //               createPendingPayment();
-                //               setIsDialogOpen(true);
-                //             }}
-                //             disabled={!selectedReader || !amount}
-                //             className="w-full"
-                //           >
-                //             Create Payment ({currencySymbol}
-                //             {totalAmount})
-                //           </Button>
-                //         ) : (
-                //           <>
-                //             <Button
-                //               onClick={cancelPayment}
-                //               disabled={!selectedReader}
-                //               className="w-full"
-                //             >
-                //               Cancel Payment
-                //             </Button>
-                //             <Button
-                //               onClick={() => setIsPaymentCaptured(true)}
-                //               disabled={!selectedReader}
-                //               className="w-full"
-                //             >
-                //               Approve Card Payment
-                //             </Button>
-                //           </>
-                //         )}
-                //       </>
-                //     ) : (
-                //       <>
-                //         <Button onClick={resetComponent} className="w-full">
-                //           New Payment
-                //         </Button>
-                //         <Button onClick={printReceipt} className="w-full">
-                //           Print Receipt
-                //         </Button>
-                //       </>
-                //     )}
-                //   </CardFooter>
-                // </Card>
               )}
             </div>
           </div>
