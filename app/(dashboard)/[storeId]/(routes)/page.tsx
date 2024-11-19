@@ -87,6 +87,9 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
   });
 
   const users = await prismadb.user.findMany({
+    where: {
+      storeId: params.storeId,
+    },
     // include: { orders: true }, // TODO: Make tab and staff and users display when switch
     orderBy: { name: "desc" },
   });
