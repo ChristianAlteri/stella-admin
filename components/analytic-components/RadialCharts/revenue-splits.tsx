@@ -65,20 +65,39 @@ export default function RevenueSplits({
     },
   } satisfies ChartConfig;
 
+  // const CustomTooltip = ({ active, payload }: any) => {
+  //   if (active && payload && payload.length) {
+  //     const data = payload[0].payload;
+  //     const percentage = ((data.netRevenue / grossRevenue) * 100).toFixed(2);
+  //     const dif = (100 - Number(percentage)).toFixed(2);
+  //     return (
+  //       <div className="custom-tooltip bg-background p-2 rounded shadow-md border border-border">
+  //         <p className="label text-sm">{`Net Revenue: ${percentage}%`}</p>
+  //         <p className="label text-sm">{`Seller Payouts: ${dif}%`}</p>
+  //       </div>
+  //     );
+  //   }
+  //   return null;
+  // };
+
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
-      const percentage = ((data.netRevenue / grossRevenue) * 100).toFixed(2);
-      const dif = (100 - Number(percentage)).toFixed(2);
+      const profit = grossRevenue - totalFees;
+  
+      const netRevenuePercentage = ((data.netRevenue / profit) * 100).toFixed(2);
+      const sellerPayoutsPercentage = ((data.sellerPayouts / profit) * 100).toFixed(2);
+  
       return (
         <div className="custom-tooltip bg-background p-2 rounded shadow-md border border-border">
-          <p className="label text-sm">{`Our Revenue: ${percentage}%`}</p>
-          <p className="label text-sm">{`Seller Payouts: ${dif}%`}</p>
+          <p className="label text-sm">{`Net Revenue: ${netRevenuePercentage}%`}</p>
+          <p className="label text-sm">{`Seller Payouts: ${sellerPayoutsPercentage}%`}</p>
         </div>
       );
     }
     return null;
   };
+  
 
   return (
     <Card className="w-full">

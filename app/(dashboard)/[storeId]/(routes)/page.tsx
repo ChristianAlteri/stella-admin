@@ -108,8 +108,8 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
   // Cleaning up the data
   const plainOrders = convertDecimalsToNumbers(orders);
   const plainPayouts = convertDecimalsToNumbers(payouts);
-  const latestPayouts = plainPayouts.slice(0, 5);
-  const latestOrders = plainOrders.slice(0, 5);
+  const latestPayouts = plainPayouts.slice(0, 10);
+  const latestOrders = plainOrders.slice(0, 10);
   const plainProducts = convertDecimalsToNumbers(products);
   const plainSellers = convertDecimalsToNumbers(sellers);
   const calculateAveragePrice = (products: { ourPrice: number }[]): number =>
@@ -163,9 +163,9 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
   const averagePrice = calculateAveragePrice(liveStockData);
 
   const topSellers = plainSellers
-    .filter((seller: any) => seller.soldCount)
+    .filter((seller: any) => seller.soldCount && seller.id !== params.storeId) // Filter removes any seller wos sold count = 0 and the store
     .sort((a: any, b: any) => b.soldCount! - a.soldCount!)
-    .slice(0, 5);
+    // .slice(0, 5);
 
   const topSellingColors = await getTopSellingColorCount(params.storeId);
   const topSellingSize = await getTopSellingSizeCount(params.storeId);
@@ -173,12 +173,11 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
   const topSellingSubcategory = await getTopSellingSubcategoryCount(
     params.storeId
   );
-  const topSellingCondition = await getTopSellingGenderCount(params.storeId);
-  const topSellingGender = await getTopSellingConditionCount(params.storeId);
+  const topSellingGender = await getTopSellingGenderCount(params.storeId);
+  const topSellingCondition = await getTopSellingConditionCount(params.storeId);
   return (
     <div className="flex-col bg-secondary md:w-full w-1/2">
       <div className="flex-1 space-y-4 p-3">
-        {/* <Separator /> */}
 
         <div className="grid gap-4 grid-cols-2">
           <RevenueSplits

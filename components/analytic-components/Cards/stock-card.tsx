@@ -97,8 +97,6 @@ export default function StockCard({
     }
   }, 0);
 
-  console.log("FRONTEND_todaysSellerPayouts", todaysSellerPayouts);
-
   const averageItemsSoldPerOrder = todaysOrders.map((order) => {
     const totalAmount = order.totalAmount;
     const itemsCount = order.orderItems.length;
