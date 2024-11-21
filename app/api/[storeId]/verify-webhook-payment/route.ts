@@ -41,7 +41,7 @@ export async function POST(request: Request) {
       where: { id: metadata.storeId },
       include: { address: true },
     });
-    const consignmentRate = store?.consignmentRate ?? 50;
+    let consignmentRate = store?.consignmentRate ?? 50;
 
     // Split the funds into
     const productIds = Object.keys(metadata)
@@ -233,6 +233,10 @@ export async function POST(request: Request) {
         // Use seller's consignment rate if available, otherwise use default consignmentRate
         const consignmentRateToUse =
           product?.seller?.consignmentRate ?? consignmentRate;
+        console.log(
+          `[INFO] ${logKey} consignmentRateToUse:`,
+          consignmentRateToUse
+        );
         const sellerPayout = payoutAfterFees * (consignmentRateToUse / 100);
         // Add the payout to the correct seller's total payout
         if (!acc[product.seller.stripe_connect_unique_id!]) {
@@ -242,10 +246,6 @@ export async function POST(request: Request) {
         const storeAdditionalCut =
           payoutAfterFees * ((100 - consignmentRateToUse) / 100);
         storeCut += storeAdditionalCut;
-        console.log(
-          `[INFO] ${logKey} consignmentRateToUse`,
-          consignmentRateToUse
-        );
         console.log(`[INFO] ${logKey} storeCut`, storeCut);
         console.log(`[INFO] ${logKey} payoutAfterFees`, payoutAfterFees);
 
@@ -273,6 +273,14 @@ export async function POST(request: Request) {
         )?.seller.id;
         console.log(`[INFO] ${logKey} sellerWhoSoldId`, sellerWhoSoldId);
         if (sellerWhoSoldId) {
+          const consignmentRateForMetadata =
+            products.find(
+              (product) =>
+                product.seller.stripe_connect_unique_id ===
+                stripe_connect_unique_id
+            )?.seller.consignmentRate ??
+            store?.consignmentRate ??
+            50;
           const stripeTransferForSeller = await stripe.transfers.create({
             amount: Math.round(sellerNetPayout * 100), // Stripe requires amounts in pence (smallest currency unit)
             currency: store?.currency?.toString() || "GBP",
@@ -287,7 +295,7 @@ export async function POST(request: Request) {
               total_sales: totalSales,
               total_sales_after_fees: totalSalesAfterFees,
               store_cut: storeCut,
-              consignment_rate: consignmentRate,
+              consignment_rate: consignmentRateForMetadata,
               total_fees: totalFees,
               products: productIds.join(","),
             },
@@ -325,12 +333,13 @@ export async function POST(request: Request) {
                 klaviyoProfileId
               );
               try {
-                const saleConfirmationEmail = await postConfirmationOfSaleToSeller(
-                  klaviyoProfileId,
-                  sellerEmail,
-                  sellerNetPayout.toString(),
-                  productIds.join(", ")
-                );
+                const saleConfirmationEmail =
+                  await postConfirmationOfSaleToSeller(
+                    klaviyoProfileId,
+                    sellerEmail,
+                    sellerNetPayout.toString(),
+                    productIds.join(", ")
+                  );
                 if (saleConfirmationEmail) {
                   console.log(
                     `[INFO] ${logKey} Sale confirmation email successfully sent for ${sellerEmail}. Response:`,
@@ -381,7 +390,13 @@ export async function POST(request: Request) {
           total_sales: totalSales,
           total_sales_after_fees: totalSalesAfterFees,
           store_cut: storeCut,
-          consignment_rate: consignmentRate,
+          consignment_rates: JSON.stringify(products.map((product) => ({
+            productId: product.id,
+            productName: product.name,
+            productSeller: product.seller.storeName,
+            consignmentRate:
+              product?.seller?.consignmentRate ?? store?.consignmentRate ?? 50,
+          }))),
           total_fees: totalFees,
           products: productIds.join(","),
         },
