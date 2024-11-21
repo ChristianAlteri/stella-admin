@@ -41,7 +41,7 @@ export async function POST(request: Request) {
       where: { id: metadata.storeId },
       include: { address: true },
     });
-    let consignmentRate = store?.consignmentRate ?? 50;
+    const consignmentRate = store?.consignmentRate ?? 50;
 
     // Split the funds into
     const productIds = Object.keys(metadata)
