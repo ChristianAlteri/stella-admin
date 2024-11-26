@@ -33,7 +33,7 @@ export async function POST(
       isArchived,
       isCharity,
       isHidden,
-      // isOnline,
+      isOnline,
       measurements,
       likes,
       clicks,
@@ -86,7 +86,7 @@ export async function POST(
         isArchived,
         isOnSale,
         isHidden,
-        // isOnline, TODO: get this done
+        isOnline,
         images: {
           createMany: {
             data: [...images.map((image: { url: string }) => image)],
@@ -176,7 +176,7 @@ export async function GET(
       searchParams.get("isFeatured") === "true" ? true : undefined;
     const isOnSale = searchParams.get("isOnSale") === "true" ? true : undefined;
     const isHidden = searchParams.get("isHidden") === "true" ? true : undefined;
-    // const isOnline = searchParams.get("isOnline") === "true" ? true : undefined;
+    const isOnline = searchParams.get("isOnline") === "true" ? true : undefined;
     const isCharity =
       searchParams.get("isCharity") === "true" ? true : undefined;
 
@@ -235,7 +235,7 @@ export async function GET(
         isOnSale,
         isCharity,
         isHidden,
-        // isOnline, TODO: get this done
+        isOnline,
         isArchived: isArchived,
         ourPrice: {
           gte: minPrice,

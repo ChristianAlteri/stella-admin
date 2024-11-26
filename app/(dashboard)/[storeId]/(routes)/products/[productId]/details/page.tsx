@@ -75,6 +75,7 @@ export default async function ProductDetailsPage({
     isOnSale: product.isOnSale,
     isCharity: product.isCharity,
     isHidden: product.isHidden,
+    isOnline: product.isOnline,
     material: product.material?.name,
     likes: product.likes,
     clicks: product.clicks,

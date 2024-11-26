@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { HiStatusOnline } from "react-icons/hi";
 import ProductActions from "./product-cell-action";
 import { ProductColumn } from "./columns";
 import { useRouter } from "next/navigation";
@@ -145,6 +146,12 @@ export default function ProductDetailsComponent({
                         icon={Archive}
                         trueText="Live"
                         falseText="Sold"
+                      />
+                      <ProductBadge
+                        condition={data.isOnline}
+                        icon={HiStatusOnline}
+                        trueText="Online"
+                        falseText="Not Online"
                       />
                       <ProductBadge
                         condition={data.isOnSale}

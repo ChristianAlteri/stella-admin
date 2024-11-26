@@ -76,6 +76,7 @@ const formSchema = z.object({
   isOnSale: z.boolean().default(false).optional(),
   isCharity: z.boolean().default(false).optional(),
   isHidden: z.boolean().default(false).optional(),
+  isOnline: z.boolean().default(false).optional(),
   measurements: z.string().nullable().optional(),
 });
 
@@ -108,7 +109,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   subcategories: initialSubcategories,
   genders: initialGenders,
 }) => {
-  const currencySymbol = currencyConvertor(countryCode)
+  const currencySymbol = currencyConvertor(countryCode);
   const params = useParams();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -295,7 +296,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         fetchDesigners(),
       ]);
     };
-  
+
     fetchAllFieldData();
   }, [params.storeId]);
 
@@ -338,7 +339,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           isOnSale: false,
           isCharity: false,
           isHidden: false,
-          // isOnline: false, TODO: Make this happen
+          isOnline: false,
         },
   });
 
@@ -356,7 +357,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     });
   };
 
-  // const onSubmit = async (data: ProductFormValues) => {
   const onSubmit: SubmitHandler<ProductFormValues> = async (data) => {
     try {
       setLoading(true);
@@ -547,7 +547,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <Card>
             <CardContent className="p-6">
-              <h2 className="text-xl font-semibold mb-4 underline">Required Fields</h2>
+              <h2 className="text-xl font-semibold mb-4 underline">
+                Required Fields
+              </h2>
               <div className="grid grid-cols-2 gap-6 w-full">
                 <FormField
                   control={form.control}
@@ -771,11 +773,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             </div>
             {isOpen && (
               <div className="mt-4">
-                {/* {renderCheckbox(
+                {renderCheckbox(
                   "isOnline",
                   "Online",
                   "This product will appear on your website."
-                )} */}
+                )}
                 {renderCheckbox(
                   "isArchived",
                   "Archived",
@@ -801,7 +803,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   "Hidden",
                   "This product will appear blurred until changed to false, defaults to false."
                 )}
-              
               </div>
             )}
           </Card>

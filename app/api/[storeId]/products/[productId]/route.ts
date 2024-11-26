@@ -121,7 +121,7 @@ export async function PATCH(
       isCharity, 
       isOnSale, 
       isHidden,
-      // isOnline,
+      isOnline,
       measurements,
       likes,
       clicks } = body;
@@ -162,7 +162,7 @@ export async function PATCH(
         isOnSale,
         isCharity,
         isHidden,
-        // isOnline, TODO: get this done
+        isOnline,
         images: {
           deleteMany: {},
         },

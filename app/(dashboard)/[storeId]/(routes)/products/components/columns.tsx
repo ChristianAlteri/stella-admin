@@ -25,6 +25,7 @@ export type ProductColumn = {
   isOnSale: boolean;
   isCharity: boolean;
   isHidden: boolean;
+  isOnline: boolean;
   material: string | null | undefined;
   likes: number | null | undefined;
   clicks: number | null | undefined;
