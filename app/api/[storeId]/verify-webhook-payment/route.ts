@@ -68,7 +68,7 @@ export async function POST(request: Request) {
     const STRIPE_FEE_PERCENTAGE = 0.02;
     const OUR_PLATFORM_FEE = store?.our_platform_fee
       ? store.our_platform_fee / 100
-      : 0.05;
+      : 0.01;
 
     console.log(`[INFO] ${logKey} OUR_PLATFORM_FEE`, OUR_PLATFORM_FEE);
 

@@ -496,21 +496,6 @@ export default function StripeTerminalComponent({
     }
   };
 
-  const keypadButtons = [
-    "7",
-    "8",
-    "9",
-    "4",
-    "5",
-    "6",
-    "1",
-    "2",
-    "3",
-    "0",
-    ".",
-    "backspace",
-  ];
-
   const getSellers = async () => {
     setLoadingSellers(true);
     try {
@@ -669,7 +654,7 @@ export default function StripeTerminalComponent({
                                     <div className="flex flex-row gap-2 justify-between text-center items-center w-full">
                                       <div className="flex flex-row gap-2 text-center items-center w-full">
                                         <h3
-                                          className="font-semibold hover:cursor-pointer hover:underline"
+                                          className="font-semibold hover:cursor-pointer hover:underline text-xs"
                                           onClick={() =>
                                             router.push(
                                               `/${storeId}/products/${result.id}/details`
@@ -678,13 +663,19 @@ export default function StripeTerminalComponent({
                                         >
                                           {result.name}
                                         </h3>
-                                        <p className="text-sm text-gray-500">
+                                        <p className="text-xs text-muted-foreground">
                                           {currencySymbol}
                                           {result.ourPrice.toString()}
                                         </p>
                                       </div>
                                       <div className="flex flex-row gap-2 text-end items-center w-full">
-                                        <p className="text-xs text-gray-500 w-full mr-4">
+                                        <p className="text-xs text-muted-foreground w-full mr-4 hover:cursor-pointer hover:underline"
+                                        onClick={() =>
+                                          router.push(
+                                            `/${storeId}/sellers/${result.id}/details`
+                                          )
+                                        }
+                                        >
                                           {result.seller.storeName ||
                                             result.seller.instagramHandle ||
                                             result.seller.firstName}
@@ -692,6 +683,7 @@ export default function StripeTerminalComponent({
                                       </div>
                                     </div>
                                   </div>
+                                  {result.seller.stripe_connect_unique_id ? (
                                   <Button
                                     onClick={() => handleSelect(result)}
                                     variant={
@@ -708,6 +700,14 @@ export default function StripeTerminalComponent({
                                       ? "Selected"
                                       : "Select for Sale"}
                                   </Button>
+                                  ) : (
+                                    <Button
+                                      disabled
+                                      className="bg-red-500 text-white cursor-not-allowed"
+                                    >
+                                      Seller not connected to Stripe
+                                    </Button>
+                                  )}
                                 </div>
                               ))}
                             </div>

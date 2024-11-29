@@ -21,7 +21,7 @@ model Store {
   countryCode     String @default("GB")
   taxRate         Int    @default(20)
 
-  our_platform_fee Int     @default(5) // just incase we wana offer the servce at a discount rate
+  our_platform_fee Int     @default(1) // just incase we wanna offer the servce at a discount rate
   email            String?
 
   address   StoreAddress? @relation(fields: [addressId], references: [id])
