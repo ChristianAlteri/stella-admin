@@ -316,6 +316,7 @@ export async function POST(request: Request) {
             },
           });
           console.log(`[INFO] ${logKey} payout: `, payout);
+          // TODO: if this is succesfull then update the product to sellerPayedOut=true
 
           // Send event to Klaviyo which sends them email saying they made a sale
           const sellerEmailData = await prismadb?.seller.findUnique({
@@ -416,6 +417,7 @@ export async function POST(request: Request) {
         stripeTransferForStore
       );
       console.log(`[INFO] ${logKey} storePayoutRecord: `, storePayoutRecord);
+      // TODO: if this is succesfull then update the product to sellerPayedOut=true
     } catch (error) {
       console.error(
         `[ERROR] ${logKey} Error creating Stripe transfer for store:`,

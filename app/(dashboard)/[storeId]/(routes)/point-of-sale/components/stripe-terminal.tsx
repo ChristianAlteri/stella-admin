@@ -705,8 +705,8 @@ export default function StripeTerminalComponent({
                                       disabled
                                       className="bg-red-500 text-white cursor-not-allowed"
                                     >
-                                      Seller not connected to Stripe
-                                    </Button>
+                                      Seller not connected to Stripe 
+                                    </Button> // TODO: On click set item to stores stripe id that way we can still sell the item but will have to distribute the funds manually
                                   )}
                                 </div>
                               ))}

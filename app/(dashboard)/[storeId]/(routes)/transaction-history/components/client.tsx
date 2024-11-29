@@ -78,7 +78,8 @@ export const TransactionHistoryClient: React.FC<
   //   });
   // }, [searchTerm, transformedOrders]);
 
-  
+  // TODO: Add the filter here to sort cash payments marked as unpaid vs paid
+  // TODO: Add the filter here to sort products purchased online or in store and if online, if it was dispatched or not
 
   const filteredOrders = useMemo(() => {
     return transformedOrders.filter((data) => {
