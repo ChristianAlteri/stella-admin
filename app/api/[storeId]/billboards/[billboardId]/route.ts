@@ -9,17 +9,13 @@ export async function GET(
 ) {
   try {
     const { searchParams } = new URL(req.url);
-    const label = searchParams.get("label");
-    const storeId = searchParams.get("storeId");
-
-    if (!label || !storeId) {
-      return new NextResponse("Both label and storeId are required", { status: 400 });
-    }
+    // const label = searchParams.get("label");
+    // const storeId = searchParams.get("storeId");
 
     const billboard = await prismadb.billboard.findFirst({
       where: {
-        label: label,
-        storeId: storeId,
+        label: params.label,
+        storeId: params.storeId,
       },
     });
 
