@@ -9,13 +9,13 @@ export async function GET(
 ) {
   try {
     const { searchParams } = new URL(req.url);
-    // const label = searchParams.get("label");
-    // const storeId = searchParams.get("storeId");
+    const label = searchParams.get("label") || undefined;
+    const storeId = params.storeId;
 
     const billboard = await prismadb.billboard.findFirst({
       where: {
-        label: params.label,
-        storeId: params.storeId,
+        label,
+        storeId: storeId,
       },
     });
 
