@@ -18,8 +18,8 @@ export async function GET(
 
     const billboard = await prismadb.billboard.findFirst({
       where: {
-        label,
-        storeId,
+        label: label,
+        storeId: storeId,
       },
     });
 
