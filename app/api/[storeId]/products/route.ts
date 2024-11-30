@@ -162,7 +162,8 @@ export async function GET(
 ) {
   try {
     const { searchParams } = new URL(req.url);
-    console.log("searchParams", searchParams);
+    // console.log("searchParams", searchParams);
+    const storeIdFromOnlineStore = searchParams.get("storeIdFromOnlineStore") || undefined;
     const categoryId = searchParams.get("categoryId") || undefined;
     const designerId = searchParams.get("designerId") || undefined;
     const sellerId = searchParams.get("sellerId") || undefined;
@@ -190,10 +191,8 @@ export async function GET(
       ? parseFloat(searchParams.get("maxPrice")!)
       : undefined;
 
-    // const isArchived = searchParams.get("isArchived") === "true" ? true : undefined;
     const isArchived = searchParams.get("isArchived") === "true" ? true : false;
 
-    // console.log("searchParams", searchParams);
 
 
     if (!params.storeId) {
@@ -215,9 +214,11 @@ export async function GET(
       };
     }
 
+    const storeId = storeIdFromOnlineStore || params.storeId;
+
     const products = await prismadb.product.findMany({
       where: {
-        storeId: params.storeId,
+        storeId: storeId,
         categoryId,
         designerId,
         sellerId,
@@ -265,7 +266,6 @@ export async function GET(
       })),
     }));
 
-    // console.log("API_GET_PRODUCTS products", productsWithCDN[0]);
     return NextResponse.json(productsWithCDN);
   } catch (error) {
     console.log("[PRODUCTS_GET]", error);

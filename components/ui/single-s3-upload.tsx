@@ -85,7 +85,7 @@ const SingleS3Upload: React.FC<SingleS3UploadProps> = ({
               key={url}
               src={url}
               alt={`Media from ${url}`}
-              fill
+              // fill
               className="object-cover rounded-md transition-opacity duration-200 ease-in-out"
               width={100}
                     height={0}
