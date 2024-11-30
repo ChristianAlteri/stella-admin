@@ -17,6 +17,7 @@ import {
   MousePointer,
   ChevronDown,
   ChevronUp,
+  WifiIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,6 +35,7 @@ interface ProductDetailsComponentProps {
 export default function ProductDetailsComponent({
   data,
 }: ProductDetailsComponentProps) {
+  console.log("data", data);
   const currencySymbol = currencyConvertor(data.countryCode);
   const router = useRouter();
   const [isMinimized, setIsMinimized] = useState(true);
@@ -149,7 +151,7 @@ export default function ProductDetailsComponent({
                       />
                       <ProductBadge
                         condition={data.isOnline}
-                        icon={HiStatusOnline}
+                        icon={WifiIcon}
                         trueText="Online"
                         falseText="Not Online"
                       />

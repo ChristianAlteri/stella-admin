@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
-import { auth } from "@clerk/nextjs/server"
+import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 
-import prismadb from '@/lib/prismadb';
- 
+import prismadb from "@/lib/prismadb";
+
 export async function POST(
   req: Request,
   { params }: { params: { storeId: string } }
@@ -22,7 +22,6 @@ export async function POST(
       return new NextResponse("Name is required", { status: 400 });
     }
 
- 
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
     }
@@ -30,8 +29,8 @@ export async function POST(
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: params.storeId,
-        userId
-      }
+        userId,
+      },
     });
 
     if (!storeByUserId) {
@@ -42,35 +41,41 @@ export async function POST(
       data: {
         name,
         value,
-        storeId: params.storeId
-      }
+        storeId: params.storeId,
+      },
     });
-  
+
     return NextResponse.json(gender);
   } catch (error) {
-    console.log('[gender_POST]', error);
+    console.log("[gender_POST]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
-};
+}
 
 export async function GET(
   req: Request,
   { params }: { params: { storeId: string } }
 ) {
+  const { searchParams } = new URL(req.url);
+  const storeIdFromOnlineStore =
+    searchParams.get("storeIdFromOnlineStore") || params.storeId;
+  console.log("searchParams", searchParams);
   try {
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
     }
 
+    const storeId = storeIdFromOnlineStore || params.storeId;
+
     const gender = await prismadb.gender.findMany({
       where: {
-        storeId: params.storeId
-      }
+        storeId: storeId,
+      },
     });
-  
+
     return NextResponse.json(gender);
   } catch (error) {
-    console.log('[gender_GET]', error);
+    console.log("[gender_GET]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
-};
+}

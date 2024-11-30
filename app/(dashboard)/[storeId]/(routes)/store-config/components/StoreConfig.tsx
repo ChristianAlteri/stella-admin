@@ -12,8 +12,8 @@ export default function StoreConfig() {
   const configRoutes = [
     {
       href: `/${params.storeId}/billboards`,
-      label: 'Profile Pictures',
-      description: 'Manage your store Profile Pictures',
+      label: 'Billboards',
+      description: 'Manage your store Billboards',
       icon: <Grid className="h-6 w-6" />,
     },
     {
