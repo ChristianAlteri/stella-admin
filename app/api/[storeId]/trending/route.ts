@@ -76,6 +76,7 @@ export async function GET(
         isCharity: isCharity ? true : undefined,
         isHidden: isHidden ? true : undefined,
         isArchived: false,
+        isOnline: true,
         ourPrice: {
           gte: minPrice,
           lte: maxPrice,
