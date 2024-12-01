@@ -47,6 +47,7 @@ export const ProductClient: React.FC<ProductClientProps> = ({
   const searchParams = useSearchParams();
   const [value, setValue] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [showOnlineOnly, setShowOnlineOnly] = useState(false);
 
   const sellerId = searchParams.get("sellerId");
   const staffId = searchParams.get("staffId");
@@ -77,7 +78,15 @@ export const ProductClient: React.FC<ProductClientProps> = ({
         typeof value === "string" &&
         value.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    return sellerMatch && categoryMatch && staffMatch && userMatch && searchMatch;
+    const onlineMatch = showOnlineOnly ? product.isOnline === true : true;
+    return (
+      sellerMatch &&
+      categoryMatch &&
+      staffMatch &&
+      userMatch &&
+      searchMatch &&
+      onlineMatch
+    );
   });
 
   const archivedProducts = filteredData.filter((product) => product.isArchived);
@@ -174,6 +183,13 @@ export const ProductClient: React.FC<ProductClientProps> = ({
                   ))}
                 </SelectContent>
               </Select>
+              <Button
+                size="sm"
+                variant={showOnlineOnly ? "default" : "outline"}
+                onClick={() => setShowOnlineOnly(!showOnlineOnly)}
+              >
+                {showOnlineOnly ? "Show All Products" : "On Website Only"}
+              </Button>
               {(sellerId || categoryId || searchTerm) && (
                 <Button
                   onClick={handleClearFilters}
@@ -216,4 +232,3 @@ export const ProductClient: React.FC<ProductClientProps> = ({
     </Card>
   );
 };
-
