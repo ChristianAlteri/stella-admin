@@ -10,6 +10,7 @@ export async function GET(
   try {
     const { searchParams } = new URL(req.url);
     const productName = searchParams.get("productName") || undefined;
+    const isOnline = searchParams.get("isOnline") || undefined;
     const limit = parseInt(searchParams.get("limit") || "500", 10);
 
     if (!params.storeId) {
@@ -193,6 +194,7 @@ export async function GET(
           { genderId: { in: genderIds } },
           { materialId: { in: materialIds } },
           { name: { contains: productName, mode: "insensitive" } },
+          { isOnline: isOnline === "true" ? true : undefined }
         ],
       },
       include: {
