@@ -36,6 +36,7 @@ export async function GET(
         isFeatured: isFeatured ? true : undefined,
         isOnSale: true ,
         isArchived: false,
+        isOnline: true,
         ourPrice: {
           gte: minPrice,
           lte: maxPrice,
