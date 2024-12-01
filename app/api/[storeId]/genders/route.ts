@@ -59,7 +59,6 @@ export async function GET(
   const { searchParams } = new URL(req.url);
   const storeIdFromOnlineStore =
     searchParams.get("storeIdFromOnlineStore") || params.storeId;
-  console.log("searchParams", searchParams);
   try {
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
