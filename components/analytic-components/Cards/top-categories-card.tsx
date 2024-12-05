@@ -73,7 +73,7 @@ const TopCategoriesCard: React.FC<TopCategoriesCardProps> = ({ products, country
   }, [sortedCategories, showBottomCategories])
 
   return (
-    <Card className="col-span-3 h-[280px] flex flex-col">
+    <Card className="col-span-3 h-[280px] flex flex-col w-full">
       <CardHeader className="flex-shrink-0 flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex items-center space-x-2">
           <Tag className="h-5 w-5 text-purple-400" />
