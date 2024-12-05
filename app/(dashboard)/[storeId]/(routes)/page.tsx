@@ -36,71 +36,122 @@ interface DashboardPageProps {
 }
 
 const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
-  const products = await prismadb.product.findMany({
-    where: {
-      storeId: params.storeId,
-    },
-    include: {
-      seller: { include: { payouts: true } },
-      designer: true,
-      category: true,
-    },
-    orderBy: { createdAt: "desc" },
-  });
-  const store = await prismadb.store.findUnique({
-    where: {
-      id: params.storeId,
-    }
-  })
-
-  const sellers = await prismadb.seller.findMany({
-    where: {
-      storeId: params.storeId,
-    },
-    include: {
-      payouts: {
-        // where: { sellerId: params.sellerId },
-        orderBy: { createdAt: "desc" },
+  const [
+    products,
+    store,
+    sellers,
+    orders,
+    users,
+    payouts,
+    topSellingColors,
+    topSellingSize,
+    topSellingMaterial,
+    topSellingSubcategory,
+    topSellingGender,
+    topSellingCondition,
+  ] = await Promise.all([
+    prismadb.product.findMany({
+      where: { storeId: params.storeId },
+      include: { seller: { include: { payouts: true } }, designer: true, category: true },
+      orderBy: { createdAt: "desc" },
+    }),
+    prismadb.store.findUnique({ where: { id: params.storeId } }),
+    prismadb.seller.findMany({
+      where: { storeId: params.storeId },
+      include: {
+        payouts: { orderBy: { createdAt: "desc" } },
+        products: { include: { images: true, designer: true, seller: true, category: true, size: true, color: true } },
+        orderedItems: { include: { order: true } },
       },
-      products: {
-        include: {
-          images: true,
-          designer: true,
-          seller: true,
-          category: true,
-          size: true,
-          color: true,
-        },
-      },
-      orderedItems: { include: { order: true } },
-    },
+      orderBy: { createdAt: "desc" },
+    }),
+    prismadb.order.findMany({
+      where: { storeId: params.storeId },
+      include: { orderItems: true },
+      orderBy: { createdAt: "desc" },
+    }),
+    prismadb.user.findMany({
+      where: { storeId: params.storeId },
+      orderBy: { name: "desc" },
+    }),
+    prismadb.payout.findMany({
+      where: { storeId: params.storeId },
+      orderBy: { createdAt: "desc" },
+      include: { seller: true },
+    }),
+    getTopSellingColorCount(params.storeId),
+    getTopSellingSizeCount(params.storeId),
+    getTopSellingMaterialCount(params.storeId),
+    getTopSellingSubcategoryCount(params.storeId),
+    getTopSellingGenderCount(params.storeId),
+    getTopSellingConditionCount(params.storeId),
+  ]);
+  
+  // const products = await prismadb.product.findMany({
+  //   where: {
+  //     storeId: params.storeId,
+  //   },
+  //   include: {
+  //     seller: { include: { payouts: true } },
+  //     designer: true,
+  //     category: true,
+  //   },
+  //   orderBy: { createdAt: "desc" },
+  // });
+  // const store = await prismadb.store.findUnique({
+  //   where: {
+  //     id: params.storeId,
+  //   }
+  // })
 
-    orderBy: { createdAt: "desc" },
-  });
+  // const sellers = await prismadb.seller.findMany({
+  //   where: {
+  //     storeId: params.storeId,
+  //   },
+  //   include: {
+  //     payouts: {
+  //       // where: { sellerId: params.sellerId },
+  //       orderBy: { createdAt: "desc" },
+  //     },
+  //     products: {
+  //       include: {
+  //         images: true,
+  //         designer: true,
+  //         seller: true,
+  //         category: true,
+  //         size: true,
+  //         color: true,
+  //       },
+  //     },
+  //     orderedItems: { include: { order: true } },
+  //   },
 
-  const orders = await prismadb.order.findMany({
-    where: {
-      storeId: params.storeId,
-    },
-    include: { orderItems: true },
-    orderBy: { createdAt: "desc" },
-  });
+  //   orderBy: { createdAt: "desc" },
+  // });
 
-  const users = await prismadb.user.findMany({
-    where: {
-      storeId: params.storeId,
-    },
-    // include: { orders: true }, // TODO: Make tab and staff and users display when switch
-    orderBy: { name: "desc" },
-  });
+  // const orders = await prismadb.order.findMany({
+  //   where: {
+  //     storeId: params.storeId,
+  //   },
+  //   include: { orderItems: true },
+  //   orderBy: { createdAt: "desc" },
+  // });
 
-  const payouts = await prismadb.payout.findMany({
-    where: {
-      storeId: params.storeId,
-    },
-    orderBy: { createdAt: "desc" },
-    include: { seller: true },
-  });
+  // const users = await prismadb.user.findMany({
+  //   where: {
+  //     storeId: params.storeId,
+  //   },
+  //   // include: { orders: true }, // TODO: Make tab and staff and users display when switch
+  //   orderBy: { name: "desc" },
+  // });
+
+  // const payouts = await prismadb.payout.findMany({
+  //   where: {
+  //     storeId: params.storeId,
+  //   },
+  //   orderBy: { createdAt: "desc" },
+  //   include: { seller: true },
+  // });
   const { storePayoutSum, sellerPayoutSum } = getPayoutSums(
     payouts,
     params.storeId
@@ -167,14 +218,14 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
     .sort((a: any, b: any) => b.soldCount! - a.soldCount!)
     // .slice(0, 5);
 
-  const topSellingColors = await getTopSellingColorCount(params.storeId);
-  const topSellingSize = await getTopSellingSizeCount(params.storeId);
-  const topSellingMaterial = await getTopSellingMaterialCount(params.storeId);
-  const topSellingSubcategory = await getTopSellingSubcategoryCount(
-    params.storeId
-  );
-  const topSellingGender = await getTopSellingGenderCount(params.storeId);
-  const topSellingCondition = await getTopSellingConditionCount(params.storeId);
+  // const topSellingColors = await getTopSellingColorCount(params.storeId);
+  // const topSellingSize = await getTopSellingSizeCount(params.storeId);
+  // const topSellingMaterial = await getTopSellingMaterialCount(params.storeId);
+  // const topSellingSubcategory = await getTopSellingSubcategoryCount(
+  //   params.storeId
+  // );
+  // const topSellingGender = await getTopSellingGenderCount(params.storeId);
+  // const topSellingCondition = await getTopSellingConditionCount(params.storeId);
   return (
     <div className="flex-col bg-secondary md:w-full w-1/2">
       <div className="flex-1 space-y-4 p-3">
