@@ -34,49 +34,40 @@ export async function GET(
       );
     }
 
-    const orderItemsAssociatedWithOrder = await prismadb.orderItem.findMany({
-      where: { orderId: orderId },
-    });
     const order = await prismadb.order.findUnique({
-      where: { id: orderItemsAssociatedWithOrder[0]?.orderId || undefined },
-    });
-    const uniqueProductIds = Array.from(new Set(orderItemsAssociatedWithOrder.map(item => item.productId)));
-    const products = await prismadb.product.findMany({
-      where: {
-        id: {
-          in: uniqueProductIds,
+      where: { id: orderId },
+      include: {
+        orderItems: {
+          include: {
+            product: {
+              include: {
+                images: true,
+                designer: true,
+                seller: true,
+                size: true,
+              },
+            },
+          },
         },
       },
-      include: {
-        images: true,
-        designer: true,
-        seller: true,
-        size: true,
-      },
     });
+    // console.log("ORDER DETAILS", JSON.stringify(order));
 
     // Replace S3 URLs with CDN URLs in products' images
-    const transformedProducts = products.map((product) => ({
-      ...product,
-      images: product.images.map((image) => ({
-        ...image,
-        url: image.url.replace(
-          "stella-ecomm-media-bucket.s3.amazonaws.com",
-          "d1t84xijak9ta1.cloudfront.net"
-        ),
-      })),
-    }));
-
-    // Construct the response
-    const responseData = {
-      success: true,
-      orderId: orderItemsAssociatedWithOrder[0]?.orderId,
-      order,
-      transformedProducts,
-    };
+    // if (order) {
+    //   order.orderItems.forEach((orderItem) => {
+    //     orderItem.product.images.forEach((image) => {
+    //       image.url = image.url.replace(
+    //         "stella-ecomm-media-bucket.s3.amazonaws.com",
+    //         "d1t84xijak9ta1.cloudfront.net"
+    //       );
+    //     });
+    //   });
+    // }
 
     // console.log("responseData", responseData);
-    return NextResponse.json(responseData, { headers });
+    // return NextResponse.json(order, { headers });
+    return NextResponse.json(order);
   } catch (error) {
     return NextResponse.json(
       { success: false, message: "Internal server error" },

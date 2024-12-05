@@ -1,11 +1,12 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
-import { v4 as uuidv4 } from 'uuid';
-
+import { v4 as uuidv4 } from "uuid";
 
 import { stripe } from "@/lib/stripe";
 import prismadb from "@/lib/prismadb";
-import { Prisma } from "@prisma/client";
+import { Prisma, Store } from "@prisma/client";
+
+const logKey = "CHECKOUT";
 
 export async function OPTIONS(request: Request) {
   // Just return a simple OK response without setting any CORS headers.
@@ -16,66 +17,117 @@ export async function POST(
   req: Request,
   { params }: { params: { storeId: string } }
 ) {
+  // This route creates them order and sends to stripe then back to our front end which sends it to the verify-online-payment route
+  let store: Store | null;
+  // TODO: Grab user id from front end
+  // const { productIds, userId } = await req.json();
   const { productIds } = await req.json();
-  const store = await prismadb.store.findUnique({
-    where: { id: params.storeId },
-  })
+  console.log(`[ENTERING_${logKey}] and product ids`, productIds);
+  console.log(`[DEBUG_${logKey}] params.storeId`, params.storeId);
+
+  try {
+    store = await prismadb.store.findUnique({
+      where: { id: params.storeId },
+    });
+    console.log(`[INFO API_${logKey}] store`, store);
+
+    if (!store) {
+      return NextResponse.json(
+        { success: false, message: "Store not found" },
+        { status: 404 }
+      );
+    }
+  } catch (error) {
+    console.error(`[ERROR] Store not found: `, error);
+    return NextResponse.json(
+      { success: false, message: "Store not found" },
+      { status: 404 }
+    );
+  }
 
   if (!productIds || productIds.length === 0) {
-    return new NextResponse("CHECKOUT Product ids are required", {
+    return new NextResponse("[ERROR API_${logKey}] Product ids are required", {
       status: 400,
     });
   }
 
   // Fetch products and their associated seller
   const products = await prismadb.product.findMany({
-    where: {
-      id: {
-        in: productIds,
-      },
-    },
-    include: {
-      seller: true,
-    },
+    where: { id: { in: productIds } },
+    include: { seller: true },
   });
+  console.log(`[INFO] ${logKey} products`, JSON.stringify(products));
 
-  // TODO: I want to be able to add a userId to the order
-  const order = await prismadb.order.create({
-    data: {
-      storeId: params.storeId,
-      totalAmount: new Prisma.Decimal(products.map((product) => product.ourPrice.toNumber()).reduce((acc, price) => acc + price, 0)),
-      isPaid: false,
-      orderItems: {
-        create: products.map((product) => ({
-          stripe_connect_unique_id: product.seller.stripe_connect_unique_id,
-          productAmount: product.ourPrice,
-          product: {
-            connect: {
-              id: product.id, 
+  // Calculate the total amount of the order (all products combined)
+  const totalSales = products.reduce(
+    (acc, product) => acc + product.ourPrice.toNumber(),
+    0
+  );
+
+  console.log(`[INFO] ${logKey} totalSales`, JSON.stringify(totalSales));
+
+  // TODO: When users can actually log in, we will need to get the userId from the session
+  let newOrder: any = null;
+  try {
+    // Create a new Order
+    newOrder = await prismadb.order.create({
+      data: {
+        store: { connect: { id: store.id } },
+        isPaid: false, // Not paid until the payment is successful and that happens in /success
+        inStoreSale: false,
+        totalAmount: new Prisma.Decimal(totalSales),
+        soldByStaff: {
+          connect: { id: store.id },
+        },
+        orderItems: {
+          create: products.map((product) => ({
+            stripe_connect_unique_id: product.seller.stripe_connect_unique_id,
+            soldByStaff: { 
+              connect: { id: store?.id || "" },
             },
-          },
-          seller: {
-            connect: {
-              id: product.seller.id, 
+            productAmount: new Prisma.Decimal(product.ourPrice),
+            product: {
+              connect: {
+                id: product.id,
+              },
             },
-          },
-          store: {
-            connect: {
-              id: params.storeId,
+            seller: {
+              connect: {
+                id: product.seller.id,
+              },
             },
-          },
-        })),
+            store: {
+              connect: {
+                id: params.storeId,
+              },
+            },
+          })),
+        },
+        // ...(userId && { userId: userId }),
       },
-    },
-  });
+    });
+    console.log(`[INFO] ${logKey} orderItems`, newOrder.orderItems);
+  } catch (error) {
+    console.error(`[ERROR] ${logKey} Error creating new order: `, error);
+    return NextResponse.json(
+      { success: false, message: "Error creating new order" },
+      { status: 500 }
+    );
+  }
+  console.log(`[INFO] ${logKey} newOrder`, JSON.stringify(newOrder));
+
+
 
   const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
 
+  console.log(`[DEBUG] Store currency before line items: ${store.currency}`);
+
+  const itemCurrency = store?.currency || "GBP";
   products.forEach((product) => {
     line_items.push({
       quantity: 1,
       price_data: {
-        currency: store?.currency?.toString() || "GBP",
+        currency: itemCurrency,
         product_data: {
           name: product.name,
         },
@@ -83,7 +135,8 @@ export async function POST(
       },
     });
   });
-  console.log(`order at checkout order_${order.id}`);
+  console.log(`[INFO API_${logKey}] order at checkout order_${newOrder.id}`);
+  
 
   const session = await stripe.checkout.sessions.create({
     line_items,
@@ -93,22 +146,26 @@ export async function POST(
       enabled: true,
     },
     shipping_address_collection: {
-      allowed_countries: ["US", "CA", "GB", "AU", "IT"],
+      allowed_countries: ["AU"],
     },
     shipping_options: [
-      { shipping_rate: "shr_1Oor5xBvscKKdpTG4Z2tIKyI" },
+      { shipping_rate: "shr_1QSammKCnSe3p09QJslPWBG3" },
       // Add more shipping rates as needed
     ],
     allow_promotion_codes: true,
-    success_url: `${process.env.FRONTEND_STORE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.FRONTEND_STORE_URL}/cart?canceled=1`,
+    success_url: `${process.env.FRONTEND_STORE_URL}/${store.id}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${process.env.FRONTEND_STORE_URL}/${store.id}/cart?canceled=1`,
     metadata: {
-      orderId: order.id,
+      orderId: newOrder.id,
+      storeId: store.id,
+      productIds: productIds.join(","),
     },
     payment_intent_data: {
-    transfer_group: `order_${order.id}`,
+      transfer_group: `order_${newOrder.id}`,
     },
   });
+
+  console.log(`[INFO API_${logKey}] Session sent to front end `, session);
 
   return NextResponse.json({ url: session.url }, { status: 200 });
 }

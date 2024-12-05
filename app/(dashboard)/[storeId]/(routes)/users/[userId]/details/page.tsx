@@ -60,7 +60,7 @@ export default async function UserDetailsPage({
   });
 
   const user = cleanDecimals(rawUser);
-  const currencySymbol = currencyConvertor(user.store.countryCode || "GB");
+  const currencySymbol = currencyConvertor(user?.store?.countryCode || "GB");
 
   if (!user) {
     return <div>User not found</div>;
@@ -189,11 +189,11 @@ function UserAnalytics({
       <div className="grid gap-4 grid-cols-2 w-full">
         <TopDesignersCard
           products={products}
-          countryCode={user.store.countryCode || "GB"}
+          countryCode={user?.store?.countryCode || "GB"}
         />
         <TopCategoriesCard
           products={products}
-          countryCode={user.store.countryCode || "GB"}
+          countryCode={user?.store?.countryCode || "GB"}
         />
       </div>
 

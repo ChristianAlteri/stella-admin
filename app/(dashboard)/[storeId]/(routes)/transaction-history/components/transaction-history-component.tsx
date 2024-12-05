@@ -1,20 +1,20 @@
 "use client";
 
 import Image from "next/image";
-import {
-  Tag,
-  ChevronDown,
-  ChevronUp,
-  PrinterIcon,
-  PackageIcon,
-} from "lucide-react";
+import { ChevronDown, ChevronUp, PrinterIcon, PackageIcon } from "lucide-react";
+import { User } from "@prisma/client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TransactionHistoryColumn } from "./columns";
 import { useParams, useRouter } from "next/navigation";
-import { currencyConvertor } from "@/lib/utils";
-import { useState } from "react";
+import { currencyConvertor, formatAddress } from "@/lib/utils";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+
+import axios from "axios";
+import DispatchOrderDialog from "./dispatch-order-dialog";
+import toast from "react-hot-toast";
+import { TbFaceId, TbFaceIdError } from "react-icons/tb";
 
 interface TransactionHistoryComponentProps {
   data: TransactionHistoryColumn;
@@ -27,6 +27,65 @@ export default function TransactionHistoryComponent({
   const router = useRouter();
   const params = useParams();
   const [isMinimized, setIsMinimized] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
+  const [isDispatchDialogOpen, setIsDispatchDialogOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+// Custom Toast Error
+const toastError = (message: string) => {
+  toast.error(message, {
+    style: {
+      background: "white",
+      color: "black",
+    },
+    icon: <TbFaceIdError size={30} />,
+  });
+};
+// Custom Toast Success
+const toastSuccess = (message: string) => {
+  toast.error(message, {
+    style: {
+      background: "white",
+      color: "green",
+    },
+    icon: <TbFaceId size={30} />,
+  });
+};
+
+  const handleDispatchSuccess = () => {
+    // TODO: Refresh data or update state as needed
+    toastSuccess('Order successfully dispatched.');
+    window.location.reload();
+  };
+
+  const openModal = (imageUrl: any) => {
+    setSelectedImage(imageUrl);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setSelectedImage(null);
+    setIsModalOpen(false);
+  };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (data.order?.userId) {
+        try {
+          const response = await axios.get(
+            `/api/${params.storeId}/users/${data.order.userId}`
+          );
+          console.log("Fetched User:", response.data);
+          setUser(response.data);
+        } catch (error) {
+          console.error("Error fetching user details:", error);
+        }
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   return (
     <Card className="w-full overflow-hidden">
@@ -48,7 +107,9 @@ export default function TransactionHistoryComponent({
               <p className="font-semibold text-xs col-span-1 text-left truncate flex items-center">
                 {data.order && data.order.orderItems?.length > 0 && (
                   <>
-                    <span className="truncate">{data.order.orderItems[0].product.name}</span>
+                    <span className="truncate">
+                      {data.order.orderItems[0].product.name}
+                    </span>
                     {data.order.orderItems.length > 1 && (
                       <span className="ml-2 text-xs text-muted-foreground truncate">
                         + {data.order.orderItems.length - 1}
@@ -63,7 +124,7 @@ export default function TransactionHistoryComponent({
                     <span
                       onClick={() =>
                         router.push(
-                          `/${params.storeId}/sellers/${data.order?.orderItems[0].product.seller.storeName}/details`
+                          `/${params.storeId}/sellers/${data?.order?.orderItems[0].product.seller.id}/details`
                         )
                       }
                       className="cursor-pointer text-blue-500 hover:underline"
@@ -107,24 +168,29 @@ export default function TransactionHistoryComponent({
               </div>
 
               <h3 className="font-semibold text-xs col-span-1 truncate">
-                {data.order?.soldByStaff 
+                {data.order?.soldByStaff
                   ? typeof data.order.soldByStaff === "string"
                     ? data.order.soldByStaff
                     : data.order.soldByStaff.name
                   : "No staff details"}
               </h3>
 
-              {/* TODO: Attach the actual user object to the order modal */}
-              <h3 className="font-semibold text-xs col-span-1 truncate">
-                {data.order?.userId ? data.order.userId : "No customer details"}
+              <h3
+                className="font-semibold text-xs col-span-1 truncate hover:underline hover:cursor-pointer"
+                onClick={() =>
+                  router.push(`/${params.storeId}/users/${user?.id}/details`)
+                }
+              >
+                {user ? user?.name : "No customer details"}
               </h3>
 
               <h3 className="font-semibold text-xs col-span-1 truncate">
-                {data.order?.address && data.order?.hasBeenDispatched === false
-                  ? "Not Dispatched"
-                  : data.order?.hasBeenDispatched
+                {data.order?.inStoreSale
+                  ? "In Store Sale"
+                  : data.order?.hasBeenDispatched &&
+                    data.order?.inStoreSale === false
                   ? "Dispatched"
-                  : "No Address"}
+                  : "Unfulfilled"}
               </h3>
 
               <p className="text-sm text-muted-foreground col-span-1 truncate">
@@ -198,6 +264,7 @@ export default function TransactionHistoryComponent({
                             width={100}
                             height={100}
                             className="rounded-md object-cover shadow-md hover:shadow-lg transition-shadow duration-300"
+                            onClick={() => openModal(item.product.images[0].url)}
                           />
                         )}
                       <p
@@ -213,7 +280,7 @@ export default function TransactionHistoryComponent({
                       <span
                         onClick={() =>
                           router.push(
-                            `/${params.storeId}/sellers/${item.product.sellerId}/details`
+                            `/${params.storeId}/sellers/${item.product.seller.id}/details`
                           )
                         }
                         className="cursor-pointer text-blue-500 hover:text-blue-700 font-medium text-xs truncate max-w-[100px]"
@@ -223,6 +290,34 @@ export default function TransactionHistoryComponent({
                     </div>
                   ))}
                 </div>
+
+                {/* Modal */}
+                {isModalOpen && selectedImage && (
+                  <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                    onClick={closeModal} 
+                  >
+                    <div
+                      className="relative"
+                      onClick={(e) => e.stopPropagation()} 
+                    >
+                      <Image
+                        src={selectedImage}
+                        alt="Enlarged"
+                        width={600}
+                        height={600}
+                        className="rounded-md shadow-lg"
+                      />
+                      <button
+                        className="absolute top-2 right-2 text-white bg-black bg-opacity-70 rounded-full px-2 py-1"
+                        onClick={closeModal}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pt-4 border-t border-border">
                   <div className="">
                     <div>
@@ -254,21 +349,38 @@ export default function TransactionHistoryComponent({
 
                   <div className="space-y-1">
                     <h3 className="font-semibold text-xs">Customer</h3>
+                    <p
+                      className="font-semibold text-xs col-span-1 truncate text-muted-foreground hover:underline hover:cursor-pointer"
+                      onClick={() =>
+                        router.push(
+                          `/${params.storeId}/users/${user?.id}/details`
+                        )
+                      }
+                    >
+                      {user ? user?.name : "No customer details"}
+                    </p>
+                    <h3 className="font-semibold text-black text-xs">
+                      Shipping Address
+                    </h3>
                     <p className="text-xs text-muted-foreground">
-                      {data.order?.userId
-                        ? data.order.userId
-                        : "No Customer Details"}
+                      {data?.order?.address
+                        ? formatAddress(data?.order?.address)
+                        : "N/A"}
+                    </p>
+                    <h3 className="font-semibold text-black text-xs">Email</h3>
+                    <p className="text-xs text-muted-foreground">
+                      {data?.order?.email || "N/A"}
                     </p>
                   </div>
                   <div className="space-y-1">
                     <h3 className="font-semibold text-xs">Dispatch Status</h3>
-                    <p className="text-xs text-muted-foreground">
-                      {data.order?.address &&
-                      data.order?.hasBeenDispatched === false
-                        ? "Not Dispatched"
-                        : data.order?.hasBeenDispatched
+                    <p className="font-semibold text-xs col-span-1 truncate">
+                      {data.order?.inStoreSale
+                        ? "In Store Sale"
+                        : data.order?.hasBeenDispatched &&
+                          data.order?.inStoreSale === false
                         ? "Dispatched"
-                        : "No Address"}
+                        : "Unfulfilled"}
                     </p>
                   </div>
                   <div className="space-y-1">
@@ -290,15 +402,28 @@ export default function TransactionHistoryComponent({
                   </div>
                 </div>
                 <div className="flex justify-end space-x-2">
-                  <Button variant="outline" size="sm">
+                  {/* <Button variant="outline" size="sm">
                     <PrinterIcon className="mr-2 h-4 w-4" />
                     Print Shipping Label
-                  </Button>
-                  <Button variant="default" size="sm">
-                    {/* TODO: logic to mark as shipped plus api call to sipping provider ect */}
+                  </Button> */}
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() => setIsDispatchDialogOpen(true)}
+                  >
                     <PackageIcon className="mr-2 h-4 w-4" />
                     Dispatch Order
                   </Button>
+                  {isDispatchDialogOpen && (
+                    <DispatchOrderDialog
+                      orderId={data.order?.id!}
+                      address={data.order?.address!}
+                      email={data.order?.email!}
+                      storeId={Array.isArray(params.storeId) ? params.storeId[0] : params.storeId}
+                      onClose={() => setIsDispatchDialogOpen(false)}
+                      onDispatched={handleDispatchSuccess}
+                    />
+                  )}
                 </div>
               </CardContent>
             </Card>

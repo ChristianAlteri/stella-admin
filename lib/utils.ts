@@ -14,26 +14,26 @@ export const formatter = new Intl.NumberFormat("en-GB", {
 });
 
 export const formatCurrency = (value: number) => {
-  return value.toLocaleString('en-GB', {
-    style: 'currency',
-    currency: 'GBP',
+  return value.toLocaleString("en-GB", {
+    style: "currency",
+    currency: "GBP",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  })
-}
+  });
+};
 
 export function currencyConvertor(countryCode: string) {
   let currency;
 
   switch (countryCode) {
-    case 'AU':
-      currency = '$'; 
+    case "AU":
+      currency = "$";
       break;
-    case 'GB':
-      currency = '£'; 
+    case "GB":
+      currency = "£";
       break;
     default:
-      currency = '£'; 
+      currency = "£";
       break;
   }
 
@@ -362,7 +362,6 @@ export function sanitiseAddress(address: StoreAddress | null) {
   };
 }
 
-
 // export function cleanDecimals(object: any) {
 //   return JSON.parse(
 //     JSON.stringify(object, (key, value) => {
@@ -377,9 +376,17 @@ export function cleanDecimals(object: any) {
   return JSON.parse(
     JSON.stringify(object, (key, value) => {
       if (value instanceof Decimal) {
-        return value.toNumber(); 
+        return value.toNumber();
       }
       return value;
     })
   );
+}
+
+export function formatAddress(addressString: string): string {
+  if (!addressString) return "";
+  const address = JSON.parse(addressString);
+  return `${address.line1 || ""}${address.line2 ? ", " + address.line2 : ""}
+${address.city || ""}, ${address.state || ""} ${address.postal_code || ""}
+${address.country || ""}`;
 }

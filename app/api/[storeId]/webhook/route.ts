@@ -70,6 +70,7 @@ export async function POST(req: NextRequest) {
   switch (event.type) {
     case "payment_intent.succeeded": {
       const paymentIntentSucceeded = event.data.object;
+      console.log("PaymentIntent Succeeded webhook route!", paymentIntentSucceeded);
       // Handle logic for successful payment intent
       break;
     }

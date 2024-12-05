@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { DataTable } from "@/components/ui/data-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { RefreshCw, Search } from "lucide-react";
 import { columns, TransactionHistoryColumn } from "./columns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TbReceipt, TbTag } from "react-icons/tb";
@@ -42,7 +42,6 @@ type OrderWithItemsAndSeller = Order & {
 
 interface TransactionHistoryClientProps {
   orders: OrderWithItemsAndSeller[];
-  // sellers: Seller[];
   countryCode: string;
 }
 
@@ -52,6 +51,11 @@ export const TransactionHistoryClient: React.FC<
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [showDispatchedOrders, setShowDispatchedOrders] = useState<
+    boolean | null
+  >(null);
+  const [showOnlineSales, setShowOnlineSales] = useState<boolean | null>(null);
+
   const transformedOrders = useMemo(() => {
     return orders.map((order) => ({
       order,
@@ -59,32 +63,20 @@ export const TransactionHistoryClient: React.FC<
     }));
   }, [orders, countryCode]);
 
-  // const filteredOrders = useMemo(() => {
-  //   const lowercasedSearchTerm = searchTerm.toLowerCase();
-  //   return transformedOrders.filter((data) => {
-  //     const orderIdMatch = data.order.id
-  //       .toLowerCase()
-  //       .includes(lowercasedSearchTerm);
-  //     const sellerNameMatch = data.order.orderItems.some((item) =>
-  //       item.product.seller.storeName
-  //         .toLowerCase()
-  //         .includes(lowercasedSearchTerm)
-  //     );
-  //     const productNameMatch = data.order.orderItems.some((item) =>
-  //       item.product.name.toLowerCase().includes(lowercasedSearchTerm)
-  //     );
-
-  //     return orderIdMatch || sellerNameMatch || productNameMatch;
-  //   });
-  // }, [searchTerm, transformedOrders]);
-
   // TODO: Add the filter here to sort cash payments marked as unpaid vs paid
-  // TODO: Add the filter here to sort products purchased online or in store and if online, if it was dispatched or not
+
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setStartDate("");
+    setEndDate("");
+    setShowDispatchedOrders(null);
+    setShowOnlineSales(null);
+  };
 
   const filteredOrders = useMemo(() => {
     return transformedOrders.filter((data) => {
       const lowercasedSearchTerm = searchTerm.toLowerCase();
-      
+
       // Strip time from `createdAt` to get only the date
       const orderDate = new Date(data.order.createdAt);
       const normalizedOrderDate = new Date(
@@ -92,15 +84,23 @@ export const TransactionHistoryClient: React.FC<
         orderDate.getMonth(),
         orderDate.getDate()
       );
-  
+
       // Normalize startDate and endDate to remove time
       const startDateObj = startDate
-        ? new Date(new Date(startDate).getFullYear(), new Date(startDate).getMonth(), new Date(startDate).getDate())
+        ? new Date(
+            new Date(startDate).getFullYear(),
+            new Date(startDate).getMonth(),
+            new Date(startDate).getDate()
+          )
         : null;
       const endDateObj = endDate
-        ? new Date(new Date(endDate).getFullYear(), new Date(endDate).getMonth(), new Date(endDate).getDate())
+        ? new Date(
+            new Date(endDate).getFullYear(),
+            new Date(endDate).getMonth(),
+            new Date(endDate).getDate()
+          )
         : null;
-  
+
       const matchesSearchTerm =
         data.order.id.toLowerCase().includes(lowercasedSearchTerm) ||
         data.order.orderItems.some((item) =>
@@ -111,16 +111,39 @@ export const TransactionHistoryClient: React.FC<
         data.order.orderItems.some((item) =>
           item.product.name.toLowerCase().includes(lowercasedSearchTerm)
         );
-  
+
       const matchesDateRange =
         (!startDateObj || normalizedOrderDate >= startDateObj) &&
         (!endDateObj || normalizedOrderDate <= endDateObj);
-  
-      return matchesSearchTerm && matchesDateRange;
+
+      // const matchesDispatchedFilter =
+      //   showDispatchedOrders === null ||
+      //   (!data.order.inStoreSale &&
+      //     data.order.hasBeenDispatched === showDispatchedOrders);
+
+      const matchesDispatchedFilter =
+        showDispatchedOrders === null ||
+        (data.order.inStoreSale !== true &&
+          data.order.hasBeenDispatched === showDispatchedOrders);
+
+      const matchesOnlineFilter =
+        showOnlineSales === null || data.order.inStoreSale === !showOnlineSales;
+
+      return (
+        matchesSearchTerm &&
+        matchesDateRange &&
+        matchesDispatchedFilter &&
+        matchesOnlineFilter
+      );
     });
-  }, [searchTerm, startDate, endDate, transformedOrders]);
-  
-  
+  }, [
+    searchTerm,
+    startDate,
+    endDate,
+    transformedOrders,
+    showDispatchedOrders,
+    showOnlineSales,
+  ]);
 
   // Calculate the average payout
   const averagePayout = useMemo(() => {
@@ -155,7 +178,7 @@ export const TransactionHistoryClient: React.FC<
         <div className="flex items-center justify-between">
           <CardTitle className="text-2xl font-bold flex items-center">
             <TbReceipt className="mr-2 h-6 w-6" />
-            Transaction History ({orders.length})
+            Transaction History ({filteredOrders.length})
           </CardTitle>
         </div>
       </CardHeader>
@@ -173,7 +196,6 @@ export const TransactionHistoryClient: React.FC<
               />
             </div>
             <div className="flex gap-2">
-              {/* TODO: Give me some good tools to zero in on an order */}
               <Input
                 type="date"
                 value={startDate}
@@ -195,6 +217,43 @@ export const TransactionHistoryClient: React.FC<
                 }}
               >
                 Clear Dates
+              </Button>
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row justify-between gap-4">
+            <div className="flex gap-2 ">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setShowDispatchedOrders((prev) =>
+                    prev === null ? false : !prev
+                  );
+                }}
+              >
+                {showDispatchedOrders === null || showDispatchedOrders
+                  ? "Unfulfilled Orders"
+                  : "Dispatched"}
+              </Button>
+
+              {/* <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setShowOnlineSales((prev) => (prev === true ? false : true));
+                }}
+              >
+                {showOnlineSales === true
+                  ? "Show In-Store Sales"
+                  : "Show Online Sales"}
+              </Button> */}
+
+              <Button
+                onClick={handleClearFilters}
+                size="icon"
+                variant="outline"
+              >
+                <RefreshCw className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -244,31 +303,65 @@ export const TransactionHistoryClient: React.FC<
           </div>
         </div>
         <Separator className="my-6" />
-        <Tabs defaultValue="orders" className="w-full">
+        <Tabs defaultValue="all" className="w-full">
           <TabsList>
-            <TabsTrigger value="orders">Orders</TabsTrigger>
-            {/* <TabsTrigger value="payouts">Payouts</TabsTrigger> */}
+            <TabsTrigger value="all">All</TabsTrigger>
+            <TabsTrigger value="inStore">Store</TabsTrigger>
+            <TabsTrigger value="online">Online</TabsTrigger>
           </TabsList>
-          <TabsContent value="orders">
+
+          <TabsContent value="all">
             <div className="flex mt-4">
               <Heading
-                title={`Orders (${orders.length})`}
-                description="See orders"
+                title={`All Orders (${filteredOrders.length})`}
+                description="See All"
               />
             </div>
             {/* TABLE */}
             <DataTable columns={columns} data={filteredOrders} />
           </TabsContent>
-          <TabsContent value="payouts">
+
+          <TabsContent value="inStore">
             <div className="flex mt-4">
               <Heading
-                // title={`Payouts (${payouts.length})`}
-                title={`Payouts `}
-                description="See payouts"
+                title={`In Store Sales (${
+                  filteredOrders.filter(
+                    (data) => data.order.inStoreSale === true
+                  ).length
+                })`}
+                description="See orders"
               />
             </div>
-            {/* <DataTable columns={columns} data={payouts}  /> */}
+            {/* TABLE */}
+            <DataTable
+              columns={columns}
+              data={filteredOrders.filter(
+                (data) => data.order.inStoreSale === true
+              )}
+            />
           </TabsContent>
+
+          <TabsContent value="online">
+            <div className="flex mt-4">
+              <Heading
+                title={`Online Orders (${
+                  filteredOrders.filter(
+                    (data) => data.order.inStoreSale === false
+                  ).length
+                })`}
+                description="See orders"
+              />
+            </div>
+            {/* TABLE */}
+            <DataTable
+              columns={columns}
+              data={filteredOrders.filter(
+                (data) => data.order.inStoreSale === false
+              )}
+            />
+          </TabsContent>
+
+         
         </Tabs>
       </CardContent>
     </Card>

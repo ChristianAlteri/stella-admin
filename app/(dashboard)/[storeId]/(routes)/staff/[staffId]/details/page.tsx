@@ -38,7 +38,7 @@ export default async function StaffDetailsPage({ params }: { params: { storeId: 
   });
 
   const staff = cleanDecimals(rawStaff);
-  const currencySymbol = currencyConvertor(staff.store.countryCode || "GB");
+  const currencySymbol = currencyConvertor(staff?.store?.countryCode || "GB");
 
   if (!staff) {
     return <div>Staff member not found</div>;

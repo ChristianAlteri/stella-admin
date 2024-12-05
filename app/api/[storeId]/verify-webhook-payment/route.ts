@@ -85,6 +85,7 @@ export async function POST(request: Request) {
         data: {
           store: { connect: { id: metadata.storeId } },
           isPaid: true,
+          hasBeenDispatched: true,
           totalAmount: new Prisma.Decimal(totalSales),
           soldByStaff: {
             connect: { id: metadata.soldByStaffId || metadata.storeId },
@@ -316,7 +317,7 @@ export async function POST(request: Request) {
             },
           });
           console.log(`[INFO] ${logKey} payout: `, payout);
-          // TODO: if this is succesfull then update the product to sellerPayedOut=true
+          // TODO: if this is successful then update the product to sellerPayedOut=true
 
           // Send event to Klaviyo which sends them email saying they made a sale
           const sellerEmailData = await prismadb?.seller.findUnique({

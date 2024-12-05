@@ -793,7 +793,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   "On Sale",
                   "This product will appear on the sale page"
                 )}
-                {renderCheckbox(
+                {/* {renderCheckbox(
                   "isCharity",
                   "Charity",
                   "Some of this product's proceeds will go to charity."
@@ -802,7 +802,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   "isHidden",
                   "Hidden",
                   "This product will appear blurred until changed to false, defaults to false."
-                )}
+                )} */}
               </div>
             )}
           </Card>

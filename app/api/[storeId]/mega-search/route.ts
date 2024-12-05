@@ -12,7 +12,7 @@ export async function GET(
     const productName = searchParams.get("productName") || undefined;
     const isOnlineFilter = searchParams.get("isOnline") || undefined;
     const limit = parseInt(searchParams.get("limit") || "500", 10);
-    console.log("isOnlineFilter IN API", isOnlineFilter);
+
 
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
@@ -226,8 +226,7 @@ export async function GET(
       })),
     }));
 
-    console.log("API_MEGA_SEARCH products", productsWithCDN.length);
-    // return NextResponse.json(products);
+    // console.log("API_MEGA_SEARCH products", productsWithCDN.length);
     return NextResponse.json(productsWithCDN);
   } catch (error) {
     console.log("[PRODUCTS_GET]", error);

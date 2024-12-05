@@ -108,7 +108,7 @@ model Seller {
   // Items sold by the seller
   orderedItems OrderItem[]
 
-  followingUsers User[]    @relation("FollowingSeller")
+  followingUsers User[] @relation("FollowingSeller")
   // Product        Product[] @relation("StaffToProduct")
   // Product        Product[] @relation("UserToProduct")
 
@@ -123,6 +123,7 @@ model Order {
   orderItems        OrderItem[] // Relation to OrderItem model
   isPaid            Boolean     @default(false)
   hasBeenDispatched Boolean     @default(false)
+  inStoreSale       Boolean     @default(true)
   totalAmount       Decimal
 
   soldByStaffId String? // Foreign Key to Staff
@@ -212,9 +213,9 @@ model Product {
   sellerId      String // Foreign Key to Seller
   seller        Seller      @relation("SellerToProduct", fields: [sellerId], references: [id])
   staffId       String? // Foreign Key to staff
-  staff         Staff?     @relation("StaffToProduct", fields: [staffId], references: [id])
+  staff         Staff?      @relation("StaffToProduct", fields: [staffId], references: [id])
   userId        String? // Foreign Key to User
-  user          User?     @relation("UserToProduct", fields: [userId], references: [id])
+  user          User?       @relation("UserToProduct", fields: [userId], references: [id])
   sizeId        String // Foreign Key to Size
   size          Size        @relation(fields: [sizeId], references: [id])
   subcategoryId String // Foreign Key to Color
@@ -455,7 +456,7 @@ model User {
   // Interaction Metrics
   likeList  Product[] @relation("ProductToUserLikes")
   clickList Product[] @relation("ProductToUserClicks")
-  Product Product[] @relation("UserToProduct")
+  Product   Product[] @relation("UserToProduct")
 
   orderHistory    Order[]   @relation("OrderHistory")
   purchaseHistory Product[] @relation("PurchaseHistory")
@@ -498,8 +499,8 @@ model Staff {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  isArchived Boolean @default(false)
+  isArchived Boolean   @default(false)
+  Product    Product[] @relation("StaffToProduct")
 
   @@index([storeId])
-  Product Product[] @relation("StaffToProduct")
 }
