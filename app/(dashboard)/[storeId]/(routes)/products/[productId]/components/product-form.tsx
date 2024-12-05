@@ -476,18 +476,21 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   </Command>
                 </PopoverContent>
               </Popover>
-              {label.toLowerCase() !== "seller" && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setIsDialogOpen(true)}
-                  className="flex-shrink-0"
-                >
-                  <Plus className="h-4 w-4" />
-                  <span className="sr-only">Add new {label.toLowerCase()}</span>
-                </Button>
-              )}
+              {label.toLowerCase() !== "seller" &&
+                label.toLowerCase() !== "gender" && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setIsDialogOpen(true)}
+                    className="flex-shrink-0"
+                  >
+                    <Plus className="h-4 w-4" />
+                    <span className="sr-only">
+                      Add new {label.toLowerCase()}
+                    </span>
+                  </Button>
+                )}
             </div>
             <FormMessage />
           </FormItem>
