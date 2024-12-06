@@ -225,6 +225,30 @@ export function convertDecimalsToNumbers(data: any): any {
   return data;
 }
 
+export function convertSpecificDecimals(data: any): any {
+  if (Array.isArray(data)) {
+    // Process arrays recursively
+    return data.map((item) => convertSpecificDecimals(item));
+  } else if (data && typeof data === "object") {
+    // Create a new object with converted values
+    const converted = { ...data };
+
+    // Convert only the specific decimal fields
+    if (converted.ourPrice && typeof converted.ourPrice === "object" && "toNumber" in converted.ourPrice) {
+      converted.ourPrice = converted.ourPrice.toNumber();
+    }
+    if (converted.retailPrice && typeof converted.retailPrice === "object" && "toNumber" in converted.retailPrice) {
+      converted.retailPrice = converted.retailPrice.toNumber();
+    }
+
+    return converted;
+  }
+
+  // Return primitive values as is
+  return data;
+}
+
+
 // export const totalRevenue = (orders: any): number => {
 //   return orders.reduce((acc: any, order: any) => {
 //     return (

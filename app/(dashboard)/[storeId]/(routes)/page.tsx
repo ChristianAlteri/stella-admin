@@ -4,6 +4,7 @@ import { Heading } from "@/components/ui/heading";
 import prismadb from "@/lib/prismadb";
 import {
   convertDecimalsToNumbers,
+  convertSpecificDecimals,
   filterLastMonthOrders,
   filterThisMonthOrders,
   getPayoutSums,
@@ -262,11 +263,11 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
 
         <div className="flex flex-row w-full gap-4 justify-between">
           {/* <StoreRevenueVsOrderAreaChart countryCode={store?.countryCode || "GB"} orders={plainOrders} /> */}
-          <div className="flex flex-row w-full h-full gap-4 justify-between">
+          {/* <div className="flex flex-row w-full h-full gap-4 justify-between">
             <TopSellersCard countryCode={store?.countryCode || "GB"} sellers={topSellers} />
             <TopDesignersCard countryCode={store?.countryCode || "GB"} products={plainProducts} />
             <TopCategoriesCard countryCode={store?.countryCode || "GB"} products={plainProducts} />
-          </div>
+          </div> */}
         </div>
 
         {/* <div className="flex flex-row w-full gap-4 justify-between">
@@ -278,7 +279,7 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
         </div> */}
 
         <div className="flex flex-row w-full gap-4 justify-between">
-          <TopColorBarChart
+          {/* <TopColorBarChart
             topSellingData={topSellingColors}
             attribute="Color"
           />
@@ -300,7 +301,7 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
           <TopColorBarChart
             topSellingData={topSellingGender}
             attribute="Gender"
-          />
+          /> */}
         </div>
 
         <Separator />
@@ -311,7 +312,7 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
         </div> */}
         <div className="flex flex-row gap-4">
           <div className="flex flex-row w-full gap-4 justify-between">
-            <TopUsersCard users={users} sortBy={"totalPurchases"} />
+            {/* <TopUsersCard users={users} sortBy={"totalPurchases"} /> */}
             {/* <TopUsersCard users={users} sortBy={"totalItemsPurchased"} /> */}
             {/* <TopUsersCard users={users} sortBy={"totalTransactionCount"} /> */}
           </div>
