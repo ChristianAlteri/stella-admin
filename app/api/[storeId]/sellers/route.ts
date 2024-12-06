@@ -120,6 +120,7 @@ export async function GET(
       },
       include: {
         billboard: true,
+        payouts: true,
         products: {
           include: {
             images: true,
@@ -133,7 +134,7 @@ export async function GET(
       },
     });
 
-    // console.log('[SELLER_GET]', sellers);
+    // console.log('[SELLER_GET] payout amount', sellers.map(seller => seller.payouts.map(payout => payout.amount)));
     return NextResponse.json(sellers);
   } catch (error) {
     console.log("[SELLER_GET]", error);

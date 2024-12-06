@@ -188,11 +188,9 @@ function UserAnalytics({
       {/* Top Designers and Top Categories Cards in two columns */}
       <div className="grid gap-4 grid-cols-2 w-full">
         <TopDesignersCard
-          products={products}
           countryCode={user?.store?.countryCode || "GB"}
         />
         <TopCategoriesCard
-          products={products}
           countryCode={user?.store?.countryCode || "GB"}
         />
       </div>

@@ -160,10 +160,7 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
   // Cleaning up the data
   const plainOrders = convertDecimalsToNumbers(orders);
   const plainPayouts = convertDecimalsToNumbers(payouts);
-  const latestPayouts = plainPayouts.slice(0, 10);
-  const latestOrders = plainOrders.slice(0, 10);
   const plainProducts = convertDecimalsToNumbers(products);
-  const plainSellers = convertDecimalsToNumbers(sellers);
   const calculateAveragePrice = (products: { ourPrice: number }[]): number =>
     products.length
   ? +(
@@ -231,13 +228,6 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
       }))
     );
 
-
-
-  const topSellers = plainSellers
-    .filter((seller: any) => seller.soldCount && seller.id !== params.storeId) // Filter removes any seller wos sold count = 0 and the store
-    .sort((a: any, b: any) => b.soldCount! - a.soldCount!)
-    // .slice(0, 5);
-
   // const topSellingColors = await getTopSellingColorCount(params.storeId);
   // const topSellingSize = await getTopSellingSizeCount(params.storeId);
   // const topSellingMaterial = await getTopSellingMaterialCount(params.storeId);
@@ -283,9 +273,9 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
         <div className="flex flex-row w-full gap-4 justify-between">
           {/* <StoreRevenueVsOrderAreaChart countryCode={store?.countryCode || "GB"} orders={plainOrders} /> */}
           <div className="flex flex-row w-full h-full gap-4 justify-between">
-            <TopSellersCard countryCode={store?.countryCode || "GB"} sellers={topSellers} />
-            <TopDesignersCard countryCode={store?.countryCode || "GB"} products={plainProducts} />
-            <TopCategoriesCard countryCode={store?.countryCode || "GB"} products={plainProducts} />
+            <TopSellersCard countryCode={store?.countryCode || "GB"} />
+            {/* <TopDesignersCard countryCode={store?.countryCode || "GB"} /> */}
+            {/* <TopCategoriesCard countryCode={store?.countryCode || "GB"} /> */}
           </div>
         </div>
 
