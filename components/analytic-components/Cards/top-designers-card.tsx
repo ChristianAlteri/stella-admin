@@ -49,7 +49,7 @@ const TopDesignersCard: React.FC<TopDesignersCardProps> = ({ countryCode }) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(`/api/${params.storeId}/products`,{
+        const response = await axios.get(`/api/${params.storeId}/products`, {
           params: {
             isArchived: true,
           },
@@ -66,36 +66,70 @@ const TopDesignersCard: React.FC<TopDesignersCardProps> = ({ countryCode }) => {
     fetchProducts();
   }, []);
 
+  // const designerStats = useMemo(() => {
+  //   const stats: { [key: string]: DesignerStats } = {};
+
+  //   frontendProducts?.forEach((product) => {
+  //     if (product.isArchived) {
+  //       const { id, name } = product.designer;
+  //       if (!stats[id]) {
+  //         stats[id] = { id, name, totalValue: 0, count: 0 };
+  //       }
+  //       stats[id].totalValue += product.ourPrice;
+  //       stats[id].count += 1;
+  //     }
+  //   });
+
+  //   return Object.values(stats);
+  // }, [frontendProducts]);
+
   const designerStats = useMemo(() => {
     const stats: { [key: string]: DesignerStats } = {};
+    const topDesigners: DesignerStats[] = [];
 
     frontendProducts?.forEach((product) => {
-      if (product.isArchived) {
-        const { id, name } = product.designer;
-        if (!stats[id]) {
-          stats[id] = { id, name, totalValue: 0, count: 0 };
-        }
-        stats[id].totalValue += product.ourPrice;
-        stats[id].count += 1;
+      if (!product.isArchived) return;
+
+      const { id, name } = product.designer;
+      if (!stats[id]) {
+        stats[id] = { id, name, totalValue: 0, count: 0 };
+      }
+      stats[id].totalValue += product.ourPrice;
+      stats[id].count += 1;
+
+      // Check if designer is already in the top designers
+      const existingIndex = topDesigners.findIndex((d) => d.id === id);
+      if (existingIndex !== -1) {
+        topDesigners[existingIndex] = stats[id];
+      } else {
+        topDesigners.push(stats[id]);
+      }
+
+      // Keep only the top 10 designers sorted
+      topDesigners.sort((a, b) => b.totalValue - a.totalValue);
+      if (topDesigners.length > 10) {
+        topDesigners.pop(); // Remove the lowest value designer
       }
     });
 
-    return Object.values(stats);
+    return topDesigners;
   }, [frontendProducts]);
 
-  const sortedDesigners = useMemo(() => {
-    return [...designerStats].sort((a, b) => {
-      if (sortByValue) {
-        return b.totalValue - a.totalValue;
-      } else {
-        return b.count - a.count;
-      }
-    });
-  }, [designerStats, sortByValue]);
+  // const sortedDesigners = useMemo(() => {
+  //   return [...designerStats].sort((a, b) => {
+  //     if (sortByValue) {
+  //       return b.totalValue - a.totalValue;
+  //     } else {
+  //       return b.count - a.count;
+  //     }
+  //   });
+  // }, [designerStats, sortByValue]);
+
+  const sortedDesigners = designerStats;
 
   const displayedDesigners = useMemo(() => {
     return showBottomDesigners
-      ? sortedDesigners.slice().reverse()
+      ? [...sortedDesigners].reverse()
       : sortedDesigners;
   }, [sortedDesigners, showBottomDesigners]);
 
@@ -158,9 +192,7 @@ const TopDesignersCard: React.FC<TopDesignersCardProps> = ({ countryCode }) => {
                   key={designer.id}
                   onClick={() =>
                     params?.storeId &&
-                    router.push(
-                      `/${params.storeId}/designers/${designer.id}`
-                    )
+                    router.push(`/${params.storeId}/designers/${designer.id}`)
                   }
                 >
                   <Avatar className="h-10 w-10 flex-shrink-0">
@@ -202,4 +234,3 @@ const TopDesignersCard: React.FC<TopDesignersCardProps> = ({ countryCode }) => {
 };
 
 export default TopDesignersCard;
-
