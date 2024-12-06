@@ -202,6 +202,28 @@ export function calculateTopSellersByMonth(sellers: any[]) {
   return sellerData.slice(0, 10);
 }
 
+// export function convertDecimalsToNumbers(data: any): any {
+//   if (Array.isArray(data)) {
+//     return data.map(convertDecimalsToNumbers);
+//   } else if (typeof data === "object" && data !== null) {
+//     return Object.keys(data).reduce((acc: Record<string, any>, key) => {
+//       const value = data[key];
+
+//       // Check if value is a Date and leave it as is
+//       if (value instanceof Date) {
+//         acc[key] = value;
+//       }
+//       // Check if value is a Prisma Decimal and convert it
+//       else if (value && typeof value === "object" && "toNumber" in value) {
+//         acc[key] = value.toNumber();
+//       } else {
+//         acc[key] = convertDecimalsToNumbers(value);
+//       }
+//       return acc;
+//     }, {});
+//   }
+//   return data;
+// }
 export function convertDecimalsToNumbers(data: any): any {
   if (Array.isArray(data)) {
     return data.map(convertDecimalsToNumbers);
@@ -209,20 +231,27 @@ export function convertDecimalsToNumbers(data: any): any {
     return Object.keys(data).reduce((acc: Record<string, any>, key) => {
       const value = data[key];
 
-      // Check if value is a Date and leave it as is
       if (value instanceof Date) {
-        acc[key] = value;
-      }
-      // Check if value is a Prisma Decimal and convert it
-      else if (value && typeof value === "object" && "toNumber" in value) {
-        acc[key] = value.toNumber();
+        acc[key] = value; // Leave dates as is
+      } else if (value && typeof value === "object" && "toNumber" in value) {
+        const numberValue = value.toNumber();
+        // console.log(`Converting Decimal to Number:`, {
+        //   key,
+        //   value,
+        //   numberValue,
+        // });
+        acc[key] = numberValue;
+      } else if (typeof value === "string" && !isNaN(Number(value))) {
+        // console.log(`Converting string "${value}" to number.`);
+        acc[key] = Number(value);
       } else {
-        acc[key] = convertDecimalsToNumbers(value);
+        acc[key] = convertDecimalsToNumbers(value); 
       }
+
       return acc;
     }, {});
   }
-  return data;
+  return data; 
 }
 
 export function convertSpecificDecimals(data: any): any {
@@ -234,10 +263,18 @@ export function convertSpecificDecimals(data: any): any {
     const converted = { ...data };
 
     // Convert only the specific decimal fields
-    if (converted.ourPrice && typeof converted.ourPrice === "object" && "toNumber" in converted.ourPrice) {
+    if (
+      converted.ourPrice &&
+      typeof converted.ourPrice === "object" &&
+      "toNumber" in converted.ourPrice
+    ) {
       converted.ourPrice = converted.ourPrice.toNumber();
     }
-    if (converted.retailPrice && typeof converted.retailPrice === "object" && "toNumber" in converted.retailPrice) {
+    if (
+      converted.retailPrice &&
+      typeof converted.retailPrice === "object" &&
+      "toNumber" in converted.retailPrice
+    ) {
       converted.retailPrice = converted.retailPrice.toNumber();
     }
 
@@ -247,7 +284,6 @@ export function convertSpecificDecimals(data: any): any {
   // Return primitive values as is
   return data;
 }
-
 
 // export const totalRevenue = (orders: any): number => {
 //   return orders.reduce((acc: any, order: any) => {

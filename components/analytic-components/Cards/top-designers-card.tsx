@@ -10,7 +10,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { currencyConvertor } from "@/lib/utils";
+import { convertDecimalsToNumbers, currencyConvertor } from "@/lib/utils";
 import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -49,8 +49,13 @@ const TopDesignersCard: React.FC<TopDesignersCardProps> = ({ countryCode }) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(`/api/${params.storeId}/products`);
-        setFrontendProducts(response.data);
+        const response = await axios.get(`/api/${params.storeId}/products`,{
+          params: {
+            isArchived: true,
+          },
+        });
+        const processedData = convertDecimalsToNumbers(response.data);
+        setFrontendProducts(processedData);
       } catch (error) {
         console.error("Error fetching products for top-designer-card:", error);
       } finally {
@@ -154,7 +159,7 @@ const TopDesignersCard: React.FC<TopDesignersCardProps> = ({ countryCode }) => {
                   onClick={() =>
                     params?.storeId &&
                     router.push(
-                      `/${params.storeId}/designers/${designer.id}/details`
+                      `/${params.storeId}/designers/${designer.id}`
                     )
                   }
                 >
@@ -164,17 +169,14 @@ const TopDesignersCard: React.FC<TopDesignersCardProps> = ({ countryCode }) => {
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">
+                    <p className="text-sm font-medium truncate hover:underline hover:cursor-pointer">
                       {designer.name}
                     </p>
                     <p className="text-xs text-muted-foreground truncate">
                       {designer.count} products sold
                     </p>
                   </div>
-                  <Badge
-                    variant="secondary"
-                    className="ml-auto flex-shrink-0"
-                  >
+                  <Badge variant="secondary" className="ml-auto flex-shrink-0">
                     {sortByValue
                       ? `${currencySymbol}${designer.totalValue.toLocaleString(
                           undefined,
@@ -197,64 +199,7 @@ const TopDesignersCard: React.FC<TopDesignersCardProps> = ({ countryCode }) => {
       </CardContent>
     </Card>
   );
-}
+};
 
 export default TopDesignersCard;
 
-// 'use client'
-
-// import React, { useState } from 'react';
-// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-// import { Badge } from "@/components/ui/badge";
-// import { Award } from 'lucide-react';
-// import { TbSwitchVertical } from "react-icons/tb";
-// import { Button } from '@/components/ui/button';
-
-// export default function MostPopularDesignerCard({ products }: any) {
-//   const [showTopDesigners, setShowTopDesigners] = useState(true);
-
-//   // Function to calculate top or bottom 5 designers with archived products
-//   const getDesigners = (products: any[], isTop: boolean) => {
-//     const archivedProducts = products.filter(product => product.isArchived);
-//     const designerCounts: { [key: string]: number } = archivedProducts.reduce((acc, product) => {
-//       const designerName = product.designer.name;
-//       acc[designerName] = (acc[designerName] || 0) + 1;
-//       return acc;
-//     }, {});
-
-//     // Convert object to array, sort by count
-//     const sortedDesigners = Object.entries(designerCounts).sort((a, b) => b[1] - a[1]);
-
-//     // Get the top 5 or bottom 5 designers based on the toggle
-//     return isTop ? sortedDesigners.slice(0, 5) : sortedDesigners.slice(-5).reverse();
-//   };
-
-//   const designers = getDesigners(products, showTopDesigners);
-
-//   return (
-//     <Card className="w-full">
-//       <CardHeader>
-//         <CardTitle className="flex items-center gap-2 w-full justify-between">
-//           <Award className="h-5 w-5 text-blue-400" />
-//           {showTopDesigners ? "Top Designers" : "Bottom Designers"}
-//           <Button variant="outline" onClick={() => setShowTopDesigners(!showTopDesigners)}>
-//             <TbSwitchVertical className="h-4 w-4" />
-//           </Button>
-//         </CardTitle>
-//       </CardHeader>
-//       <CardContent>
-//         <ul className="space-y-4">
-//           {designers.map(([designerName, count], index) => (
-//             <li key={designerName} className="flex items-center gap-3">
-//               <span className="font-bold text-lg text-muted-foreground">{index + 1}</span>
-//               <div className="flex-1">
-//                 <p className="font-semibold">{designerName}</p>
-//               </div>
-//               <Badge variant="secondary">{count.toString()} sold</Badge>
-//             </li>
-//           ))}
-//         </ul>
-//       </CardContent>
-//     </Card>
-//   );
-// }

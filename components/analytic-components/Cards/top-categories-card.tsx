@@ -10,7 +10,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { currencyConvertor } from "@/lib/utils";
+import { convertDecimalsToNumbers, currencyConvertor } from "@/lib/utils";
 import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -51,8 +51,13 @@ const TopCategoriesCard: React.FC<TopCategoriesCardProps> = ({
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(`/api/${params.storeId}/products`);
-        setFrontendProducts(response.data);
+        const response = await axios.get(`/api/${params.storeId}/products`,{
+          params: {
+            isArchived: true,
+          },
+        });
+        const processedData = convertDecimalsToNumbers(response.data);
+        setFrontendProducts(processedData);
       } catch (error) {
         console.error("Error fetching products for top-designer-card:", error);
       } finally {
@@ -155,7 +160,7 @@ const TopCategoriesCard: React.FC<TopCategoriesCardProps> = ({
                   key={category.id}
                   onClick={() =>
                     router.push(
-                      `/${params.storeId}/categories/${category.id}/details`
+                      `/${params.storeId}/categories/${category.id}`
                     )
                   }
                 >
@@ -165,7 +170,7 @@ const TopCategoriesCard: React.FC<TopCategoriesCardProps> = ({
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">
+                    <p className="text-sm font-medium truncate hover:underline hover:cursor-pointer">
                       {category.name}
                     </p>
                     <p className="text-xs text-muted-foreground truncate">

@@ -51,7 +51,6 @@ const TopSellersCard: React.FC<TopSellersCardProps> = ({ countryCode }) => {
         const response = await axios.get(`/api/${params.storeId}/sellers`);
         const processedData = convertDecimalsToNumbers(response.data);
         setFrontendSellers(processedData);
-        console.log("response.data", response.data);
       } catch (error) {
         console.error("Error fetching sellers:", error);
       } finally {
