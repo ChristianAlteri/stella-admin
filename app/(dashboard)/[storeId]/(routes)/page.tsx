@@ -201,18 +201,37 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
     );
   });
 
-  const soldStock = products.filter(
-    (product: any) => product.isArchived === true
-  ).length;
-  const liveStock = products.filter(
-    (product: any) => product.isArchived === false
-  ).length;
+  // const soldStock = products.filter(
+  //   (product: any) => product.isArchived === true
+  // ).length;
+  // const liveStock = products.filter(
+  //   (product: any) => product.isArchived === false
+  // ).length;
 
-  const liveStockData = plainProducts.filter(
-    (product: any) => product.isArchived === false
-  );
+  // const liveStockData = plainProducts.filter(
+  //   (product: any) => product.isArchived === false
+  // );
+  // const averagePrice = calculateAveragePrice(liveStockData);
+  const { soldStock, liveStock, liveStockData } = products.reduce(
+      (acc: { soldStock: number; liveStock: number; liveStockData: typeof products }, product) => {
+        if (product.isArchived) {
+          acc.soldStock++;
+        } else {
+          acc.liveStock++;
+          acc.liveStockData.push(product);
+        }
+        return acc;
+      },
+      { soldStock: 0, liveStock: 0, liveStockData: [] as typeof products }
+    );
+    const averagePrice = calculateAveragePrice(
+      liveStockData.map(product => ({
+        ...product,
+        ourPrice: product.ourPrice.toNumber(),
+      }))
+    );
 
-  const averagePrice = calculateAveragePrice(liveStockData);
+
 
   const topSellers = plainSellers
     .filter((seller: any) => seller.soldCount && seller.id !== params.storeId) // Filter removes any seller wos sold count = 0 and the store
@@ -263,11 +282,11 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
 
         <div className="flex flex-row w-full gap-4 justify-between">
           {/* <StoreRevenueVsOrderAreaChart countryCode={store?.countryCode || "GB"} orders={plainOrders} /> */}
-          {/* <div className="flex flex-row w-full h-full gap-4 justify-between">
+          <div className="flex flex-row w-full h-full gap-4 justify-between">
             <TopSellersCard countryCode={store?.countryCode || "GB"} sellers={topSellers} />
             <TopDesignersCard countryCode={store?.countryCode || "GB"} products={plainProducts} />
             <TopCategoriesCard countryCode={store?.countryCode || "GB"} products={plainProducts} />
-          </div> */}
+          </div>
         </div>
 
         {/* <div className="flex flex-row w-full gap-4 justify-between">
