@@ -274,8 +274,8 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
           {/* <StoreRevenueVsOrderAreaChart countryCode={store?.countryCode || "GB"} orders={plainOrders} /> */}
           <div className="flex flex-row w-full h-full gap-4 justify-between">
             <TopSellersCard countryCode={store?.countryCode || "GB"} />
-            <TopDesignersCard countryCode={store?.countryCode || "GB"} />
-            <TopCategoriesCard countryCode={store?.countryCode || "GB"} />
+            {/* <TopDesignersCard countryCode={store?.countryCode || "GB"} /> */}
+            {/* <TopCategoriesCard countryCode={store?.countryCode || "GB"} /> */}
           </div>
         </div>
 
