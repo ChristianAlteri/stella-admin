@@ -163,9 +163,10 @@ const TopSellersCard: React.FC<TopSellersCardProps> = ({ countryCode }) => {
                   </div>
                   <Badge variant="secondary" className="ml-auto flex-shrink-0">
                     {sortByPayouts
-                      ? `${currencySymbol}${calculateTotalPayouts(
-                          seller.payouts
-                        )}`
+                      ? `${currencySymbol}${calculateTotalPayouts(seller.payouts).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}`
                       : `${seller.soldCount} sold`}
                   </Badge>
                 </div>
