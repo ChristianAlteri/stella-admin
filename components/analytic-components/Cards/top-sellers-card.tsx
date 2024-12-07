@@ -86,7 +86,7 @@ const TopSellersCard: React.FC<TopSellersCardProps> = ({ countryCode }) => {
   return (
     <Card className="col-span-3 h-[280px] flex flex-col w-full">
       {isLoading ? (
-        <div className="flex w-full items-center justify-center mt-4">
+        <div className="flex w-full items-center justify-center mt-4 text-muted-foreground">
           Loading...
         </div>
       ) : (

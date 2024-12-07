@@ -88,7 +88,10 @@ export async function GET(
             color: true,
           },
         }
-      }
+      },
+      orderBy: {
+        name: 'asc', // Order by name in asc order
+      },
     });
   
     return NextResponse.json(categories);

@@ -54,11 +54,13 @@ export async function POST(
 
 export async function GET(
   req: Request,
-  { params }: { params: { storeId: string; name: string } }
+  { params }: { params: { storeId: string; name: string; isArchived: boolean } }
 ) {
   try {
     const { searchParams } = new URL(req.url);
     const name = searchParams.get("name") || undefined;
+    const storeId = searchParams.get("storeId");
+    const isArchived = searchParams.get("isArchived") === "true" ? true : false;
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
     }
@@ -66,6 +68,7 @@ export async function GET(
     const designer = await prismadb.designer.findMany({
       where: {
         storeId: params.storeId,
+        isArchived: isArchived,
         name: {
           contains: name,
           mode: 'insensitive',
@@ -83,6 +86,9 @@ export async function GET(
             color: true,
           },
         }
+      },
+      orderBy: {
+        name: 'asc', // Order by name in asc order
       },
     });
   

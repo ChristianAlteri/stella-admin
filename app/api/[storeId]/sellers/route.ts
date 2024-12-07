@@ -132,6 +132,9 @@ export async function GET(
           },
         },
       },
+      orderBy: {
+        storeName: 'asc', // Order by name in asc order
+      },
     });
 
     // console.log('[SELLER_GET] payout amount', sellers.map(seller => seller.payouts.map(payout => payout.amount)));
