@@ -72,20 +72,37 @@ export async function POST(
     newOrder = await prismadb.order.create({
       data: {
         store: { connect: { id: store.id } },
-        isPaid: false,
+        isPaid: false, // Not paid until the payment is successful and that happens in /success
         inStoreSale: false,
         totalAmount: new Prisma.Decimal(totalSales),
-        soldByStaff: { connect: { id: store.id } },
+        soldByStaff: {
+          connect: { id: store.id },
+        },
         orderItems: {
           create: products.map((product) => ({
             stripe_connect_unique_id: product.seller.stripe_connect_unique_id,
-            soldByStaff: { connect: { id: store.id } },
+            soldByStaff: {
+              connect: { id: store?.id || "" },
+            },
             productAmount: new Prisma.Decimal(product.ourPrice),
-            product: { connect: { id: product.id } },
-            seller: { connect: { id: product.seller.id } },
-            store: { connect: { id: params.storeId } },
+            product: {
+              connect: {
+                id: product.id,
+              },
+            },
+            seller: {
+              connect: {
+                id: product.seller.id,
+              },
+            },
+            store: {
+              connect: {
+                id: params.storeId,
+              },
+            },
           })),
         },
+        // ...(userId && { userId: userId }),
       },
     });
     console.log(`[INFO API_${logKey}] newOrder created:`, newOrder);
