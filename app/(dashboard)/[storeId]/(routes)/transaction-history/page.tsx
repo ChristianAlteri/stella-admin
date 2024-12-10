@@ -10,6 +10,7 @@ const TransactionHistoryPage = async ({
   const orders = await prismadb.order.findMany({
     where: {
       storeId: params.storeId,
+      isPaid: true,
     },
     include: {
       Payout: true,

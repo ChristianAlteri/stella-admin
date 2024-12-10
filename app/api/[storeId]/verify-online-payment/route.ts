@@ -92,6 +92,9 @@ export async function POST(request: Request) {
           where: { id: orderId },
           data: {
             isPaid: true,
+            totalAmount: {
+              increment: 10, 
+            }, // Increment by a hard coded shipping rate of $10
             address: JSON.stringify(session.customer_details?.address),
             phone: session.customer_details?.phone || "",
             email: session.customer_details?.email || "",
@@ -164,7 +167,7 @@ export async function POST(request: Request) {
         );
       }
 
-      let storeCut = 0;
+      let storeCut = 10; // Hard coded shipping rate
       // PAYOUT SELLERS
       const sellerPayouts = products.reduce<{ [key: string]: number }>(
         (acc, product) => {
