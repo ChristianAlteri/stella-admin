@@ -112,7 +112,7 @@ export async function POST(req: Request) {
     const genders = await prismadb.gender.createMany({
       data: [
         { name: "Mens", storeId: store.id },
-        { name: "Womans", storeId: store.id },
+        { name: "Women's", storeId: store.id },
       ],
     });
 

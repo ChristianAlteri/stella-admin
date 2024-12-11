@@ -222,7 +222,7 @@ export const TransactionHistoryClient: React.FC<
           </div>
           <div className="flex flex-col sm:flex-row justify-between gap-4">
             <div className="flex gap-2 ">
-              <Button
+              {/* <Button
                 variant="outline"
                 size="sm"
                 onClick={() => {
@@ -234,7 +234,53 @@ export const TransactionHistoryClient: React.FC<
                 {showDispatchedOrders === null || showDispatchedOrders
                   ? "Unfulfilled Orders"
                   : "Dispatched"}
-              </Button>
+              </Button> */}
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={`${
+                    showDispatchedOrders === false ||
+                    showDispatchedOrders === null
+                      ? "text-white bg-red-500"
+                      : "text-white bg-gray-500"
+                  }`}
+                  onClick={() => setShowDispatchedOrders(false)}
+                >
+                  Unfulfilled Orders
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={`${
+                    showDispatchedOrders === true
+                      ? "text-white bg-green-500"
+                      : "text-white bg-gray-500"
+                  }`}
+                  onClick={() => setShowDispatchedOrders(true)}
+                >
+                  Dispatched
+                </Button>
+              </div>
+              {/* <Button
+                variant="outline"
+                size="sm"
+                className={`${
+                  showDispatchedOrders === null || showDispatchedOrders
+                    ? "text-white bg-red-500"
+                    : "text-white bg-green-500"
+                }`}
+                onClick={() => {
+                  setShowDispatchedOrders((prev) =>
+                    prev === null ? false : !prev
+                  );
+                }}
+              >
+                {showDispatchedOrders === null || showDispatchedOrders
+                  ? "Unfulfilled Orders"
+                  : "Dispatched"}
+              </Button> */}
 
               {/* <Button
                 variant="outline"
@@ -360,8 +406,6 @@ export const TransactionHistoryClient: React.FC<
               )}
             />
           </TabsContent>
-
-         
         </Tabs>
       </CardContent>
     </Card>

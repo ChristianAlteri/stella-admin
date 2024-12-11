@@ -152,7 +152,7 @@ export const GenderForm: React.FC<GenderFormProps> = ({
                     <Input disabled={loading} placeholder="Gender name" {...field} />
                   </FormControl>
                   <FormDescription>
-                      Make sure to upload Womans first, then Mens or the app will break!
+                      Make sure to upload Womens first, then Mens or the app will break!
                     </FormDescription>
                   <FormMessage />
                 </FormItem>
