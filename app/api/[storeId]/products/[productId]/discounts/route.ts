@@ -29,7 +29,6 @@ export async function PATCH(
     const discountedProduct = await prismadb.product.update({
       where: { id: params.productId },
       data: {
-        // originalPrice: product.originalPrice ?? product.ourPrice, // Keep the initial price as originalPrice
         originalPrice: (product.timesDiscounted ?? 0) < 1 ? product.ourPrice : product.originalPrice, // Update the product, ensuring `originalPrice` is set only if timesDiscounted < 1
         ourPrice: newPrice,
         isOnSale: true,
@@ -37,7 +36,7 @@ export async function PATCH(
       },
     });
 
-    console.log("discountedProduct", discountedProduct);
+    // console.log("discountedProduct", discountedProduct);
     return NextResponse.json(
       { message: "Product updated successfully" },
       { status: 200 }

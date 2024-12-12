@@ -185,6 +185,8 @@ const OldStock: React.FC<OldStockProps> = ({ countryCode }) => {
     }
   };
 
+  console.log("sorted", sortedProducts);
+
   return (
     <>
       <div className="flex-grow flex flex-col">
@@ -226,7 +228,7 @@ const OldStock: React.FC<OldStockProps> = ({ countryCode }) => {
                       <th className="px-2 py-2">Category</th>
                       <th className="px-2 py-2">Price</th>
                       <th className="px-2 py-2">Date Created</th>
-                      <th className="px-2 py-2">Discount</th>
+                      <th className="px-2 py-2">Discount %</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -275,12 +277,6 @@ const OldStock: React.FC<OldStockProps> = ({ countryCode }) => {
                             )}{" "}
                             days ago
                           </span>
-                          <button
-                            className="text-xs text-blue-500 hover:underline hover:cursor-pointer"
-                            onClick={() => resetDate(product.id)}
-                          >
-                            Reset
-                          </button>
                         </td>
 
                         <th className="px-4 py-2">
@@ -309,6 +305,15 @@ const OldStock: React.FC<OldStockProps> = ({ countryCode }) => {
                             >
                               Apply
                             </button>
+                            <div className="text-super-small">
+                              or
+                            </div>
+                            <button
+                            className="text-xs text-blue-500 hover:underline hover:cursor-pointer"
+                            onClick={() => resetDate(product.id)}
+                          >
+                            Reset
+                          </button>
                           </td>
                         </th>
                       </tr>
@@ -335,7 +340,7 @@ const OldStock: React.FC<OldStockProps> = ({ countryCode }) => {
                       <th className="px-2 py-2">Category</th>
                       <th className="px-2 py-2">Price</th>
                       <th className="px-2 py-2">Date Created</th>
-                      <th className="px-2 py-2">Discount</th>
+                      <th className="px-2 py-2">Discount %</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -384,12 +389,6 @@ const OldStock: React.FC<OldStockProps> = ({ countryCode }) => {
                             )}{" "}
                             days ago
                           </span>
-                          <button
-                            className="text-xs text-blue-500 hover:underline hover:cursor-pointer"
-                            onClick={() => resetDate(product.id)}
-                          >
-                            Reset
-                          </button>
                         </td>
 
                         <th className="px-4 py-2">
@@ -417,6 +416,15 @@ const OldStock: React.FC<OldStockProps> = ({ countryCode }) => {
                               onClick={() => applyDiscount(product.id)}
                             >
                               Apply
+                            </button>
+                            <div className="text-super-small">
+                              or
+                            </div>
+                            <button
+                              className="text-xs text-blue-500 hover:underline hover:cursor-pointer"
+                              onClick={() => resetDate(product.id)}
+                            >
+                              Reset
                             </button>
                           </td>
                         </th>
