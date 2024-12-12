@@ -61,6 +61,7 @@ export default async function ProductDetailsPage({
     description: product.description || "",
     ourPrice: formatter.format(product.ourPrice.toNumber()),
     retailPrice: product.retailPrice ? formatter.format(product.retailPrice.toNumber()) : "",
+    originalPrice: product.originalPrice ? formatter.format(product.originalPrice.toNumber()) : "",
     designer: product.designer.name,
     category: product.category.name,
     sellerHandle: product.seller.instagramHandle,

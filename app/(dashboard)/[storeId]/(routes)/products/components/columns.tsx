@@ -11,6 +11,7 @@ export type ProductColumn = {
   description: string;
   ourPrice: string;
   retailPrice: string;
+  originalPrice: string;
   designer: string;
   category: string;
   sellerHandle: string;

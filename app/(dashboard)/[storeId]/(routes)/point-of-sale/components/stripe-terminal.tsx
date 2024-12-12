@@ -325,7 +325,8 @@ export default function StripeTerminalComponent({
           urlFrom: urlFrom,
           soldByStaffId: selectedStaffId || `${storeId}`,
           userId: `${selectedUserId}` || "",
-          userEmail: users.find((user) => user.id === selectedUserId)?.email || "",
+          userEmail:
+            users.find((user) => user.id === selectedUserId)?.email || "",
         }
       );
       setPaymentIntentId(data?.paymentIntent?.id);
@@ -663,18 +664,25 @@ export default function StripeTerminalComponent({
                                         >
                                           {result.name}
                                         </h3>
-                                        <p className="text-xs text-muted-foreground">
+                                        <div className="text-xs text-muted-foreground flex flex-row gap-2">
                                           {currencySymbol}
                                           {result.ourPrice.toString()}
-                                        </p>
+                                          {result.isOnSale && (
+                                              <div className="text-muted-foreground line-through">
+                                                {currencySymbol}
+                                                {result.originalPrice.toString()}
+                                              </div>
+                                            )}
+                                        </div>
                                       </div>
                                       <div className="flex flex-row gap-2 text-end items-center w-full">
-                                        <p className="text-xs text-muted-foreground w-full mr-4 hover:cursor-pointer hover:underline"
-                                        onClick={() =>
-                                          router.push(
-                                            `/${storeId}/sellers/${result.id}/details`
-                                          )
-                                        }
+                                        <p
+                                          className="text-xs text-muted-foreground w-full mr-4 hover:cursor-pointer hover:underline"
+                                          onClick={() =>
+                                            router.push(
+                                              `/${storeId}/sellers/${result.id}/details`
+                                            )
+                                          }
                                         >
                                           {result.seller.storeName ||
                                             result.seller.instagramHandle ||
@@ -684,28 +692,28 @@ export default function StripeTerminalComponent({
                                     </div>
                                   </div>
                                   {result.seller.stripe_connect_unique_id ? (
-                                  <Button
-                                    onClick={() => handleSelect(result)}
-                                    variant={
-                                      selectedProducts.some(
+                                    <Button
+                                      onClick={() => handleSelect(result)}
+                                      variant={
+                                        selectedProducts.some(
+                                          (p) => p.id === result.id
+                                        )
+                                          ? "default"
+                                          : "outline"
+                                      }
+                                    >
+                                      {selectedProducts.some(
                                         (p) => p.id === result.id
                                       )
-                                        ? "default"
-                                        : "outline"
-                                    }
-                                  >
-                                    {selectedProducts.some(
-                                      (p) => p.id === result.id
-                                    )
-                                      ? "Selected"
-                                      : "Select for Sale"}
-                                  </Button>
+                                        ? "Selected"
+                                        : "Select for Sale"}
+                                    </Button>
                                   ) : (
                                     <Button
                                       disabled
                                       className="bg-red-500 text-white cursor-not-allowed"
                                     >
-                                      Seller not connected to Stripe 
+                                      Seller not connected to Stripe
                                     </Button> // TODO: On click set item to stores stripe id that way we can still sell the item but will have to distribute the funds manually
                                   )}
                                 </div>
@@ -909,20 +917,24 @@ export default function StripeTerminalComponent({
                     {!isPaymentCaptured ? (
                       <>
                         {!paymentIntentId ? (
-                            <Button
-                              onClick={() => {
-                                if (!selectedStaffId) {
-                                  toastError("Please select a staff member.");
-                                } else {
-                                  createPendingPayment();
-                                  setIsDialogOpen(true);
-                                }
-                              }}
-                              disabled={!selectedReader || !amount || !selectedStaffId}
-                              className="w-full"
-                            >
-                             {selectedStaffId ? `Create Payment (${currencySymbol}${amount})` : "Select Staff Member"}
-                            </Button>
+                          <Button
+                            onClick={() => {
+                              if (!selectedStaffId) {
+                                toastError("Please select a staff member.");
+                              } else {
+                                createPendingPayment();
+                                setIsDialogOpen(true);
+                              }
+                            }}
+                            disabled={
+                              !selectedReader || !amount || !selectedStaffId
+                            }
+                            className="w-full"
+                          >
+                            {selectedStaffId
+                              ? `Create Payment (${currencySymbol}${amount})`
+                              : "Select Staff Member"}
+                          </Button>
                         ) : (
                           <>
                             <Button

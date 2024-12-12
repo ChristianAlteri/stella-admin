@@ -57,6 +57,7 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
     isHidden: item.isHidden,
     isOnline: item.isOnline,
     ourPrice: (item.ourPrice.toString()),
+    originalPrice: item.originalPrice ? item.originalPrice.toString() : "",
     retailPrice: item.retailPrice
       ? (item.retailPrice.toString())
       : "",

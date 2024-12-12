@@ -221,25 +221,27 @@ model Product {
   subcategoryId String // Foreign Key to Color
   subcategory   Subcategory @relation(fields: [subcategoryId], references: [id])
 
-  colorId      String? // Foreign Key to Color
-  color        Color?     @relation(fields: [colorId], references: [id])
-  conditionId  String? // Foreign Key to Color
-  condition    Condition? @relation(fields: [conditionId], references: [id])
-  materialId   String? // Foreign Key to Color
-  material     Material?  @relation(fields: [materialId], references: [id])
-  genderId     String? // Foreign Key to Color
-  gender       Gender?    @relation(fields: [genderId], references: [id])
-  isOnSale     Boolean    @default(false)
-  isFeatured   Boolean    @default(false)
-  isArchived   Boolean    @default(false)
-  isCharity    Boolean    @default(false)
-  isHidden     Boolean    @default(false)
-  isOnline     Boolean    @default(false)
-  retailPrice  Decimal?   @default(0.0)
-  likes        Int?       @default(0)
-  clicks       Int?       @default(0)
-  description  String?
-  measurements String?
+  colorId         String? // Foreign Key to Color
+  color           Color?     @relation(fields: [colorId], references: [id])
+  conditionId     String? // Foreign Key to Color
+  condition       Condition? @relation(fields: [conditionId], references: [id])
+  materialId      String? // Foreign Key to Color
+  material        Material?  @relation(fields: [materialId], references: [id])
+  genderId        String? // Foreign Key to Color
+  gender          Gender?    @relation(fields: [genderId], references: [id])
+  isOnSale        Boolean    @default(false)
+  isFeatured      Boolean    @default(false)
+  isArchived      Boolean    @default(false)
+  isCharity       Boolean    @default(false)
+  isHidden        Boolean    @default(false)
+  isOnline        Boolean    @default(false)
+  retailPrice     Decimal?   @default(0.0)
+  originalPrice   Decimal?   @default(0.0)
+  timesDiscounted Int?       @default(0)
+  likes           Int?       @default(0)
+  clicks          Int?       @default(0)
+  description     String?
+  measurements    String?
 
   userClicks User[] @relation("ProductToUserClicks")
   userLikes  User[] @relation("ProductToUserLikes")

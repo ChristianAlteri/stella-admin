@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Badge, Package, ShoppingCart, TrendingUp } from "lucide-react";
 import { currencyConvertor } from "@/lib/utils";
 import { TbTag } from "react-icons/tb";
+import OldStockTable from "../Tables/old-stock-table";
 
 type ProductWithRelations = Product & {
   designer?: Designer;
@@ -52,23 +53,6 @@ export default function StockCard({
   const currencySymbol = currencyConvertor(countryCode);
   const router = useRouter();
   const params = useParams();
-
-  const [isOldestFirst, setIsOldestFirst] = useState(true);
-
-  const filteredProducts = products.filter(
-    (product) =>
-      new Date(product.createdAt) <
-        new Date(new Date().setMonth(new Date().getMonth() - 1)) &&
-      !product.isArchived
-  );
-
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    if (isOldestFirst) {
-      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-    } else {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    }
-  });
 
   const totalStockWorth = products.reduce((total, product) => {
     if (!product.isArchived) {
@@ -133,18 +117,16 @@ export default function StockCard({
                       <>
                         {`${currencySymbol}${todaysGrossRevenue.toFixed(2)}`}
                         <div className="flex flex-col justify-start">
-                            <p className="text-xs text-green-500">
-                              Net:{" "}
-                              {`${currencySymbol}${todaysNetRevenue.toFixed(
-                                2
-                              )}`}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              Payout:{" "}
-                              {`${currencySymbol}${todaysSellerPayouts.toFixed(
-                                2
-                              )}`}
-                            </p>
+                          <p className="text-xs text-green-500">
+                            Net:{" "}
+                            {`${currencySymbol}${todaysNetRevenue.toFixed(2)}`}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Payout:{" "}
+                            {`${currencySymbol}${todaysSellerPayouts.toFixed(
+                              2
+                            )}`}
+                          </p>
                           <p className="text-super-small text-muted-foreground">
                             Fees:{" "}
                             {`${currencySymbol}${(
@@ -260,7 +242,9 @@ export default function StockCard({
           </Card>
         </div>
         <Separator />
-        <div className="flex-grow flex flex-col">
+
+        <OldStockTable countryCode={countryCode} />
+        {/* <div className="flex-grow flex flex-col">
           <div className="flex items-center justify-between mb-2">
             <span className="text-md font-bold flex items-center gap-2">
               Stock Older Than 4 weeks:
@@ -317,9 +301,9 @@ export default function StockCard({
                         {currencySymbol}
                         {product.ourPrice.toString()}
                       </td>
-                      {/* <td className="px-4 py-2">
+                      <td className="px-4 py-2">
                         {new Date(product.createdAt).toLocaleDateString()}
-                      </td> */}
+                      </td>
                       <td className="px-4 py-2">
                         {Math.floor(
                           (Number(new Date()) -
@@ -334,7 +318,7 @@ export default function StockCard({
               </table>
             )}
           </ScrollArea>
-        </div>
+        </div> */}
       </CardContent>
     </Card>
   );

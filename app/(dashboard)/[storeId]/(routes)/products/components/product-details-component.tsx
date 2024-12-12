@@ -27,18 +27,73 @@ import { ProductColumn } from "./columns";
 import { useRouter } from "next/navigation";
 import { currencyConvertor } from "@/lib/utils";
 import { useState } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { TbFaceId, TbFaceIdError } from "react-icons/tb";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface ProductDetailsComponentProps {
   data: ProductColumn;
 }
 
+// Custom Toast Error
+const toastError = (message: string) => {
+  toast.error(message, {
+    style: {
+      background: "white",
+      color: "black",
+    },
+    icon: <TbFaceIdError size={30} />,
+  });
+};
+// Custom Toast Success
+const toastSuccess = (message: string) => {
+  toast.error(message, {
+    style: {
+      background: "white",
+      color: "green",
+    },
+    icon: <TbFaceId size={30} />,
+  });
+};
+
 export default function ProductDetailsComponent({
   data,
 }: ProductDetailsComponentProps) {
-  console.log("data", data);
   const currencySymbol = currencyConvertor(data.countryCode);
   const router = useRouter();
   const [isMinimized, setIsMinimized] = useState(true);
+  const [discounts, setDiscounts] = useState<{ [key: string]: number }>({});
+  // Helper function to handle discount change
+  const handleDiscountChange = (productId: string, value: number) => {
+    setDiscounts((prevDiscounts) => ({
+      ...prevDiscounts,
+      [productId]: value,
+    }));
+  };
+
+  const applyDiscount = async (data: ProductColumn) => {
+    try {
+      const defaultDiscount = 50;
+      const discountToApply = discounts[data.id] || defaultDiscount;
+      const response = await axios.patch(
+        `/api/${data.storeId}/products/${data.id}/discounts`,
+        {
+          productPrice: data.ourPrice,
+          discountToApply: discountToApply,
+        }
+      );
+
+      if (response.status === 200) {
+        toastSuccess("Discount applied successfully");
+      } else {
+        toastError(`Error applying discount: ${response.data}`);
+      }
+    } catch (error: any) {
+      toastError(`Failed to apply discount: ${error.data}`);
+    }
+  };
 
   const ProductBadge = ({
     condition,
@@ -75,13 +130,26 @@ export default function ProductDetailsComponent({
               <h3 className="font-semibold text-xs col-span-1 truncate">
                 {data.name}
               </h3>
-              <p className="text-sm text-muted-foreground col-span-1 truncate">
+              <div className="text-sm text-muted-foreground col-span-1 truncate">
                 {data.designer}
-              </p>
-              <p className="font-semibold text-xs col-span-1 text-left">
-                {currencySymbol} {data.ourPrice}
-              </p>
-              <p
+              </div>
+              <div className="flex flex-col col-span-1 gap-2 w-full">
+                <div className="flex flex-row font-semibold text-xs text-left gap-1">
+                  {currencySymbol} {data.ourPrice}
+                  {data.isOnSale && (
+                    <div className="flex flex-row text-super-small gap-1 justify-center items-center">
+                      <h6 className="flex flex-row text-super-small text-muted-foreground">
+                        WAS
+                      </h6>
+                      <h6 className="flex flex-row  text-super-small text-muted-foreground line-through">
+                        {currencySymbol}
+                        {data.originalPrice}
+                      </h6>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div
                 className="text-xs text-blue-600 hover:underline hover:cursor-pointer col-span-1 truncate"
                 onClick={() =>
                   router.push(
@@ -90,10 +158,10 @@ export default function ProductDetailsComponent({
                 }
               >
                 {data.sellerStoreName}
-              </p>
-              <p className="text-xs text-muted-foreground col-span-1 text-left truncate w-full">
+              </div>
+              <div className="text-xs text-muted-foreground col-span-1 text-left truncate w-full">
                 {data.id}
-              </p>
+              </div>
               <div className="flex items-center justify-center p-2">
                 <ProductActions data={data} />
                 <button
@@ -136,8 +204,8 @@ export default function ProductDetailsComponent({
                     <CardTitle className="text-2xl font-bold">
                       {data.name}
                     </CardTitle>
-                    <p className="text-muted-foreground">{data.designer}</p>
-                    <p className="text-muted-foreground">{data.id}</p>
+                    <div className="text-muted-foreground">{data.designer}</div>
+                    <div className="text-muted-foreground">{data.id}</div>
                     <div className="flex items-center">
                       <Tag className="mr-2 h-4 w-4" />
                       <span>{data.category}</span>
@@ -188,9 +256,9 @@ export default function ProductDetailsComponent({
                   <button
                     onClick={() => setIsMinimized(!isMinimized)}
                     className="hover:cursor-pointer focus:outline-none focus:ring-2 m-2 p-1"
-                    >
-                      <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                    </button>
+                  >
+                    <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                  </button>
                 </div>
               </CardHeader>
               <CardContent>
@@ -201,11 +269,47 @@ export default function ProductDetailsComponent({
                         <Tag className="mr-2 h-4 w-4" />
                         <span>{data.category}</span>
                       </div>
-                      <div className="flex items-center">
-                        <span>
-                          {currencySymbol}
-                          {data.ourPrice}
-                        </span>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center space-x-2 text-sm">
+                          <div className="flex items-baseline space-x-1">
+                            <span className="font-medium">
+                              {currencySymbol}
+                              {data.ourPrice}
+                            </span>
+                            {data.isOnSale && data.originalPrice && (
+                              <span className="text-muted-foreground line-through">
+                                {currencySymbol}
+                                {data.originalPrice}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="number"
+                              placeholder="Discount %"
+                              className="w-12 text-xs border rounded-md text-muted-foreground p-1"
+                              value={discounts[data.id] || 50}
+                              min={1}
+                              max={99}
+                              onChange={(e) => {
+                                const value = Math.min(
+                                  Math.max(
+                                    parseInt(e.target.value, 10) || 0,
+                                    1
+                                  ),
+                                  99
+                                );
+                                handleDiscountChange(data.id, value);
+                              }}
+                            />
+                            <button
+                            className="hover:underline hover:cursor-pointer"  
+                              onClick={() => applyDiscount(data)}
+                            >
+                              Discount
+                            </button>
+                          </div>
+                        </div>
                       </div>
                       <div
                         onClick={() => {
