@@ -476,7 +476,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   </Command>
                 </PopoverContent>
               </Popover>
-              {label.toLowerCase() !== "seller" &&
+              {label.toLowerCase() !== "seller" && 
+              label.toLowerCase() !== "size" && 
+              label.toLowerCase() !== "category" && 
+              label.toLowerCase() !== "color" && 
+              label.toLowerCase() !== "material" && 
+              label.toLowerCase() !== "condition" && 
+              label.toLowerCase() !== "sub-category" && 
                 label.toLowerCase() !== "gender" && (
                   <Button
                     type="button"
@@ -639,14 +645,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   () => openAddFieldDialog("colors")
                 )}
                 {renderSelector(
-                  "designerId",
-                  "Designer",
-                  updatedDesigners,
-                  "name",
-                  activeFieldType === "designers",
-                  () => openAddFieldDialog("designers")
-                )}
-                {renderSelector(
                   "categoryId",
                   "Category",
                   updatedCategories,
@@ -655,20 +653,20 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   () => openAddFieldDialog("categories")
                 )}
                 {renderSelector(
-                  "subcategoryId",
-                  "Sub-category",
-                  updatedSubcategories,
-                  "name",
-                  activeFieldType === "sub-categories",
-                  () => openAddFieldDialog("sub-categories")
-                )}
-                {renderSelector(
                   "sizeId",
                   "Size",
                   updatedSizes,
                   "name",
                   activeFieldType === "sizes",
                   () => openAddFieldDialog("sizes")
+                )}
+                {renderSelector(
+                  "designerId",
+                  "Designer",
+                  updatedDesigners,
+                  "name",
+                  activeFieldType === "designers",
+                  () => openAddFieldDialog("designers")
                 )}
               </div>
             </CardContent>
@@ -699,8 +697,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                           />
                         </FormControl>
                         <FormDescription>
-                          Use bullet points for details. Start with - . E.g., -
-                          S/S 1999. - Sourced from Italy
+                          This will appear online
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -761,6 +758,14 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                     activeFieldType === "genders",
                     () => openAddFieldDialog("genders")
                   )}
+                  {renderSelector(
+                  "subcategoryId",
+                  "Sub-category",
+                  updatedSubcategories,
+                  "name",
+                  activeFieldType === "sub-categories",
+                  () => openAddFieldDialog("sub-categories")
+                )}
                 </div>
               </CardContent>
             )}
