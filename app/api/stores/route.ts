@@ -165,11 +165,105 @@ export async function POST(req: Request) {
     
     const genders = await prismadb.gender.createMany({
       data: [
-        { name: "Mens", storeId: store.id },
-        { name: "Women's", storeId: store.id },
+        { name: "MENS", storeId: store.id },
+        { name: "WOMEN'S", storeId: store.id },
       ],
     });
 
+    const colors = await prismadb.color.createMany({
+      data: [
+        { name: "BLACK", storeId: store.id },
+        { name: "BLUE", storeId: store.id },
+        { name: "BROWN", storeId: store.id },
+        { name: "BURGUNDY", storeId: store.id },
+        { name: "CREAM", storeId: store.id },
+        { name: "GOLD", storeId: store.id },
+        { name: "GREY", storeId: store.id },
+        { name: "GREEN", storeId: store.id },
+        { name: "SILVER", storeId: store.id },
+        { name: "MULTI COLOR", storeId: store.id },
+        { name: "ORANGE", storeId: store.id },
+        { name: "PINK", storeId: store.id },
+        { name: "PURPLE", storeId: store.id },
+        { name: "RED", storeId: store.id },
+        { name: "WHITE", storeId: store.id },
+        { name: "YELLOW", storeId: store.id },
+        { name: "ANIMAL PRINT", storeId: store.id },
+        { name: "KHAKI", storeId: store.id },
+        { name: "BEIGE", storeId: store.id },
+        { name: "CAMO PRINT", storeId: store.id },
+        { name: "TAN", storeId: store.id },
+        { name: "NAVY", storeId: store.id },
+        { name: "N/A", storeId: store.id },
+      ],
+    });    
+
+    const materials = await prismadb.material.createMany({
+      data: [
+        { name: "COTTON", storeId: store.id },
+        { name: "LINEN", storeId: store.id },
+        { name: "WOOL", storeId: store.id },
+        { name: "SILK", storeId: store.id },
+        { name: "POLYESTER", storeId: store.id },
+        { name: "NYLON", storeId: store.id },
+        { name: "RAYON", storeId: store.id },
+        { name: "LACE", storeId: store.id },
+        { name: "VELVET", storeId: store.id },
+        { name: "LEATHER", storeId: store.id },
+        { name: "HEMP", storeId: store.id },
+        { name: "BAMBOO", storeId: store.id },
+        { name: "VISCOSE", storeId: store.id },
+        { name: "ACRYLIC", storeId: store.id },
+        { name: "BEADING/SEQUINS", storeId: store.id },
+        { name: "FUR", storeId: store.id },
+        { name: "SHELL", storeId: store.id },
+        { name: "METAL", storeId: store.id },
+        { name: "JERSEY", storeId: store.id },
+        { name: "KNIT", storeId: store.id },
+        { name: "MESH", storeId: store.id },
+        { name: "CANVAS", storeId: store.id },
+        { name: "FLEECE", storeId: store.id },
+        { name: "PLASTIC", storeId: store.id },
+        { name: "SATIN", storeId: store.id },
+        { name: "WOOD", storeId: store.id },
+        { name: "DENIM", storeId: store.id },
+        { name: "PLEATHER", storeId: store.id },
+      ],
+    });
+
+    const categories = await prismadb.category.createMany({
+      data: [
+        { name: "ACCESSORIES", storeId: store.id },
+        { name: "BAGS", storeId: store.id },
+        { name: "HOME", storeId: store.id },
+        { name: "JEWELLERY & WATCHES", storeId: store.id },
+        { name: "SHOES", storeId: store.id },
+        { name: "COATS & JACKETS", storeId: store.id },
+        { name: "JEANS", storeId: store.id },
+        { name: "DRESSES", storeId: store.id },
+        { name: "JUMPSUITS & PLAYSUITS", storeId: store.id },
+        { name: "KNITWEAR", storeId: store.id },
+        { name: "LOUNGEWEAR", storeId: store.id },
+        { name: "MATCHING SET", storeId: store.id },
+        { name: "PANTS", storeId: store.id },
+        { name: "SHORTS", storeId: store.id },
+        { name: "SKIRTS", storeId: store.id },
+        { name: "SPORTSWEAR", storeId: store.id },
+        { name: "SWIMWEAR", storeId: store.id },
+        { name: "SUITS", storeId: store.id },
+        { name: "BOARDIES", storeId: store.id },
+        { name: "TOPS", storeId: store.id },
+        { name: "CORSET", storeId: store.id },
+        { name: "VEST", storeId: store.id },
+        { name: "UNDERWEAR", storeId: store.id },
+        { name: "BODYSUIT", storeId: store.id },
+        { name: "SHIRTS", storeId: store.id },
+        { name: "SWEATS", storeId: store.id },
+        { name: "T-SHIRT", storeId: store.id },
+        { name: "N/A", storeId: store.id },
+      ],
+    });
+    
     const billboards = await prismadb.billboard.createMany({
       data: [
         {
@@ -191,6 +285,9 @@ export async function POST(req: Request) {
     console.log("[INFO] New Store Created:", store);
     console.log("[INFO] New template Created Sizes added:", sizes);
     console.log("[INFO] New template Created Genders added:", genders);
+    console.log("[INFO] New template Created Categories added:", categories);
+    console.log("[INFO] New template Created Color added:", colors);
+    console.log("[INFO] New template Created Material added:", materials);
     console.log("[INFO] New template Created Billboards added:", billboards);
     console.log("[INFO] New Seller Created:", seller);
     console.log("[INFO] New Location Created:", location);
