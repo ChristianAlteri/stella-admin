@@ -14,7 +14,7 @@ datasource db {
 model Store {
   id     String @id @default(uuid())
   name   String
-  userId String // Clerk js user id
+  userId String // Clerk js user id. This allows only the signed in user to see the companies stores.
 
   consignmentRate Int    @default(50)
   currency        String @default("GBP")

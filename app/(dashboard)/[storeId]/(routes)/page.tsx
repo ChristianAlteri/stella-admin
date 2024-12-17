@@ -250,7 +250,6 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
             lastMonthRevenue={lastMonthRevenue}
             currentMonthRevenue={currentMonthRevenue}
           />
-<div>HELLO</div>
           <StockCard
             countryCode={store?.countryCode || "GB"}
             liveStock={liveStock}

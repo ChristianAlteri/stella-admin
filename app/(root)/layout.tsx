@@ -21,6 +21,8 @@ export default async function SetupLayout({
   console.log("CLG store", store);
   console.log("CLG userId", userId);
 
+  // If the user has a store, redirect to the store page, otherwise show the create store modal.
+  // TODO: We need to show the create company modal
   if (store) {
     redirect(`/${store.id}`);
   }
