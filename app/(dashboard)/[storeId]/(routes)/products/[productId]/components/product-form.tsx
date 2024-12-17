@@ -478,11 +478,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               </Popover>
               {label.toLowerCase() !== "seller" && 
               label.toLowerCase() !== "size" && 
-              label.toLowerCase() !== "category" && 
-              label.toLowerCase() !== "color" && 
-              label.toLowerCase() !== "material" && 
-              label.toLowerCase() !== "condition" && 
-              label.toLowerCase() !== "sub-category" && 
+              // label.toLowerCase() !== "category" && 
+              // label.toLowerCase() !== "color" && 
+              // label.toLowerCase() !== "material" && 
+              // label.toLowerCase() !== "condition" && 
+              // label.toLowerCase() !== "sub-category" && 
                 label.toLowerCase() !== "gender" && (
                   <Button
                     type="button"

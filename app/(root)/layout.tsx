@@ -9,10 +9,15 @@ export default async function SetupLayout({
 }) {
   const { userId } = auth();
 
+  // If no clerk user then re direct to sign-up
   if (!userId) {
     redirect("/sign-in");
   }
 
+  // TODO: Now try find if they have a company, if not then show the create company modal
+
+
+  // Find the store for the clerk user.
   const store = await prismadb.store.findFirst({
     where: {
       userId,
@@ -20,9 +25,7 @@ export default async function SetupLayout({
   });
   console.log("CLG store", store);
   console.log("CLG userId", userId);
-
   // If the user has a store, redirect to the store page, otherwise show the create store modal.
-  // TODO: We need to show the create company modal
   if (store) {
     redirect(`/${store.id}`);
   }
