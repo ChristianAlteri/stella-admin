@@ -157,7 +157,8 @@ export default function StripeTerminalComponent({
 
       const timeout = setTimeout(async () => {
         try {
-          const response = await axios.get(`${URL}`, {
+          // Hitting the mega-search route that our front end store uses
+          const response = await axios.get(`${URL}`, { 
             params: { productName: passedInId, limit: 10 },
           });
           setSearchResults(response.data);
@@ -177,7 +178,8 @@ export default function StripeTerminalComponent({
 
       const timeout = setTimeout(async () => {
         try {
-          const response = await axios.get(`${URL}`, {
+          // Hitting the pos specific route
+          const response = await axios.get(`${URL}/point-of-sale`, {
             params: { productName: inputRef.current?.value || "", limit: 10 }, // Original search logic
           });
           setSearchResults(response.data);
@@ -198,7 +200,6 @@ export default function StripeTerminalComponent({
 
     return { inputRef, handleSearch, handleSearchById }; // Return the new function
   };
-  // const { inputRef, handleSearch } = useProductSearch();
   const { inputRef, handleSearch, handleSearchById } = useProductSearch();
   useEffect(() => {
     const fetchInitialProducts = async () => {
