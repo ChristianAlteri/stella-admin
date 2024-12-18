@@ -43,6 +43,7 @@ import { currencyConvertor } from "@/lib/utils";
 import PrintableReceipt from "./printable-receipt";
 import { createRoot } from "react-dom/client";
 import CreateUserDialog from "./create-user-dialog";
+import { AvatarFallback } from "@/components/ui/avatar";
 
 // Custom Toast Error
 const toastError = (message: string) => {
@@ -184,7 +185,7 @@ export default function StripeTerminalComponent({
           console.error("Error fetching search results:", error);
           setSearchResults([]);
         }
-      }, 300);
+      }, 400);
 
       setDebounceTimeout(timeout);
     }, [debounceTimeout]);
@@ -643,14 +644,22 @@ export default function StripeTerminalComponent({
                                   className="flex items-center justify-between"
                                 >
                                   <div className="flex items-center w-full rounded-md">
-                                    {result.images && result.images[0] && (
+                                    {result.images && result.images[0] ? (
                                       <Image
                                         width={80}
                                         height={80}
-                                        src={result.images[0].url}
+                                        src={
+                                          result.images[0].url ||
+                                          "https://stella-ecomm-media-bucket.s3.amazonaws.com/uploads/mobilehome.jpg"
+                                        }
                                         alt={result.name}
                                         className="w-20 h-20 object-cover rounded-md p-2"
                                       />
+                                    ) : (
+                                      <AvatarFallback>
+                                        {result?.name?.[0]?.toUpperCase() || ""}
+                                        {result?.name?.[1]?.toUpperCase() || ""}
+                                      </AvatarFallback>
                                     )}
                                     <div className="flex flex-row gap-2 justify-between text-center items-center w-full">
                                       <div className="flex flex-row gap-2 text-center items-center w-full">
@@ -668,11 +677,11 @@ export default function StripeTerminalComponent({
                                           {currencySymbol}
                                           {result.ourPrice.toString()}
                                           {result.isOnSale && (
-                                              <div className="text-muted-foreground line-through">
-                                                {currencySymbol}
-                                                {result.originalPrice.toString()}
-                                              </div>
-                                            )}
+                                            <div className="text-muted-foreground line-through">
+                                              {currencySymbol}
+                                              {result.originalPrice.toString()}
+                                            </div>
+                                          )}
                                         </div>
                                       </div>
                                       <div className="flex flex-row gap-2 text-end items-center w-full">
@@ -743,52 +752,54 @@ export default function StripeTerminalComponent({
                     : categories;
 
                 return (
-                  <TabsContent key={tab} value={tab} className="mt-0">
-                    <Card className="h-[400px]">
-                      <CardHeader>
-                        <CardTitle>
-                          {tab === "category"
-                            ? "Categories"
-                            : tab.charAt(0).toUpperCase() + tab.slice(1) + "s"}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <ScrollArea className="h-[calc(100%-80px)]">
-                          {isLoading ? (
-                            <div className="space-y-2">
-                              {[...Array(10)].map((_, i) => (
-                                <div
-                                  key={i}
-                                  className="flex flex-row w-full gap-2"
-                                >
-                                  <Skeleton key={i} className="h-8 w-1/2" />
-                                  <Skeleton key={i} className="h-8 w-1/2" />
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                              {items.map((item: any) => (
-                                <Button
-                                  key={item.id}
-                                  variant="outline"
-                                  className="justify-start h-auto py-2 px-4"
-                                  onClick={() => {
-                                    handleSearchProductByIDClick(item.id);
-                                    setActiveTab("search");
-                                  }}
-                                >
-                                  {tab === "seller"
-                                    ? item.storeName || item.instagramHandle
-                                    : item.name}
-                                </Button>
-                              ))}
-                            </div>
-                          )}
-                        </ScrollArea>
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
+                    <TabsContent key={tab} value={tab} className="mt-0">
+                      <Card className="h-[400px]">
+                        <CardHeader>
+                          <CardTitle>
+                            {tab === "category"
+                              ? "Categories"
+                              : tab.charAt(0).toUpperCase() +
+                                tab.slice(1) +
+                                "s"}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <ScrollArea className="flex-grow ">
+                            {isLoading ? (
+                              <div className="space-y-2">
+                                {[...Array(10)].map((_, i) => (
+                                  <div
+                                    key={i}
+                                    className="flex flex-row w-full gap-2"
+                                  >
+                                    <Skeleton key={i} className="h-8 w-1/2" />
+                                    <Skeleton key={i} className="h-8 w-1/2" />
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                {items.map((item: any) => (
+                                  <Button
+                                    key={item.id}
+                                    variant="outline"
+                                    className="justify-start h-auto py-2 px-4"
+                                    onClick={() => {
+                                      handleSearchProductByIDClick(item.id);
+                                      setActiveTab("search");
+                                    }}
+                                  >
+                                    {tab === "seller"
+                                      ? item.storeName || item.instagramHandle
+                                      : item.name}
+                                  </Button>
+                                ))}
+                              </div>
+                            )}
+                          </ScrollArea>
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
                 );
               })}
             </Tabs>
