@@ -44,7 +44,7 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
     where: {
       id: params.storeId,
     },
-  })
+  });
 
   const formattedProducts: ProductColumn[] = products.map((item) => ({
     id: item.id,
@@ -56,11 +56,9 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
     isCharity: item.isCharity,
     isHidden: item.isHidden,
     isOnline: item.isOnline,
-    ourPrice: (item.ourPrice.toString()),
+    ourPrice: item.ourPrice.toString(),
     originalPrice: item.originalPrice ? item.originalPrice.toString() : "",
-    retailPrice: item.retailPrice
-      ? (item.retailPrice.toString())
-      : "",
+    retailPrice: item.retailPrice ? item.retailPrice.toString() : "",
     likes: item.likes,
     clicks: item.clicks,
     category: item.category.name,
@@ -75,10 +73,12 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
     subcategory: item.subcategory.name,
     createdAt: format(item.createdAt, "MMMM do, yyyy"),
     // CDN url
-    imageUrl: item.images[0].url.replace(
-      "stella-ecomm-media-bucket.s3.amazonaws.com",
-      "d1t84xijak9ta1.cloudfront.net"
-    ), 
+    imageUrl: item.images?.[0]?.url
+      ? item.images[0].url.replace(
+          "stella-ecomm-media-bucket.s3.amazonaws.com",
+          "d1t84xijak9ta1.cloudfront.net"
+        )
+      : "https://stella-ecomm-media-bucket.s3.amazonaws.com/uploads/mobilehome.jpg",
     designerId: item.designerId,
     categoryId: item.categoryId,
     sellerId: item.seller?.id || "",
