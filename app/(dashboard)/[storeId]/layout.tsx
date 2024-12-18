@@ -3,7 +3,7 @@ import prismadb from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-export default async function DashboardLayout({
+export default async function StoresLayout({
   children,
   params,
 }: {
@@ -15,6 +15,7 @@ export default async function DashboardLayout({
   if (!userId) {
     redirect("/sign-in");
   }
+  
 
   let store = await prismadb.store.findFirst({
     where: {
@@ -34,7 +35,7 @@ export default async function DashboardLayout({
     <div className="min-h-screen flex flex-col bg-secondary">
       <NavBar storeId={params.storeId} />
       <div className="flex flex-1 p-2">
-        <main className="flex-1 ml-[50px] mt-[50px] w-full">{children}</main>
+        <main className="flex-1 ml-[50px] mt-[50px] w-full">STORES LAYOUT{children}</main>
       </div>
     </div>
   );
