@@ -4,17 +4,17 @@ export async function postConfirmationOfSaleToSeller(
   klaviyoProfileId: string,
   email: string,
   sellerNetPayout: string,
-  productIds: any
+  sellersProductData: { productId: string[]; productName: string[]; productPrice: number[] }
 ) {
   const apiKey = process.env.NEXT_PUBLIC_KLAVIYO_API_KEY;
-
   let sellerSaleConfirmationPayload = JSON.stringify({
       "data": {
         "type": "event",
         "attributes": {
           "properties": {
             "sellerNetPayout": `${sellerNetPayout}`,
-            "productIds": productIds
+            "productNames": `${sellersProductData.productName.join(", ")}`,
+            "productPrices": `${sellersProductData.productPrice.join(", ")}`,
           },
           "metric": {
             "data": {
@@ -38,6 +38,8 @@ export async function postConfirmationOfSaleToSeller(
     }
 );
 
+// console.log("sellerSaleConfirmationPayload", sellerSaleConfirmationPayload);
+
   const options = {
     method: "post",
     url: `https://a.klaviyo.com/api/events/`,
@@ -52,7 +54,7 @@ export async function postConfirmationOfSaleToSeller(
 
   try {
     const response = await axios(options);
-    console.log("SUCCESS KLAVIYO SELLER SALE", response);  
+    console.log("SUCCESS KLAVIYO SELLER SALE");  
     return response;
   } catch (error) {
     console.error("Error KLAVIYO SELLER SALE", error);

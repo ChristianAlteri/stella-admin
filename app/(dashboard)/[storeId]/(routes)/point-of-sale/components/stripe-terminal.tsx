@@ -158,7 +158,7 @@ export default function StripeTerminalComponent({
       const timeout = setTimeout(async () => {
         try {
           // Hitting the mega-search route that our front end store uses
-          const response = await axios.get(`${URL}`, { 
+          const response = await axios.get(`${URL}`, {
             params: { productName: passedInId, limit: 10 },
           });
           setSearchResults(response.data);
@@ -313,9 +313,44 @@ export default function StripeTerminalComponent({
       return;
     }
     const amountInCents = Math.round(parseFloat(amount) * 100);
-    // const totalAmountInCents = Math.round(parseFloat(totalAmount) * 100);
     try {
-      console.log("selectedUserId: ", selectedUserId);
+      // Define the type for grouped products
+      type GroupedProducts = {
+        [key: string]: {
+          productId: string[];
+          productName: string[];
+          productPrice: number[];
+        };
+      };
+
+      // Group products by sellerId
+      const productsWithSellerId: GroupedProducts = selectedProducts.reduce(
+        (acc: GroupedProducts, product) => {
+          const {
+            id: productId,
+            name: productName,
+            ourPrice: productPrice,
+            sellerId,
+          } = product;
+
+          if (!acc[sellerId]) {
+            acc[sellerId] = {
+              productId: [],
+              productName: [],
+              productPrice: [],
+            };
+          }
+
+          acc[sellerId].productId.push(productId);
+          acc[sellerId].productName.push(productName);
+          acc[sellerId].productPrice.push(Number(productPrice));
+
+          return acc;
+        },
+        {}
+      );
+      const productsWithSellerIdStringify = JSON.stringify(productsWithSellerId);
+
       const { data, status } = await axios.post(
         `/api/${storeId}/stripe/create_payment_intent`,
         {
@@ -324,6 +359,9 @@ export default function StripeTerminalComponent({
           readerId: selectedReader,
           storeId: storeId,
           productIds: selectedProducts.map((product) => product.id),
+          productNames: selectedProducts.map((product) => product.name),
+          productPrices: selectedProducts.map((product) => product.ourPrice),
+          productsWithSellerIdStringify, // Object with sellerId as key and productIds, productNames, productPrices as values
           urlFrom: urlFrom,
           soldByStaffId: selectedStaffId || `${storeId}`,
           userId: `${selectedUserId}` || "",
@@ -753,54 +791,52 @@ export default function StripeTerminalComponent({
                     : categories;
 
                 return (
-                    <TabsContent key={tab} value={tab} className="mt-0">
-                      <Card className="h-[400px]">
-                        <CardHeader>
-                          <CardTitle>
-                            {tab === "category"
-                              ? "Categories"
-                              : tab.charAt(0).toUpperCase() +
-                                tab.slice(1) +
-                                "s"}
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <ScrollArea className="flex-grow ">
-                            {isLoading ? (
-                              <div className="space-y-2">
-                                {[...Array(10)].map((_, i) => (
-                                  <div
-                                    key={i}
-                                    className="flex flex-row w-full gap-2"
-                                  >
-                                    <Skeleton key={i} className="h-8 w-1/2" />
-                                    <Skeleton key={i} className="h-8 w-1/2" />
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                {items.map((item: any) => (
-                                  <Button
-                                    key={item.id}
-                                    variant="outline"
-                                    className="justify-start h-auto py-2 px-4"
-                                    onClick={() => {
-                                      handleSearchProductByIDClick(item.id);
-                                      setActiveTab("search");
-                                    }}
-                                  >
-                                    {tab === "seller"
-                                      ? item.storeName || item.instagramHandle
-                                      : item.name}
-                                  </Button>
-                                ))}
-                              </div>
-                            )}
-                          </ScrollArea>
-                        </CardContent>
-                      </Card>
-                    </TabsContent>
+                  <TabsContent key={tab} value={tab} className="mt-0">
+                    <Card className="h-[400px]">
+                      <CardHeader>
+                        <CardTitle>
+                          {tab === "category"
+                            ? "Categories"
+                            : tab.charAt(0).toUpperCase() + tab.slice(1) + "s"}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ScrollArea className="flex-grow ">
+                          {isLoading ? (
+                            <div className="space-y-2">
+                              {[...Array(10)].map((_, i) => (
+                                <div
+                                  key={i}
+                                  className="flex flex-row w-full gap-2"
+                                >
+                                  <Skeleton key={i} className="h-8 w-1/2" />
+                                  <Skeleton key={i} className="h-8 w-1/2" />
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              {items.map((item: any) => (
+                                <Button
+                                  key={item.id}
+                                  variant="outline"
+                                  className="justify-start h-auto py-2 px-4"
+                                  onClick={() => {
+                                    handleSearchProductByIDClick(item.id);
+                                    setActiveTab("search");
+                                  }}
+                                >
+                                  {tab === "seller"
+                                    ? item.storeName || item.instagramHandle
+                                    : item.name}
+                                </Button>
+                              ))}
+                            </div>
+                          )}
+                        </ScrollArea>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
                 );
               })}
             </Tabs>

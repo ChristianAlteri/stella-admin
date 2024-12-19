@@ -41,7 +41,7 @@ export async function OPTIONS(request: Request) {
 
 export async function POST(req: NextRequest) {
   const sig = req.headers.get("stripe-signature");
-  console.log("sig", sig);
+  // console.log("sig", sig);
 
   let event;
 
@@ -70,19 +70,19 @@ export async function POST(req: NextRequest) {
   switch (event.type) {
     case "payment_intent.succeeded": {
       const paymentIntentSucceeded = event.data.object;
-      console.log("PaymentIntent Succeeded webhook route!", paymentIntentSucceeded);
+      // console.log("PaymentIntent Succeeded webhook route!", paymentIntentSucceeded);
       // Handle logic for successful payment intent
       break;
     }
     case "payment_intent.created": {
       const paymentIntentCreated = event.data.object;
-      console.log("PaymentIntent was created!", paymentIntentCreated);
+      // console.log("PaymentIntent was created!", paymentIntentCreated);
       // Handle logic for payment intent creation
       break;
     }
     case "charge.succeeded": {
       const chargeSucceeded = event.data.object;
-      console.log("Charge was successful!", chargeSucceeded);
+      // console.log("Charge was successful!", chargeSucceeded);
 
       const paymentIntentId = chargeSucceeded.payment_intent;
 
@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
               });
 
               const data = await response.json();
-              console.log("response from sending to verify-webhook-payment from [API_WEBHOOK]", data);
+              // console.log("response from sending to verify-webhook-payment from [API_WEBHOOK]", data);
 
               if (response.ok) {
                 console.log("Metadata successfully passed to API", data);
@@ -155,7 +155,7 @@ export async function POST(req: NextRequest) {
       break;
     }
     default:
-      console.log(`Unhandled event type: ${event.type}`);
+      // console.log(`Unhandled event type: ${event.type}`);
   }
 
   // Return 200 to acknowledge receipt of the event

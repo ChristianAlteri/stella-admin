@@ -127,8 +127,8 @@ export async function PATCH(
       consignmentRate
     } = body;
 
-    console.log("BODY", body);
-    console.log("INSIDE PATCH Seller Id", params.sellerId);
+    // console.log("BODY", body);
+    // console.log("INSIDE PATCH Seller Id", params.sellerId);
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 403 });
     }
