@@ -12,9 +12,10 @@ datasource db {
 }
 
 model Company {
-  id     String @id @default(uuid())
-  name   String
-  userId String // Clerk js user id. This allows only the signed in user to see the company.
+  id         String @id @default(uuid())
+  name       String
+  adminEmail String 
+  userId     String // Clerk js user id. This allows only the signed in user to see the company.
 
   stores Store[] @relation("CompanyToStore")
 }
@@ -229,11 +230,11 @@ model Product {
   staff         Staff?      @relation("StaffToProduct", fields: [staffId], references: [id])
   userId        String? // Foreign Key to User
   user          User?       @relation("UserToProduct", fields: [userId], references: [id])
-  sizeId        String // Foreign Key to Size
-  size          Size        @relation(fields: [sizeId], references: [id])
-  subcategoryId String // Foreign Key to Color
-  subcategory   Subcategory @relation(fields: [subcategoryId], references: [id])
 
+  sizeId        String? // Foreign Key to Size
+  size          Size?        @relation(fields: [sizeId], references: [id])
+  subcategoryId String?// Foreign Key to Color
+  subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
   colorId         String? // Foreign Key to Color
   color           Color?     @relation(fields: [colorId], references: [id])
   conditionId     String? // Foreign Key to Color
@@ -242,6 +243,7 @@ model Product {
   material        Material?  @relation(fields: [materialId], references: [id])
   genderId        String? // Foreign Key to Color
   gender          Gender?    @relation(fields: [genderId], references: [id])
+
   isOnSale        Boolean    @default(false)
   isFeatured      Boolean    @default(false)
   isArchived      Boolean    @default(false)
