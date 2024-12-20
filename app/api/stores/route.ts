@@ -21,15 +21,15 @@ export async function POST(req: Request) {
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 403 });
     }
-    const company = await prismadb.company.findFirst({
-      where: {
-        userId,
-      },
-    });
+    // const company = await prismadb.company.findFirst({
+    //   where: {
+    //     userId,
+    //   },
+    // });
 
-    if (!company) {
-      return new NextResponse("Name is required", { status: 400 });
-    }
+    // if (!company) {
+    //   return new NextResponse("Name is required", { status: 400 });
+    // }
     
     if (!name) {
       return new NextResponse("Name is required", { status: 400 });
@@ -55,7 +55,7 @@ export async function POST(req: Request) {
 
     const store = await prismadb.store.create({
       data: {
-        company: { connect: { id: company.id } },
+        // company: { connect: { id: company.id } },
         name,
         userId,
         consignmentRate,
