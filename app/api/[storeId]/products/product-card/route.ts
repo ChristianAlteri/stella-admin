@@ -162,7 +162,9 @@ export async function GET(
   { params }: { params: { storeId: string; productName: string } }
 ) {
   try {
-    let orderBy;
+    let orderBy = {
+      createdAt: "desc" as Prisma.SortOrder,
+    };
     const { searchParams } = new URL(req.url);
     const isOnline = searchParams.get("isOnline") === "true" ? true : undefined;
     const isArchived = searchParams.get("isArchived") === "true" ? true : false;
@@ -197,10 +199,9 @@ export async function GET(
 
     // const sort = searchParams.get("sort") || undefined;
 
-    
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "4", 10);
-    
+
     const skip = (page - 1) * limit;
     console.log("pagination", { page, limit, skip });
 
