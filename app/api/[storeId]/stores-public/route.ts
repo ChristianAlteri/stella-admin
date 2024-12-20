@@ -12,9 +12,6 @@ export async function GET(
   const storeIdFromOnlineStore =
     searchParams.get("storeIdFromOnlineStore") || params.storeId;
   try {
-    // const url = new URL(req.url);
-    // const storeId = url.searchParams.get("storeId");
-    // console.log("storeId", storeId);
 
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });

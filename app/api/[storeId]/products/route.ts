@@ -118,10 +118,10 @@ export async function POST(
           },
         },
         // condition: {
-          //   connect: {
-            //     id: conditionId,
-            //   },
-            // },
+        //   connect: {
+        //     id: conditionId,
+        //   },
+        // },
         ...(conditionId ? { condition: { connect: { id: conditionId } } } : {}),
         // material: {
         //   connect: {
@@ -162,8 +162,8 @@ export async function GET(
 ) {
   try {
     const { searchParams } = new URL(req.url);
-    // console.log("searchParams", searchParams);
-    const storeIdFromOnlineStore = searchParams.get("storeIdFromOnlineStore") || undefined;
+    const storeIdFromOnlineStore =
+      searchParams.get("storeIdFromOnlineStore") || undefined;
     const categoryId = searchParams.get("categoryId") || undefined;
     const designerId = searchParams.get("designerId") || undefined;
     const sellerId = searchParams.get("sellerId") || undefined;
@@ -192,8 +192,9 @@ export async function GET(
       : undefined;
 
     const isArchived = searchParams.get("isArchived") === "true" ? true : false;
-
-
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "20", 10);
+    const skip = (page - 1) * limit;
 
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
@@ -256,13 +257,18 @@ export async function GET(
         gender: true,
       },
       orderBy,
+      skip,
+      take: limit,
     });
 
-    const productsWithCDN = products.map(product => ({
+    const productsWithCDN = products.map((product) => ({
       ...product,
-      images: product.images.map(image => ({
+      images: product.images.map((image) => ({
         ...image,
-        url: image.url.replace("stella-ecomm-media-bucket.s3.amazonaws.com", "d1t84xijak9ta1.cloudfront.net"),
+        url: image.url.replace(
+          "stella-ecomm-media-bucket.s3.amazonaws.com",
+          "d1t84xijak9ta1.cloudfront.net"
+        ),
       })),
     }));
 
