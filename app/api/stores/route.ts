@@ -21,7 +21,16 @@ export async function POST(req: Request) {
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 403 });
     }
+    const company = await prismadb.company.findFirst({
+      where: {
+        userId,
+      },
+    });
 
+    if (!company) {
+      return new NextResponse("Name is required", { status: 400 });
+    }
+    
     if (!name) {
       return new NextResponse("Name is required", { status: 400 });
     }
@@ -46,6 +55,7 @@ export async function POST(req: Request) {
 
     const store = await prismadb.store.create({
       data: {
+        company: { connect: { id: company.id } },
         name,
         userId,
         consignmentRate,
@@ -162,7 +172,7 @@ export async function POST(req: Request) {
         { name: "N/A", storeId: store.id },
       ],
     });
-    
+
     const genders = await prismadb.gender.createMany({
       data: [
         { name: "MENS", storeId: store.id },
@@ -196,7 +206,7 @@ export async function POST(req: Request) {
         { name: "NAVY", storeId: store.id },
         { name: "N/A", storeId: store.id },
       ],
-    });    
+    });
 
     const materials = await prismadb.material.createMany({
       data: [
@@ -263,7 +273,7 @@ export async function POST(req: Request) {
         { name: "N/A", storeId: store.id },
       ],
     });
-    
+
     const billboards = await prismadb.billboard.createMany({
       data: [
         {
