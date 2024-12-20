@@ -22,6 +22,12 @@ export async function POST(req: Request) {
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
+    const company = await prismadb.company.findFirst({
+      where: {
+        userId,
+      },
+    })
+
     if (!name) {
       return new NextResponse("Name is required", { status: 400 });
     }
@@ -44,8 +50,13 @@ export async function POST(req: Request) {
       return new NextResponse("Currency is required", { status: 400 });
     }
 
+    if (!company) {
+      return new NextResponse("Company not found", { status: 404 });
+    }
+
     const store = await prismadb.store.create({
       data: {
+        company: { connect: { id: company.id } },
         name,
         userId,
         consignmentRate,

@@ -2,34 +2,35 @@ import { stripe } from "@/lib/stripe";
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prismadb from "@/lib/prismadb";
+import { formatNameToSlug } from "@/lib/utils";
 
 const logKey = "API_COMPANY";
 
 export async function POST(req: Request) {
   try {
+    console.log(`[ENTERING_${logKey}_POST]`);
     const { userId } = auth();
     const body = await req.json();
-    console.log(`[ENTERING_${logKey}_POST]`);
 
     const { name } = body;
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 403 });
     }
-
     if (!name) {
       return new NextResponse("Name is required", { status: 400 });
     }
 
+    const nameFormatted = formatNameToSlug(name);
+
     const company = await prismadb.company.create({
       data: {
-        name,
+        name: nameFormatted,
         userId,
       },
     });
 
     console.log(`[${logKey}_POST Created company: `, company);
-
     return NextResponse.json(company);
   } catch (error) {
     console.log(`[${logKey}_POST]`, error);

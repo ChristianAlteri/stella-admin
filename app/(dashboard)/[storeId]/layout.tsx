@@ -15,6 +15,7 @@ export default async function StoresLayout({
   if (!userId) {
     redirect("/sign-in");
   }
+  console.log("IN StoreLayout");
   
 
   let store = await prismadb.store.findFirst({
@@ -35,7 +36,7 @@ export default async function StoresLayout({
     <div className="min-h-screen flex flex-col bg-secondary">
       <NavBar storeId={params.storeId} />
       <div className="flex flex-1 p-2">
-        <main className="flex-1 ml-[50px] mt-[50px] w-full">STORES LAYOUT{children}</main>
+        <main className="flex-1 ml-[50px] mt-[50px] w-full">{children}</main>
       </div>
     </div>
   );

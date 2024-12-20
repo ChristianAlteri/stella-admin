@@ -1,37 +1,8 @@
 import React from "react";
-import { Separator } from "@/components/ui/separator";
-import { Heading } from "@/components/ui/heading";
-import prismadb from "@/lib/prismadb";
-import {
-  convertDecimalsToNumbers,
-  convertSpecificDecimals,
-  filterLastMonthOrders,
-  filterThisMonthOrders,
-  getPayoutSums,
-  totalRevenue,
-} from "@/lib/utils";
-import TopSellersCard from "@/components/analytic-components/Cards/top-sellers-card";
-import TopDesignersCard from "@/components/analytic-components/Cards/top-designers-card";
-import TopUsersCard from "@/components/analytic-components/Cards/top-users-card";
-import { StoreRevenueVsOrderAreaChart } from "@/components/analytic-components/AreaCharts/store-revenue-vs-orders-area-chart";
-import StoreClicksAndLikesChart from "@/components/analytic-components/LineCharts/clicks-and-likes-by-month-line-chart";
-import TopColorBarChart from "@/components/analytic-components/BarCharts/top-attribute-bar-chart";
-import {
-  getTopSellingSizeCount,
-  getTopSellingColorCount,
-  getTopSellingMaterialCount,
-  getTopSellingGenderCount,
-  getTopSellingSubcategoryCount,
-  getTopSellingConditionCount,
-} from "@/actions/TopSelling/get-top-selling-attribute";
-import RevenueSplits from "@/components/analytic-components/RadialCharts/revenue-splits";
-import TopCategoriesCard from "@/components/analytic-components/Cards/top-categories-card";
-import StockCard from "@/components/analytic-components/Cards/stock-card";
-import PayoutsAndOrdersCard from "@/components/analytic-components/Cards/payouts-and-orders-card";
-import { CardHeader } from "@/components/ui/card";
 import { auth } from "@clerk/nextjs/server";
-import { useRouter } from "next/navigation";
-import CompanyStoreTiles from "../../../../../components/main-components/company-store-tiles";
+import { redirect } from "next/navigation";
+import prismadb from "@/lib/prismadb";
+import CompanyHomePageComponent from "@/components/main-components/company/company-home-page";
 
 interface CompanyHomePageProps {
   params: {
@@ -40,28 +11,37 @@ interface CompanyHomePageProps {
 }
 
 const CompanyHomePage: React.FC<CompanyHomePageProps> = async ({ params }) => {
-  
   const { userId } = auth();
-  console.log("HELLO COMPANY HOMEPAGE params", params);
-  const stores = userId ? await prismadb.store.findMany({
-    where: {
-      userId: userId,
-    },
-    include: {
-      address: true,
-    },
-  }) : [];
+  if (!userId) {
+    redirect("/sign-in");
+  }
 
-  // TODO: This should be company
-  const store = await prismadb.store.findFirst({
+  const stores = userId
+    ? await prismadb.store.findMany({
+        where: {
+          userId: userId,
+        },
+        include: {
+          address: true,
+        },
+      })
+    : [];
+
+  const company = await prismadb.company.findFirst({
     where: {
       name: params.companyName,
     },
   });
-  // console.log("store", store);
+
+  if (!company) {
+    redirect("/");
+  }
+
   return (
-    <div className="flex flex-col bg-secondary md:w-full w-1/2 p-4">
-      {store && <CompanyStoreTiles stores={stores} singleStore={store}/>}
+    <div className="flex flex-col items-center justify-center w-full bg-secondary h-full">
+      <div className="flex-1 space-y-4 p-8 pt-6 items-center justify-center w-2/3 h-full">
+        <CompanyHomePageComponent company={company} stores={stores} />
+      </div>
     </div>
   );
 };

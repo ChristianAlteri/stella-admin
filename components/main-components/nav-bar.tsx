@@ -4,15 +4,16 @@ import { redirect, useParams } from "next/navigation";
 import { MainNav } from "@/components/main-components/main-nav";
 import { ThemeToggle } from "@/components/main-components/theme-toggle";
 import prismadb from "@/lib/prismadb";
-import StoreSwitcher from "./store-switcher";
-import Sidebar from "./side-bar";
-import CompanySideBarComponent from "./company-side-bar";
+import StoreSwitcher from "./store/store-switcher";
+import StoreSideBarComponent from "./store/store-side-bar";
+import CompanySideBarComponent from "./company/company-side-bar";
 
 interface NavbarProps {
   storeId?: string;
+  companyName?: string;
 }
 
-const Navbar: React.FC<NavbarProps> = async ({ storeId }) => {
+const Navbar: React.FC<NavbarProps> = async ({ storeId, companyName }) => {
   const { userId } = auth();
 
   if (!userId) {
@@ -25,9 +26,7 @@ const Navbar: React.FC<NavbarProps> = async ({ storeId }) => {
       userId,
     },
   });
-
-  // TODO: Find the actual company associated with the clerk user.
-  const companyName = await prismadb.store.findMany({
+  const company = await prismadb.company.findMany({
     where: {
       userId,
     },
@@ -37,7 +36,11 @@ const Navbar: React.FC<NavbarProps> = async ({ storeId }) => {
     <div className="w-full h-full sticky top-0 z-50">
       <div className="absolute w-full flex h-[50px] items-center p-4  bg-secondary">
         <div className="ml-[50px]">
+        {storeId ? (
           <StoreSwitcher items={stores} />
+        ) : (
+          <div className="text-black w-full font-bold ">{(companyName?.toUpperCase() || company[0].name.toUpperCase())}</div>
+        )}
         </div>
         <div className="flex-1 flex items-center justify-center w-full mr-[100px]">
           <MainNav className="flex-1 w-full " />
@@ -48,9 +51,9 @@ const Navbar: React.FC<NavbarProps> = async ({ storeId }) => {
         </div>
       </div>
       {storeId ? (
-        <Sidebar storeId={storeId} />
+        <StoreSideBarComponent storeId={storeId} />
       ) : (
-        <CompanySideBarComponent companyName={companyName[0].name} />
+        <CompanySideBarComponent companyName={companyName} />
       )}
     </div>
   );

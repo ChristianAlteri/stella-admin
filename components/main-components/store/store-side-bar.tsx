@@ -16,9 +16,9 @@ import { FaXbox } from "react-icons/fa6";
 import { useState, useEffect } from "react";
 import { Users, Package } from "lucide-react";
 import { GrConfigure } from "react-icons/gr";
-import { Separator } from "../ui/separator";
+import { Separator } from "@/components/ui/separator";
 
-export default function Component({ storeId = "" }: { storeId?: string }) {
+export default function StoreSideBarComponent({ storeId = "" }: { storeId?: string }) {
   const params = useParams();
   const pathname = usePathname();
   const [selectedItem, setSelectedItem] = useState<string>(

@@ -14,9 +14,7 @@ import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { FaXbox } from "react-icons/fa6";
 import { useState, useEffect } from "react";
-import { Users, Package } from "lucide-react";
-import { GrConfigure } from "react-icons/gr";
-import { Separator } from "../ui/separator";
+import { Separator } from "@/components/ui/separator";
 
 export default function CompanySideBarComponent({ companyName = "" }: { companyName?: string }) {
   const params = useParams();

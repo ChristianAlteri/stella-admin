@@ -450,3 +450,13 @@ export function formatAddress(addressString: string): string {
 ${address.city || ""}, ${address.state || ""} ${address.postal_code || ""}
 ${address.country || ""}`;
 }
+
+
+export function formatNameToSlug(name: string): string {
+  return name
+    .toLowerCase() // Convert to lowercase
+    .trim() // Remove extra spaces
+    .replace(/[^a-z0-9\s-]/g, "") // Remove non-alphanumeric characters except spaces and hyphens
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/-+/g, "-"); // Remove consecutive hyphens
+}
