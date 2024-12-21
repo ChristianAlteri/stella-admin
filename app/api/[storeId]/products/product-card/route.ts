@@ -3,7 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 
 import prismadb from "@/lib/prismadb";
 import { Prisma } from "@prisma/client";
-import { convertDecimalFields } from "@/lib/utils";
+import { convertDecimalFields, parseBooleanParam } from "@/lib/utils";
 
 export async function POST(
   req: Request,
@@ -162,14 +162,30 @@ export async function GET(
   { params }: { params: { storeId: string; productName: string } }
 ) {
   try {
-    let orderBy = {
-      createdAt: "desc" as Prisma.SortOrder,
-    };
+    let orderBy: any;
     const { searchParams } = new URL(req.url);
-    const isOnline = searchParams.get("isOnline") === "true" ? true : undefined;
-    const isArchived = searchParams.get("isArchived") === "true" ? true : false;
     const storeIdFromOnlineStore =
       searchParams.get("storeIdFromOnlineStore") || undefined;
+
+    const isOnline = parseBooleanParam(searchParams.get("isOnline"));
+    const isArchived = parseBooleanParam(searchParams.get("isArchived"));
+    const isOnSale = parseBooleanParam(searchParams.get("isOnSale"));
+
+    const sort = searchParams.get("sort") || undefined;
+
+    if (sort === "most-liked") {
+      orderBy = {
+        likes: "desc" as Prisma.SortOrder,
+      };
+    } else if (sort === "most-viewed") {
+      orderBy = {
+        clicks: "desc" as Prisma.SortOrder,
+      };
+    } else {
+      orderBy = {
+        createdAt: "desc" as Prisma.SortOrder,
+      };
+    }
 
     // const categoryId = searchParams.get("categoryId") || undefined;
     // const designerId = searchParams.get("designerId") || undefined;
@@ -197,13 +213,14 @@ export async function GET(
     //   ? parseFloat(searchParams.get("maxPrice")!)
     //   : undefined;
 
-    // const sort = searchParams.get("sort") || undefined;
+    
 
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "4", 10);
 
     const skip = (page - 1) * limit;
     console.log("pagination", { page, limit, skip });
+    console.log("searchParams", searchParams);
 
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
@@ -246,6 +263,7 @@ export async function GET(
         // isCharity,
         // isHidden,
         isOnline: isOnline,
+        isOnSale: isOnSale,
         isArchived: isArchived,
         // ourPrice: {
         //   gte: minPrice,
@@ -291,8 +309,10 @@ export async function GET(
         storeId: storeId,
         isOnline: isOnline,
         isArchived: isArchived,
+        // isOnSale: isOnSale,
       },
     });
+    console.log("totalProducts", totalProducts);
     return NextResponse.json({
       products: productsWithCDNAndFormatted, // Current page products
       total: totalProducts, // Total number of matching products

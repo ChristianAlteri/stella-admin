@@ -450,3 +450,10 @@ export function formatAddress(addressString: string): string {
 ${address.city || ""}, ${address.state || ""} ${address.postal_code || ""}
 ${address.country || ""}`;
 }
+
+
+export function parseBooleanParam(param: string | null): boolean | undefined {
+  if (param === "true") return true;
+  if (param === "false") return false;
+  return undefined;
+}
