@@ -293,13 +293,6 @@ export async function GET(
         isArchived: isArchived,
       },
     });
-    console.log({
-      products: productsWithCDNAndFormatted, // Current page products
-      total: totalProducts, // Total number of matching products
-      page, // Current page
-      limit, // Items per page
-    });
-
     return NextResponse.json({
       products: productsWithCDNAndFormatted, // Current page products
       total: totalProducts, // Total number of matching products
@@ -307,7 +300,7 @@ export async function GET(
       limit, // Items per page
     });
   } catch (error) {
-    console.log("[PRODUCTS_GET]", error);
+    console.log("[PRODUCTS_CARD_GET]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
