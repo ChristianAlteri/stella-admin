@@ -187,6 +187,8 @@ export async function GET(
       };
     }
 
+    console.log("orderBy", orderBy);
+
     // const categoryId = searchParams.get("categoryId") || undefined;
     // const designerId = searchParams.get("designerId") || undefined;
     // const sellerId = searchParams.get("sellerId") || undefined;
