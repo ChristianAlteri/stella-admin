@@ -65,12 +65,12 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
     designer: item.designer.name,
     sellerHandle: item.seller?.instagramHandle || "",
     sellerStoreName: item.seller?.storeName || "",
-    size: item.size.name,
+    size: item.size?.name || "",
     color: item.color?.name || "",
     condition: item.condition?.name || "",
     material: item.material?.name || "",
     gender: item.gender?.name || "",
-    subcategory: item.subcategory.name,
+    subcategory: item.subcategory?.name || "",
     createdAt: format(item.createdAt, "MMMM do, yyyy"),
     // CDN url
     imageUrl: item.images?.[0]?.url
