@@ -452,6 +452,15 @@ ${address.country || ""}`;
 }
 
 
+export function formatNameToSlug(name: string): string {
+  return name
+    .toLowerCase() // Convert to lowercase
+    .trim() // Remove extra spaces
+    .replace(/[^a-z0-9\s-]/g, "") // Remove non-alphanumeric characters except spaces and hyphens
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/-+/g, "-"); // Remove consecutive hyphens
+}
+
 export function parseBooleanParam(param: string | null): boolean | undefined {
   if (param === "true") return true;
   if (param === "false") return false;

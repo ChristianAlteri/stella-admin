@@ -321,6 +321,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           conditionId: initialData.conditionId ?? undefined,
           materialId: initialData.materialId ?? undefined,
           genderId: initialData.genderId ?? undefined,
+          sizeId: initialData.sizeId ?? undefined,
+          subcategoryId: initialData.subcategoryId ?? undefined,
         }
       : {
           // create new product

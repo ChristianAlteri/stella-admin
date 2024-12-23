@@ -27,8 +27,6 @@ export function MainNav({
       className={cn("flex flex-row items-center justify-center  w-full", className)}
       {...props}
     >
-
-
     </nav>
   )
 }
