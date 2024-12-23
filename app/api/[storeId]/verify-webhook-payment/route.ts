@@ -4,6 +4,7 @@ import { Prisma, Product } from "@prisma/client";
 import { stripe } from "@/lib/stripe";
 import { findProfileInKlaviyo } from "@/actions/klaviyo/find-profile-in-klaviyo";
 import { postConfirmationOfSaleToSeller } from "@/actions/klaviyo/post-confirmation-of-sale-to-seller";
+import { createProfileInKlaviyo } from "@/actions/klaviyo/create-profile-in-klaviyo";
 
 interface Metadata {
   storeId: string;
@@ -11,7 +12,8 @@ interface Metadata {
   soldByStaffId: string;
   userId: string;
   userEmail: string;
-  [key: string]: string;
+  [key: string]: string; // includes product IDs, Names and Prices
+  productsWithSellerId: any;
 }
 
 const logKey = "VERIFY_WEBHOOK_PAYMENT";
@@ -43,7 +45,7 @@ export async function POST(request: Request) {
     });
     const consignmentRate = store?.consignmentRate ?? 50;
 
-    // Split the funds into
+    // Split the metadata into
     const productIds = Object.keys(metadata)
       .filter((key) => key.startsWith("productId_"))
       .map((key) => metadata[key]);
@@ -301,10 +303,10 @@ export async function POST(request: Request) {
               products: productIds.join(","),
             },
           });
-          console.log(
-            `[INFO] ${logKey} stripeTransfer for seller: `,
-            stripeTransferForSeller
-          );
+          // console.log(
+          //   `[INFO] ${logKey} stripeTransfer for seller: `,
+          //   stripeTransferForSeller
+          // );
           const payout = await prismadb.payout.create({
             data: {
               storeId: metadata.storeId,
@@ -316,7 +318,7 @@ export async function POST(request: Request) {
               // TODO: Add the seller.storeName here
             },
           });
-          console.log(`[INFO] ${logKey} payout: `, payout);
+          // console.log(`[INFO] ${logKey} payout: `, payout);
           // TODO: if this is successful then update the product to sellerPayedOut=true
 
           // Send event to Klaviyo which sends them email saying they made a sale
@@ -324,12 +326,63 @@ export async function POST(request: Request) {
             where: { id: sellerWhoSoldId },
           });
           const sellerEmail = sellerEmailData?.email;
-          console.log(`[INFO] ${logKey} sellerEmail: `, sellerEmail);
+          const sellerName = sellerEmailData?.storeName || "Seller";
+          console.log(`[INFO] ${logKey} sellerEmailData: `, sellerEmailData);
+          console.log(
+            `[INFO] ${logKey} sellerEmail and sellerName: `,
+            sellerEmail,
+            sellerName
+          );
+          const productsWithSellerIdObject = JSON.parse(
+            metadata.productsWithSellerIdStringify
+          );
+          console.log("productsWithSellerIdObject", productsWithSellerIdObject);
+          const sellersProductData =
+            productsWithSellerIdObject[sellerWhoSoldId];
+          console.log("sellersProductData", sellersProductData);
           if (sellerEmail) {
             // Find Klaviyo profile ID and send confirmation
-            const klaviyoProfile = await findProfileInKlaviyo(sellerEmail);
-            if (klaviyoProfile.data && klaviyoProfile.data.length > 0) {
-              const klaviyoProfileId = klaviyoProfile.data[0].id;
+            let klaviyoProfile = await findProfileInKlaviyo(sellerEmail);
+            if (!klaviyoProfile.data || klaviyoProfile.data.length === 0) {
+              console.log(
+                `[INFO] ${logKey} No Klaviyo profile found for ${sellerEmail}. Creating one...`
+              );
+              klaviyoProfile = await createProfileInKlaviyo(
+                sellerName,
+                sellerEmail
+              );
+              console.log(
+                `[INFO] ${logKey} Created Klaviyo profile:`,
+                klaviyoProfile
+              );
+              const klaviyoProfileId = klaviyoProfile.data?.[0]?.id;
+              try {
+                const saleConfirmationEmail =
+                  await postConfirmationOfSaleToSeller(
+                    klaviyoProfileId,
+                    sellerEmail,
+                    sellerNetPayout.toString(),
+                    sellersProductData
+                  );
+                if (saleConfirmationEmail) {
+                  console.log(
+                    `[INFO] ${logKey} Sale confirmation email successfully sent for ${sellerEmail}. Response:`
+                    // saleConfirmationEmail
+                  );
+                } else {
+                  console.log(
+                    `[WARNING] ${logKey} Sale confirmation email not sent for ${sellerEmail}. Response was null or undefined.`
+                  );
+                }
+              } catch (error) {
+                console.log(
+                  `[ERROR] ${logKey} Failed to send sale confirmation email for ${sellerEmail}:`,
+                  error
+                );
+              }
+            }
+            const klaviyoProfileId = klaviyoProfile.data?.[0]?.id;
+            if (klaviyoProfileId) {
               console.log(
                 `[INFO] ${logKey} klaviyoProfileId for ${sellerEmail}:`,
                 klaviyoProfileId
@@ -340,12 +393,12 @@ export async function POST(request: Request) {
                     klaviyoProfileId,
                     sellerEmail,
                     sellerNetPayout.toString(),
-                    productIds.join(", ")
+                    sellersProductData
                   );
                 if (saleConfirmationEmail) {
                   console.log(
-                    `[INFO] ${logKey} Sale confirmation email successfully sent for ${sellerEmail}. Response:`,
-                    saleConfirmationEmail
+                    `[INFO] ${logKey} Sale confirmation email successfully sent for ${sellerEmail}. Response:`
+                    // saleConfirmationEmail
                   );
                 } else {
                   console.log(
@@ -392,13 +445,17 @@ export async function POST(request: Request) {
           total_sales: totalSales,
           total_sales_after_fees: totalSalesAfterFees,
           store_cut: storeCut,
-          consignment_rates: JSON.stringify(products.map((product) => ({
-            productId: product.id,
-            productName: product.name,
-            productSeller: product.seller.storeName,
-            consignmentRate:
-              product?.seller?.consignmentRate ?? store?.consignmentRate ?? 50,
-          }))),
+          consignment_rates: JSON.stringify(
+            products.map((product) => ({
+              productId: product.id,
+              productName: product.name,
+              productSeller: product.seller.storeName,
+              consignmentRate:
+                product?.seller?.consignmentRate ??
+                store?.consignmentRate ??
+                50,
+            }))
+          ),
           total_fees: totalFees,
           products: productIds.join(","),
         },
@@ -413,11 +470,11 @@ export async function POST(request: Request) {
           orderId: newOrder.id,
         },
       });
-      console.log(
-        `[INFO] ${logKey} stripeTransferForStore: `,
-        stripeTransferForStore
-      );
-      console.log(`[INFO] ${logKey} storePayoutRecord: `, storePayoutRecord);
+      // console.log(
+      //   `[INFO] ${logKey} stripeTransferForStore: `,
+      //   stripeTransferForStore
+      // );
+      // console.log(`[INFO] ${logKey} storePayoutRecord: `, storePayoutRecord);
       // TODO: if this is succesfull then update the product to sellerPayedOut=true
     } catch (error) {
       console.error(

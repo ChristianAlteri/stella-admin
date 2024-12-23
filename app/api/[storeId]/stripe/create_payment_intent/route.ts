@@ -6,7 +6,7 @@ import Stripe from "stripe";  // Import Stripe types
 export async function POST(req: NextRequest) {
   if (req.method === "POST") {
     try {
-      const { amount, readerId, storeId, productIds, urlFrom, soldByStaffId, userId, userEmail } = await req.json();
+      const { amount, readerId, storeId, productIds, urlFrom, soldByStaffId, userId, userEmail, productNames, productPrices, productsWithSellerIdStringify } = await req.json();
 
       if (!amount || !readerId || !storeId) {
         return NextResponse.json(
@@ -31,9 +31,17 @@ export async function POST(req: NextRequest) {
 
       // Use store currency or default to GBP
       const currency = store.currency?.toLowerCase() || "gbp";
-      // setup the productIds metadata
+
       const productIdMetadata = productIds.reduce((acc: any, id: string, index: number) => {
         acc[`productId_${index + 1}`] = id;
+        return acc;
+      }, {});
+      const productNamesMetadata = productNames.reduce((acc: any, id: string, index: number) => {
+        acc[`productName_${index + 1}`] = id;
+        return acc;
+      }, {});
+      const productPricesMetadata = productPrices.reduce((acc: any, id: string, index: number) => {
+        acc[`productPrice_${index + 1}`] = id;
         return acc;
       }, {});
 
@@ -52,7 +60,10 @@ export async function POST(req: NextRequest) {
         // },
         receipt_email: userEmail || undefined,
         metadata: {
+          productsWithSellerIdStringify,
           ...productIdMetadata, 
+          ...productNamesMetadata, 
+          ...productPricesMetadata, 
           storeId: storeId,
           urlFrom: urlFrom,
           soldByStaffId: soldByStaffId,

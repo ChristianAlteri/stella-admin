@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 
 import prismadb from "@/lib/prismadb";
 import { Prisma } from "@prisma/client";
+import { convertDecimalFields, parseBooleanParam } from "@/lib/utils";
 
 export async function POST(
   req: Request,
@@ -161,108 +162,142 @@ export async function GET(
   { params }: { params: { storeId: string; productName: string } }
 ) {
   try {
+    let orderBy: any;
     const { searchParams } = new URL(req.url);
     const storeIdFromOnlineStore =
       searchParams.get("storeIdFromOnlineStore") || undefined;
-    const categoryId = searchParams.get("categoryId") || undefined;
-    const designerId = searchParams.get("designerId") || undefined;
-    const sellerId = searchParams.get("sellerId") || undefined;
-    const colorId = searchParams.get("colorId") || undefined;
-    const sizeId = searchParams.get("sizeId") || undefined;
-    const materialId = searchParams.get("materialId") || undefined;
-    const conditionId = searchParams.get("conditionId") || undefined;
-    const genderId = searchParams.get("genderId") || undefined;
-    const subcategoryId = searchParams.get("subcategoryId") || undefined;
-    const isFeatured =
-      searchParams.get("isFeatured") === "true" ? true : undefined;
-    const isOnSale = searchParams.get("isOnSale") === "true" ? true : undefined;
-    const isHidden = searchParams.get("isHidden") === "true" ? true : undefined;
-    const isOnline = searchParams.get("isOnline") === "true" ? true : undefined;
-    const isCharity =
-      searchParams.get("isCharity") === "true" ? true : undefined;
 
-    const name = searchParams.get("productName") || undefined;
+      // Status filters
+    const isOnline = parseBooleanParam(searchParams.get("isOnline"));
+    const isArchived = parseBooleanParam(searchParams.get("isArchived"));
+    const isOnSale = parseBooleanParam(searchParams.get("isOnSale"));
+
+    // Sort filters
     const sort = searchParams.get("sort") || undefined;
-
-    const minPrice = searchParams.get("minPrice")
-      ? parseFloat(searchParams.get("minPrice")!)
-      : undefined;
-    const maxPrice = searchParams.get("maxPrice")
-      ? parseFloat(searchParams.get("maxPrice")!)
-      : undefined;
-
-    const isArchived = searchParams.get("isArchived") === "true" ? true : false;
-    const page = parseInt(searchParams.get("page") || "1", 10);
-    const limit = parseInt(searchParams.get("limit") || "20", 10);
-    const skip = (page - 1) * limit;
-
-    if (!params.storeId) {
-      return new NextResponse("Store id is required", { status: 400 });
-    }
-
-    let orderBy;
-    if (sort === "low-to-high") {
+    if (sort === "most-liked") {
       orderBy = {
-        ourPrice: "asc" as Prisma.SortOrder,
+        likes: "desc" as Prisma.SortOrder,
       };
-    } else if (sort === "high-to-low") {
+    } else if (sort === "most-viewed") {
       orderBy = {
-        ourPrice: "desc" as Prisma.SortOrder,
+        clicks: "desc" as Prisma.SortOrder,
       };
     } else {
       orderBy = {
         createdAt: "desc" as Prisma.SortOrder,
       };
     }
+    console.log("orderBy", orderBy);
+
+    // Filters
+    const genderId = searchParams.get("genderId") || undefined;
+    const designerId = searchParams.get("designerId") || undefined;
+    const categoryId = searchParams.get("categoryId") || undefined;
+
+    const sizeId = searchParams.get("sizeId") || undefined;
+    const materialId = searchParams.get("materialId") || undefined;
+    const colorId = searchParams.get("colorId") || undefined;
+
+    // const sellerId = searchParams.get("sellerId") || undefined;
+    // const conditionId = searchParams.get("conditionId") || undefined;
+    // const subcategoryId = searchParams.get("subcategoryId") || undefined;
+    // const isFeatured =
+    //   searchParams.get("isFeatured") === "true" ? true : undefined;
+    // const isOnSale = searchParams.get("isOnSale") === "true" ? true : undefined;
+    // const isHidden = searchParams.get("isHidden") === "true" ? true : undefined;
+
+    // const isCharity =
+    //   searchParams.get("isCharity") === "true" ? true : undefined;
+
+    // const name = searchParams.get("productName") || undefined;
+
+    // const minPrice = searchParams.get("minPrice")
+    //   ? parseFloat(searchParams.get("minPrice")!)
+    //   : undefined;
+    // const maxPrice = searchParams.get("maxPrice")
+    //   ? parseFloat(searchParams.get("maxPrice")!)
+    //   : undefined;
+
+    
+
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "4", 10);
+    const skip = (page - 1) * limit;
+    console.log("pagination", { page, limit, skip });
+    console.log("searchParams", searchParams);
+
+    if (!params.storeId) {
+      return new NextResponse("Store id is required", { status: 400 });
+    }
+
+    // if (sort === "low-to-high") {
+    //   orderBy = {
+    //     ourPrice: "asc" as Prisma.SortOrder,
+    //   };
+    // } else if (sort === "high-to-low") {
+    //   orderBy = {
+    //     ourPrice: "desc" as Prisma.SortOrder,
+    //   };
+    // } else {
+    //   orderBy = {
+    //     createdAt: "desc" as Prisma.SortOrder,
+    //   };
+    // }
 
     const storeId = storeIdFromOnlineStore || params.storeId;
 
     const products = await prismadb.product.findMany({
       where: {
         storeId: storeId,
-        categoryId,
-        designerId,
-        sellerId,
-        colorId,
-        sizeId,
-        conditionId,
-        materialId,
-        genderId,
-        subcategoryId,
-        name: {
-          contains: name,
-          mode: "insensitive",
-        },
-        isFeatured,
-        isOnSale,
-        isCharity,
-        isHidden,
-        isOnline,
+        genderId: genderId,
+        designerId: designerId,
+        categoryId: categoryId,
+        colorId: colorId,
+        sizeId: sizeId,
+        materialId: materialId,
+        // sellerId,
+        // conditionId,
+        // subcategoryId,
+        // name: {
+        //   contains: name,
+        //   mode: "insensitive",
+        // },
+        // isFeatured,
+        // isOnSale,
+        // isCharity,
+        // isHidden,
+        isOnline: isOnline,
+        isOnSale: isOnSale,
         isArchived: isArchived,
-        ourPrice: {
-          gte: minPrice,
-          lte: maxPrice,
-        },
+        // ourPrice: {
+        //   gte: minPrice,
+        //   lte: maxPrice,
+        // },
       },
       include: {
         images: true,
         category: true,
         designer: true,
-        color: true,
         size: true,
-        condition: true,
-        material: true,
-        seller: true,
-        subcategory: true,
-        gender: true,
+        // color: true,
+        // condition: true,
+        // material: true,
+        // seller: true,
+        // subcategory: true,
+        // gender: true,
       },
       orderBy,
       skip,
       take: limit,
     });
 
-    const productsWithCDN = products.map((product) => ({
+    const productsWithCDNAndFormatted = products.map((product) => ({
       ...product,
+      ourPrice: product.ourPrice.toNumber(),
+      retailPrice: product.retailPrice ? product.retailPrice.toNumber() : null,
+      originalPrice: product.originalPrice
+        ? product.originalPrice.toNumber()
+        : null,
       images: product.images.map((image) => ({
         ...image,
         url: image.url.replace(
@@ -272,9 +307,23 @@ export async function GET(
       })),
     }));
 
-    return NextResponse.json(productsWithCDN);
+    // Get the total count of matching products
+    const totalProducts = await prismadb.product.count({
+      where: {
+        storeId: storeId,
+        isOnline: isOnline,
+        isArchived: isArchived,
+      },
+    });
+    console.log("totalProducts", totalProducts);
+    return NextResponse.json({
+      products: productsWithCDNAndFormatted, // Current page products
+      total: totalProducts, // Total number of matching products
+      page, // Current page
+      limit, // Items per page
+    });
   } catch (error) {
-    console.log("[PRODUCTS_GET]", error);
+    console.log("[PRODUCTS_CARD_GET]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }

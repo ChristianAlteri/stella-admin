@@ -38,7 +38,7 @@ export async function GET(
       })),
     };
 
-    console.log("API_GET_PRODUCT_BY_ID", productWithCDN);
+    // console.log("API_GET_PRODUCT_BY_ID", productWithCDN);
     return NextResponse.json(productWithCDN);
   } catch (error) {
     // console.log('[PRODUCT_GET]', error);

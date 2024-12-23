@@ -173,7 +173,7 @@ export async function POST(req: Request) {
         { name: "N/A", storeId: store.id },
       ],
     });
-    
+
     const genders = await prismadb.gender.createMany({
       data: [
         { name: "MENS", storeId: store.id },
@@ -207,7 +207,7 @@ export async function POST(req: Request) {
         { name: "NAVY", storeId: store.id },
         { name: "N/A", storeId: store.id },
       ],
-    });    
+    });
 
     const materials = await prismadb.material.createMany({
       data: [
@@ -274,7 +274,7 @@ export async function POST(req: Request) {
         { name: "N/A", storeId: store.id },
       ],
     });
-    
+
     const billboards = await prismadb.billboard.createMany({
       data: [
         {

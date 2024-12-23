@@ -60,7 +60,7 @@ const formSchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1).optional(),
   images: z.object({ url: z.string() }).array(),
-  ourPrice: z.coerce.number().min(1),
+  ourPrice: z.coerce.number().min(0.51), // stripe minimum
   retailPrice: z.coerce.number().optional(),
   designerId: z.string().min(1),
   sellerId: z.string().min(1),

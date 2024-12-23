@@ -93,7 +93,7 @@ export async function POST(request: Request) {
           data: {
             isPaid: true,
             totalAmount: {
-              increment: 10, 
+              increment: 10,
             }, // Increment by a hard coded shipping rate of $10
             address: JSON.stringify(session.customer_details?.address),
             phone: session.customer_details?.phone || "",
@@ -194,7 +194,7 @@ export async function POST(request: Request) {
           storeCut += storeAdditionalCut;
           console.log(`[INFO] ${logKey} storeCut`, storeCut);
           console.log(`[INFO] ${logKey} payoutAfterFees`, payoutAfterFees);
-          
+
           if (product.seller) {
             acc[product.seller.stripe_connect_unique_id!] += sellerPayout;
           }
@@ -271,12 +271,67 @@ export async function POST(request: Request) {
               where: { id: sellerWhoSoldId },
             });
             const sellerEmail = sellerEmailData?.email;
-            console.log(`[INFO] ${logKey} sellerEmail: `, sellerEmail);
+            const sellerName = sellerEmailData?.storeName || "Seller";
+            console.log(`[INFO] ${logKey} sellerEmailData: `, sellerEmailData);
+            console.log(
+              `[INFO] ${logKey} sellerEmail and sellerName: `,
+              sellerEmail,
+              sellerName
+            );
+            const productsWithSellerIdObject = session.metadata
+              ?.productsWithSellerIdStringify
+              ? JSON.parse(session.metadata.productsWithSellerIdStringify)
+              : {};
+            console.log(
+              "productsWithSellerIdObject",
+              productsWithSellerIdObject
+            );
+            const sellersProductData =
+              productsWithSellerIdObject[sellerWhoSoldId];
+            console.log("sellersProductData", sellersProductData);
             if (sellerEmail) {
               // Find Klaviyo profile ID and send confirmation
-              const klaviyoProfile = await findProfileInKlaviyo(sellerEmail);
-              if (klaviyoProfile.data && klaviyoProfile.data.length > 0) {
-                const klaviyoProfileId = klaviyoProfile.data[0].id;
+              let klaviyoProfile = await findProfileInKlaviyo(sellerEmail);
+              if (!klaviyoProfile.data || klaviyoProfile.data.length === 0) {
+                console.log(
+                  `[INFO] ${logKey} No Klaviyo profile found for ${sellerEmail}. Creating one...`
+                );
+                klaviyoProfile = await createProfileInKlaviyo(
+                  sellerName,
+                  sellerEmail
+                );
+                console.log(
+                  `[INFO] ${logKey} Created Klaviyo profile:`,
+                  klaviyoProfile
+                );
+                const klaviyoProfileId = klaviyoProfile.data?.[0]?.id;
+                try {
+                  const saleConfirmationEmail =
+                    await postConfirmationOfSaleToSeller(
+                      klaviyoProfileId,
+                      sellerEmail,
+                      sellerNetPayout.toString(),
+                      sellersProductData
+                    );
+                  if (saleConfirmationEmail) {
+                    console.log(
+                      `[INFO] ${logKey} Sale confirmation email successfully sent for ${sellerEmail}. Response:`
+                      // saleConfirmationEmail
+                    );
+                  } else {
+                    console.log(
+                      `[WARNING] ${logKey} Sale confirmation email not sent for ${sellerEmail}. Response was null or undefined.`
+                    );
+                  }
+                } catch (error) {
+                  console.log(
+                    `[ERROR] ${logKey} Failed to send sale confirmation email for ${sellerEmail}:`,
+                    error
+                  );
+                }
+              }
+              const klaviyoProfileId = klaviyoProfile.data?.[0]?.id;
+              if (klaviyoProfileId) {
                 console.log(
                   `[INFO] ${logKey} klaviyoProfileId for ${sellerEmail}:`,
                   klaviyoProfileId
@@ -287,12 +342,12 @@ export async function POST(request: Request) {
                       klaviyoProfileId,
                       sellerEmail,
                       sellerNetPayout.toString(),
-                      productIds.join(", ")
+                      sellersProductData
                     );
                   if (saleConfirmationEmail) {
                     console.log(
-                      `[INFO] ${logKey} Sale confirmation email successfully sent for ${sellerEmail}. Response:`,
-                      saleConfirmationEmail
+                      `[INFO] ${logKey} Sale confirmation email successfully sent for ${sellerEmail}. Response:`
+                      // saleConfirmationEmail
                     );
                   } else {
                     console.log(
@@ -326,10 +381,7 @@ export async function POST(request: Request) {
           "DEBUG STRIPE AMOUNT PAYING OUT TO STORE",
           Math.round(storeCut * 100)
         );
-        console.log(
-          "STORE DETAILS",
-          store
-        );
+        console.log("STORE DETAILS", store);
         const stripeTransferForStore = await stripe.transfers.create({
           amount: Math.round(storeCut * 100), // Stripe requires amounts in pence (smallest currency unit)
           currency: store?.currency?.toString() || "GBP",
@@ -379,7 +431,7 @@ export async function POST(request: Request) {
           error
         );
       }
-    
+
       // HANDLE USER AND KLAVIYO
       const userEmail = session.customer_details?.email || "";
       const userName = session.customer_details?.name || "";
@@ -504,7 +556,6 @@ export async function POST(request: Request) {
           console.log(
             `[INFO] ${logKey} orderConfirmationEmail: ${orderConfirmationEmail}`
           );
-          
         } catch (emailError) {
           console.warn(
             `[WARNING] ${logKey} Failed to send order confirmation email:`,

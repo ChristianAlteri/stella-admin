@@ -43,6 +43,7 @@ import { currencyConvertor } from "@/lib/utils";
 import PrintableReceipt from "./printable-receipt";
 import { createRoot } from "react-dom/client";
 import CreateUserDialog from "./create-user-dialog";
+import { AvatarFallback } from "@/components/ui/avatar";
 
 // Custom Toast Error
 const toastError = (message: string) => {
@@ -156,6 +157,7 @@ export default function StripeTerminalComponent({
 
       const timeout = setTimeout(async () => {
         try {
+          // Hitting the mega-search route that our front end store uses
           const response = await axios.get(`${URL}`, {
             params: { productName: passedInId, limit: 10 },
           });
@@ -176,7 +178,8 @@ export default function StripeTerminalComponent({
 
       const timeout = setTimeout(async () => {
         try {
-          const response = await axios.get(`${URL}`, {
+          // Hitting the pos specific route
+          const response = await axios.get(`${URL}/point-of-sale`, {
             params: { productName: inputRef.current?.value || "", limit: 10 }, // Original search logic
           });
           setSearchResults(response.data);
@@ -184,7 +187,7 @@ export default function StripeTerminalComponent({
           console.error("Error fetching search results:", error);
           setSearchResults([]);
         }
-      }, 300);
+      }, 400);
 
       setDebounceTimeout(timeout);
     }, [debounceTimeout]);
@@ -197,7 +200,6 @@ export default function StripeTerminalComponent({
 
     return { inputRef, handleSearch, handleSearchById }; // Return the new function
   };
-  // const { inputRef, handleSearch } = useProductSearch();
   const { inputRef, handleSearch, handleSearchById } = useProductSearch();
   useEffect(() => {
     const fetchInitialProducts = async () => {
@@ -311,9 +313,44 @@ export default function StripeTerminalComponent({
       return;
     }
     const amountInCents = Math.round(parseFloat(amount) * 100);
-    // const totalAmountInCents = Math.round(parseFloat(totalAmount) * 100);
     try {
-      console.log("selectedUserId: ", selectedUserId);
+      // Define the type for grouped products
+      type GroupedProducts = {
+        [key: string]: {
+          productId: string[];
+          productName: string[];
+          productPrice: number[];
+        };
+      };
+
+      // Group products by sellerId
+      const productsWithSellerId: GroupedProducts = selectedProducts.reduce(
+        (acc: GroupedProducts, product) => {
+          const {
+            id: productId,
+            name: productName,
+            ourPrice: productPrice,
+            sellerId,
+          } = product;
+
+          if (!acc[sellerId]) {
+            acc[sellerId] = {
+              productId: [],
+              productName: [],
+              productPrice: [],
+            };
+          }
+
+          acc[sellerId].productId.push(productId);
+          acc[sellerId].productName.push(productName);
+          acc[sellerId].productPrice.push(Number(productPrice));
+
+          return acc;
+        },
+        {}
+      );
+      const productsWithSellerIdStringify = JSON.stringify(productsWithSellerId);
+
       const { data, status } = await axios.post(
         `/api/${storeId}/stripe/create_payment_intent`,
         {
@@ -322,6 +359,9 @@ export default function StripeTerminalComponent({
           readerId: selectedReader,
           storeId: storeId,
           productIds: selectedProducts.map((product) => product.id),
+          productNames: selectedProducts.map((product) => product.name),
+          productPrices: selectedProducts.map((product) => product.ourPrice),
+          productsWithSellerIdStringify, // Object with sellerId as key and productIds, productNames, productPrices as values
           urlFrom: urlFrom,
           soldByStaffId: selectedStaffId || `${storeId}`,
           userId: `${selectedUserId}` || "",
@@ -643,14 +683,22 @@ export default function StripeTerminalComponent({
                                   className="flex items-center justify-between"
                                 >
                                   <div className="flex items-center w-full rounded-md">
-                                    {result.images && result.images[0] && (
+                                    {result.images && result.images[0] ? (
                                       <Image
                                         width={80}
                                         height={80}
-                                        src={result.images[0].url}
+                                        src={
+                                          result.images[0].url ||
+                                          "https://stella-ecomm-media-bucket.s3.amazonaws.com/uploads/mobilehome.jpg"
+                                        }
                                         alt={result.name}
                                         className="w-20 h-20 object-cover rounded-md p-2"
                                       />
+                                    ) : (
+                                      <AvatarFallback>
+                                        {result?.name?.[0]?.toUpperCase() || ""}
+                                        {result?.name?.[1]?.toUpperCase() || ""}
+                                      </AvatarFallback>
                                     )}
                                     <div className="flex flex-row gap-2 justify-between text-center items-center w-full">
                                       <div className="flex flex-row gap-2 text-center items-center w-full">
@@ -668,11 +716,11 @@ export default function StripeTerminalComponent({
                                           {currencySymbol}
                                           {result.ourPrice.toString()}
                                           {result.isOnSale && (
-                                              <div className="text-muted-foreground line-through">
-                                                {currencySymbol}
-                                                {result.originalPrice.toString()}
-                                              </div>
-                                            )}
+                                            <div className="text-muted-foreground line-through">
+                                              {currencySymbol}
+                                              {result.originalPrice.toString()}
+                                            </div>
+                                          )}
                                         </div>
                                       </div>
                                       <div className="flex flex-row gap-2 text-end items-center w-full">
@@ -753,7 +801,7 @@ export default function StripeTerminalComponent({
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <ScrollArea className="h-[calc(100%-80px)]">
+                        <ScrollArea className="flex-grow ">
                           {isLoading ? (
                             <div className="space-y-2">
                               {[...Array(10)].map((_, i) => (

@@ -460,3 +460,9 @@ export function formatNameToSlug(name: string): string {
     .replace(/\s+/g, "-") // Replace spaces with hyphens
     .replace(/-+/g, "-"); // Remove consecutive hyphens
 }
+
+export function parseBooleanParam(param: string | null): boolean | undefined {
+  if (param === "true") return true;
+  if (param === "false") return false;
+  return undefined;
+}

@@ -17,8 +17,9 @@ export async function POST(
   req: Request,
   { params }: { params: { storeId: string } }
 ) {
-  const { productIds } = await req.json();
+  const { productsWithSellerIdStringify, productIds } = await req.json();
   console.log(`[ENTERING_${logKey}] productIds:`, productIds);
+  console.log(`[ENTERING_${logKey}] productsWithSellerIdStringify:`, productsWithSellerIdStringify);
   console.log(`[DEBUG_${logKey}] params.storeId:`, params.storeId);
 
   if (!productIds || productIds.length === 0) {
@@ -144,7 +145,7 @@ export async function POST(
       shipping_address_collection: { allowed_countries: ["AU"] },
       shipping_options: [
         // { shipping_rate: "shr_1QSammKCnSe3p09QJslPWBG3" }, // Dev
-        { shipping_rate: "shr_1QUPUpKCnSe3p09QMK1xShGT" }, // Prod
+        // { shipping_rate: "shr_1QUPUpKCnSe3p09QMK1xShGT" }, // Prod
       ],
       // allow_promotion_codes: true,
       success_url: `${process.env.FRONTEND_STORE_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
@@ -152,6 +153,7 @@ export async function POST(
       metadata: {
         orderId: newOrder.id,
         storeId: store.id,
+        productsWithSellerIdStringify,
         productIds: productIds.join(","),
       },
       payment_intent_data: {
