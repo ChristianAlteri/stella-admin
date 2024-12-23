@@ -3,38 +3,23 @@ import prismadb from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-export default async function StoresLayout({
+export default async function CompanyLayout({
   children,
   params,
 }: {
   children: React.ReactNode;
-  params: { storeId: string };
+  params: { storeId: string, companyName: string };
 }) {
   const { userId } = auth();
 
   if (!userId) {
     redirect("/sign-in");
   }
-  console.log("IN StoreLayout");
-  
-
-  let store = await prismadb.store.findFirst({
-    where: {
-      id: params.storeId,
-      userId,
-    },
-    include: {
-      address: true,
-    },
-  });
-
-  if (!store) {
-    redirect("/");
-  }
+  console.log("IN CompanyLayout");
 
   return (
     <div className="min-h-screen flex flex-col bg-secondary">
-      <NavBar storeId={params.storeId} />
+      <NavBar companyName={params.companyName}/>
       <div className="flex flex-1 p-2">
         <main className="flex-1 ml-[50px] mt-[50px] w-full">{children}</main>
       </div>

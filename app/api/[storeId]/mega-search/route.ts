@@ -200,9 +200,9 @@ export async function GET(
       },
       include: {
         images: true,
-        category: true,
-        designer: true,
         seller: true,
+        designer: true,
+        category: true,
         // color: true,
         // size: true,
         // condition: true,
