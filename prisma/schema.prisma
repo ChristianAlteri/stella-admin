@@ -231,10 +231,10 @@ model Product {
   userId        String? // Foreign Key to User
   user          User?       @relation("UserToProduct", fields: [userId], references: [id])
 
-  sizeId        String? // Foreign Key to Size
-  size          Size?        @relation(fields: [sizeId], references: [id])
-  subcategoryId String?// Foreign Key to Color
-  subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
+  sizeId        String // Foreign Key to Size
+  size          Size        @relation(fields: [sizeId], references: [id])
+  subcategoryId String// Foreign Key to Color
+  subcategory   Subcategory @relation(fields: [subcategoryId], references: [id])
   colorId         String? // Foreign Key to Color
   color           Color?     @relation(fields: [colorId], references: [id])
   conditionId     String? // Foreign Key to Color
