@@ -167,12 +167,13 @@ export async function GET(
     const storeIdFromOnlineStore =
       searchParams.get("storeIdFromOnlineStore") || undefined;
 
+      // Status filters
     const isOnline = parseBooleanParam(searchParams.get("isOnline"));
     const isArchived = parseBooleanParam(searchParams.get("isArchived"));
     const isOnSale = parseBooleanParam(searchParams.get("isOnSale"));
 
+    // Sort filters
     const sort = searchParams.get("sort") || undefined;
-
     if (sort === "most-liked") {
       orderBy = {
         likes: "desc" as Prisma.SortOrder,
@@ -186,17 +187,19 @@ export async function GET(
         createdAt: "desc" as Prisma.SortOrder,
       };
     }
-
     console.log("orderBy", orderBy);
 
-    // const categoryId = searchParams.get("categoryId") || undefined;
-    // const designerId = searchParams.get("designerId") || undefined;
+    // Filters
+    const genderId = searchParams.get("genderId") || undefined;
+    const designerId = searchParams.get("designerId") || undefined;
+    const categoryId = searchParams.get("categoryId") || undefined;
+
+    const sizeId = searchParams.get("sizeId") || undefined;
+    const materialId = searchParams.get("materialId") || undefined;
+    const colorId = searchParams.get("colorId") || undefined;
+
     // const sellerId = searchParams.get("sellerId") || undefined;
-    // const colorId = searchParams.get("colorId") || undefined;
-    // const sizeId = searchParams.get("sizeId") || undefined;
-    // const materialId = searchParams.get("materialId") || undefined;
     // const conditionId = searchParams.get("conditionId") || undefined;
-    // const genderId = searchParams.get("genderId") || undefined;
     // const subcategoryId = searchParams.get("subcategoryId") || undefined;
     // const isFeatured =
     //   searchParams.get("isFeatured") === "true" ? true : undefined;
@@ -219,7 +222,6 @@ export async function GET(
 
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "4", 10);
-
     const skip = (page - 1) * limit;
     console.log("pagination", { page, limit, skip });
     console.log("searchParams", searchParams);
@@ -247,14 +249,14 @@ export async function GET(
     const products = await prismadb.product.findMany({
       where: {
         storeId: storeId,
-        // categoryId,
-        // designerId,
+        genderId: genderId,
+        designerId: designerId,
+        categoryId: categoryId,
+        colorId: colorId,
+        sizeId: sizeId,
+        materialId: materialId,
         // sellerId,
-        // colorId,
-        // sizeId,
         // conditionId,
-        // materialId,
-        // genderId,
         // subcategoryId,
         // name: {
         //   contains: name,
@@ -311,7 +313,6 @@ export async function GET(
         storeId: storeId,
         isOnline: isOnline,
         isArchived: isArchived,
-        // isOnSale: isOnSale,
       },
     });
     console.log("totalProducts", totalProducts);
