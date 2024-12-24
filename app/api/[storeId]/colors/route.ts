@@ -66,7 +66,10 @@ export async function GET(
     const colors = await prismadb.color.findMany({
       where: {
         storeId: params.storeId
-      }
+      },
+      orderBy: {
+        name: 'asc', // Order by name in asc order
+      },
     });
   
     return NextResponse.json(colors);

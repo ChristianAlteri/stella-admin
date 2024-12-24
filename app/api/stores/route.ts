@@ -26,7 +26,7 @@ export async function POST(req: Request) {
       where: {
         userId,
       },
-    })
+    });
 
     if (!name) {
       return new NextResponse("Name is required", { status: 400 });
@@ -275,6 +275,25 @@ export async function POST(req: Request) {
       ],
     });
 
+    const subcategories = await prismadb.subcategory.createMany({
+      data: [
+        { name: "N/A", storeId: store.id },
+      ],
+    });
+
+    const conditions = await prismadb.condition.createMany({
+      data: [
+        { name: "Used - New", storeId: store.id },
+        { name: "Used - Good", storeId: store.id },
+        { name: "Used - Minor Flaws", storeId: store.id },
+        { name: "Vintage - New", storeId: store.id },
+        { name: "Vintage - Good", storeId: store.id },
+        { name: "Vintage - Minor Flaws", storeId: store.id },
+        { name: "Up-cycled - New", storeId: store.id },
+        { name: "N/A", storeId: store.id },
+      ],
+    });
+
     const billboards = await prismadb.billboard.createMany({
       data: [
         {
@@ -300,6 +319,8 @@ export async function POST(req: Request) {
     console.log("[INFO] New template Created Color added:", colors);
     console.log("[INFO] New template Created Material added:", materials);
     console.log("[INFO] New template Created Billboards added:", billboards);
+    console.log("[INFO] New template Created subcategories added:", subcategories);
+    console.log("[INFO] New template Created conditions added:", conditions);
     console.log("[INFO] New Seller Created:", seller);
     console.log("[INFO] New Location Created:", location);
     console.groupEnd();

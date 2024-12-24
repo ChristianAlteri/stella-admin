@@ -135,11 +135,7 @@ export async function POST(
         //   },
         // },
         ...(colorId ? { color: { connect: { id: colorId } } } : {}),
-        subcategory: {
-          connect: {
-            id: subcategoryId,
-          },
-        },
+        ...(subcategoryId ? { subcategory: { connect: { id: subcategoryId } } } : {}),
         // gender: {
         //   connect: {
         //     id: genderId,

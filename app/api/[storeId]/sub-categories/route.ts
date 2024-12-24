@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
-import { auth } from "@clerk/nextjs/server"
+import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 
-import prismadb from '@/lib/prismadb';
- 
+import prismadb from "@/lib/prismadb";
+
 export async function POST(
   req: Request,
   { params }: { params: { storeId: string } }
@@ -22,8 +22,6 @@ export async function POST(
       return new NextResponse("Name is required", { status: 400 });
     }
 
- 
-
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
     }
@@ -31,8 +29,8 @@ export async function POST(
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: params.storeId,
-        userId
-      }
+        userId,
+      },
     });
 
     if (!storeByUserId) {
@@ -43,16 +41,16 @@ export async function POST(
       data: {
         name,
         value,
-        storeId: params.storeId
-      }
+        storeId: params.storeId,
+      },
     });
-  
+
     return NextResponse.json(subcategory);
   } catch (error) {
-    console.log('[subCategory_POST]', error);
+    console.log("[subCategory_POST]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
-};
+}
 
 export async function GET(
   req: Request,
@@ -65,13 +63,16 @@ export async function GET(
 
     const subcategory = await prismadb.subcategory.findMany({
       where: {
-        storeId: params.storeId
-      }
+        storeId: params.storeId,
+      },
+      orderBy: {
+        name: "asc", // Order by name in asc order
+      },
     });
-  
+
     return NextResponse.json(subcategory);
   } catch (error) {
-    console.log('[subCategory_GET]', error);
+    console.log("[subCategory_GET]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
-};
+}

@@ -66,7 +66,10 @@ export async function GET(
     const conditions = await prismadb.condition.findMany({
       where: {
         storeId: params.storeId
-      }
+      },
+      orderBy: {
+        name: 'asc', // Order by name in asc order
+      },
     });
   
     return NextResponse.json(conditions);
