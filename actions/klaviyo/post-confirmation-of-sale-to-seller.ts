@@ -54,10 +54,10 @@ export async function postConfirmationOfSaleToSeller(
 
   try {
     const response = await axios(options);
-    console.log("SUCCESS KLAVIYO SELLER SALE");  
+console.log("SUCCESS KLAVIYO POST CONFIRMATION OF SALE TO SELLER");  
     return response;
   } catch (error) {
-    console.error("Error KLAVIYO SELLER SALE", error);
+console.error("Error KLAVIYO POST CONFIRMATION OF SALE TO SELLER", error);
     return null;
   }
 }

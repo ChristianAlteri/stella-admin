@@ -347,41 +347,18 @@ export async function POST(request: Request) {
               console.log(
                 `[INFO] ${logKey} No Klaviyo profile found for ${sellerEmail}. Creating one...`
               );
+              // If no profile create one then send the email confirmation
               klaviyoProfile = await createProfileInKlaviyo(
                 sellerName,
                 sellerEmail
               );
-              console.log(
-                `[INFO] ${logKey} Created Klaviyo profile:`,
-                klaviyoProfile
-              );
-              const klaviyoProfileId = klaviyoProfile.data?.[0]?.id;
-              try {
-                const saleConfirmationEmail =
-                  await postConfirmationOfSaleToSeller(
-                    klaviyoProfileId,
-                    sellerEmail,
-                    sellerNetPayout.toString(),
-                    sellersProductData
-                  );
-                if (saleConfirmationEmail) {
-                  console.log(
-                    `[INFO] ${logKey} Sale confirmation email successfully sent for ${sellerEmail}. Response:`
-                    // saleConfirmationEmail
-                  );
-                } else {
-                  console.log(
-                    `[WARNING] ${logKey} Sale confirmation email not sent for ${sellerEmail}. Response was null or undefined.`
-                  );
-                }
-              } catch (error) {
-                console.log(
-                  `[ERROR] ${logKey} Failed to send sale confirmation email for ${sellerEmail}:`,
-                  error
-                );
-              }
+              // Refetch because of delay in Klaviyo api
+              klaviyoProfile = await findProfileInKlaviyo(sellerEmail);
+              console.log(`[INFO] ${logKey} Created Klaviyo profile:`);
             }
-            const klaviyoProfileId = klaviyoProfile.data?.[0]?.id;
+            console.log(`[INFO] ${logKey} Klaviyo profile:`, klaviyoProfile);
+            const klaviyoProfileId = klaviyoProfile?.data[0]?.id;
+            // Send the seller the email confirmation
             if (klaviyoProfileId) {
               console.log(
                 `[INFO] ${logKey} klaviyoProfileId for ${sellerEmail}:`,
