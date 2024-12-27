@@ -311,6 +311,15 @@ export async function POST(req: Request) {
       ],
     });
 
+    // TODO: create a webhook with permissions to take payments
+    //const webhookEndpoint = await stripe.webhookEndpoints.create({
+    // enabled_events: ['charge.succeeded', 'charge.failed'],
+    // url: `https://stella-admin-six.vercel.app/api/${store.id}/webhook`,  // This will change to our app name
+    // });
+
+    //TODO: Your going to have to store the webhook secret in the database eg storePaymentWebhook: webhookEndpoint.secret and figure out where its used because right now its in your .env
+
+
     console.group(`[${logKey}_POST]`);
     console.log("[INFO] New Store Created:", store);
     console.log("[INFO] New template Created Sizes added:", sizes);

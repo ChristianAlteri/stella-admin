@@ -61,6 +61,44 @@ body,
     --radius: 0.65rem;
   }
 
+  /* runescape theme */
+  .runescape {
+    --background: 32 20% 17%;
+    --foreground: 39 100% 56%;
+    --sidebar: 32 20% 17%;
+    --card: 35 25% 24%;
+    --card-foreground: 39 100% 56%;
+    --popover: 35 25% 24%;
+    --popover-foreground: 39 100% 56%;
+    --primary: 39 100% 56%;
+    --primary-foreground: 32 20% 17%;
+    --secondary: 35 25% 24%;
+    --secondary-foreground: 39 100% 56%;
+    --muted: 35 25% 24%;
+    --muted-foreground: 39 70% 50%;
+    --accent: 39 100% 56%;
+    --accent-foreground: 32 20% 17%;
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 39 100% 56%;
+    --border: 35 25% 30%;
+    --input: 35 25% 30%;
+    --ring: 39 100% 56%;
+    --radius: 0.25rem;
+  }
+
+  .bg-runescape {
+    background-color: #382f1f;
+  }
+  
+  .border-runescape {
+    border-color: #5a4f36;
+  }
+  
+  .text-runescape {
+    color: #ff981f;
+  }
+  
+
   .galaxy {
     --background: 240 30% 8%;  /* Dark space-like background */
     --foreground: 210 20% 90%; /* Star-like text color */

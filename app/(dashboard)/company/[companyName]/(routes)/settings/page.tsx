@@ -1,17 +1,13 @@
-import React from "react";
-import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { auth } from "@clerk/nextjs/server"
 import prismadb from "@/lib/prismadb";
-import TheGrandExchangeComponent from "./components/client";
+import CompanySettingsForm from "./components/company-settings-form";
 
-interface TheGrandExchangePageProps {
-  params: {
-    companyName: string;
-  };
-}
 
-const TheGrandExchangePage: React.FC<TheGrandExchangePageProps> = async ({
-  params,
+const CompanySettingsPage = async ({
+  params
+}: {
+  params: { companyName: string }
 }) => {
   const { userId } = auth();
   if (!userId) {
@@ -28,13 +24,13 @@ const TheGrandExchangePage: React.FC<TheGrandExchangePageProps> = async ({
     redirect("/");
   }
 
-  return (
+  return ( 
     <div className="flex flex-col items-center justify-center w-full bg-secondary h-full">
       <div className="flex-1 space-y-4 p-8 pt-6 items-center justify-center w-2/3 h-full">
-        <TheGrandExchangeComponent company={company}/>
+        <CompanySettingsForm company={company} />
       </div>
     </div>
   );
-};
+}
 
-export default TheGrandExchangePage;
+export default CompanySettingsPage;

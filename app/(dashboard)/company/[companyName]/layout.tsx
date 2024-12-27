@@ -15,7 +15,6 @@ export default async function CompanyLayout({
   if (!userId) {
     redirect("/sign-in");
   }
-  console.log("IN CompanyLayout");
 
   return (
     <div className="min-h-screen flex flex-col bg-secondary">

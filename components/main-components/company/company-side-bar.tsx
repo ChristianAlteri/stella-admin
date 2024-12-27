@@ -1,20 +1,18 @@
 "use client";
 
 import {
-  TbAdjustmentsCog,
   TbCreditCard,
-  TbDeviceAnalytics,
+  TbDeviceDesktopAnalytics,
   TbSettings,
-  TbStar,
-  TbTag,
-  TbLego,
-  TbReceipt,
 } from "react-icons/tb";
 import Link from "next/link";
+import { LuWarehouse } from "react-icons/lu";
 import { useParams, usePathname } from "next/navigation";
 import { FaXbox } from "react-icons/fa6";
 import { useState, useEffect } from "react";
 import { Separator } from "@/components/ui/separator";
+import { RiExchangeFundsFill } from "react-icons/ri";
+
 
 export default function CompanySideBarComponent({ companyName = "" }: { companyName?: string }) {
   const params = useParams();
@@ -29,11 +27,9 @@ export default function CompanySideBarComponent({ companyName = "" }: { companyN
   }, [pathname, params.companyName]);
 
   const menuItems = [
-    { icon: TbCreditCard, href: `/company/${params.companyName}/home`, label: "Home" },
-    { icon: TbCreditCard, href: `/company/${params.companyName}/dashboard`, label: "Dashboard" },
-    { icon: TbCreditCard, href: `/company/${params.companyName}/warehouse`, label: "Warehouse" },
-    { icon: TbCreditCard, href: `/company/${params.companyName}/the-grand-exchange`, label: "The Grand Exchange" },
-    { icon: TbCreditCard, href: `/company/${params.companyName}/settings`, label: "Settings" },
+    { icon: TbDeviceDesktopAnalytics, href: `/company/${params.companyName}/dashboard`, label: "Dashboard" },
+    { icon: LuWarehouse, href: `/company/${params.companyName}/warehouse`, label: "Warehouse" },
+    { icon: RiExchangeFundsFill, href: `/company/${params.companyName}/the-grand-exchange`, label: "The Grand Exchange" },
   ];
 
   // const middleSectionItems = [
@@ -93,7 +89,7 @@ export default function CompanySideBarComponent({ companyName = "" }: { companyN
             </Link>
           ))}
           <div className="flex w-1/2">
-            <Separator />
+            {/* <Separator /> */}
           </div>
           {/* {middleSectionItems.map((item) => (
             <Link

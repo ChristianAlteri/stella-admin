@@ -2,29 +2,21 @@ import React from "react";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import prismadb from "@/lib/prismadb";
-import CompanyHomePageComponent from "@/components/main-components/company/company-home-page";
+import { WarehouseClient } from "./components/client";
 
-interface CompanyHomePageProps {
+interface WarehousePageProps {
   params: {
     companyName: string;
   };
 }
-const CompanyHomePage: React.FC<CompanyHomePageProps> = async ({ params }) => {
+
+const WarehousePage: React.FC<WarehousePageProps> = async ({
+  params,
+}) => {
   const { userId } = auth();
   if (!userId) {
     redirect("/sign-in");
   }
-
-  const stores = userId
-    ? await prismadb.store.findMany({
-        where: {
-          userId: userId,
-        },
-        include: {
-          address: true,
-        },
-      })
-    : [];
 
   const company = await prismadb.company.findFirst({
     where: {
@@ -39,10 +31,10 @@ const CompanyHomePage: React.FC<CompanyHomePageProps> = async ({ params }) => {
   return (
     <div className="flex flex-col items-center justify-center w-full bg-secondary h-full">
       <div className="flex-1 space-y-4 p-8 pt-6 items-center justify-center w-2/3 h-full">
-        <CompanyHomePageComponent company={company} stores={stores} />
+        <WarehouseClient company={company}/>
       </div>
     </div>
   );
 };
 
-export default CompanyHomePage;
+export default WarehousePage;
