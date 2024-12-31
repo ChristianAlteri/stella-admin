@@ -4,7 +4,7 @@ import * as z from "zod";
 import axios from "axios";
 import { FormEventHandler, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Billboard, Category, Designer, Seller } from "@prisma/client";
 import { useParams, useRouter } from "next/navigation";
@@ -71,16 +71,16 @@ export const SellerForm: React.FC<SellerFormProps> = ({
   };
 
   const formSchema = z.object({
-    name: z.string().min(1, "Name is required"),
+    name: z.string().optional(),
     instagramHandle: z.string().min(1, "Instagram handle is required"),
-    billboardId: z.string().min(1, "Billboard ID is required"),
+    billboardId: z.string().optional(),
     charityName: z.string().optional(),
     charityUrl: z.string().optional(),
-    shoeSizeEU: z.string().min(1, "Shoe size is required"),
-    topSize: z.string().min(1, "Top size is required"),
-    bottomSize: z.string().min(1, "Bottom size is required"),
-    firstName: z.string().min(1, "First name is required"),
-    lastName: z.string().min(1, "Last name is required"),
+    shoeSizeEU: z.string().optional(),
+    topSize: z.string().optional(),
+    bottomSize: z.string().optional(),
+    firstName: z.string().optional(),
+    lastName: z.string().optional(),
     email: z
       .string()
       .min(1, "Email is required")
@@ -90,8 +90,8 @@ export const SellerForm: React.FC<SellerFormProps> = ({
       .min(1, "Phone number is required")
       .regex(/^[0-9]+$/, "Phone number must contain only digits"),
     shippingAddress: z.string().min(1, "Shipping Address is required"),
-    storeName: z.string().optional(),
-    description: z.string().optional(),
+    storeName: z.string().min(1, "Store Name is required"),
+    description: z.string().min(1, "Description is required"),
     consignmentRate: z.number().optional(),
     country: z.enum(["AU", "GB"]),
   });
@@ -163,17 +163,14 @@ export const SellerForm: React.FC<SellerFormProps> = ({
   const description = initialData ? "Edit a Seller." : "Create a new Seller";
   const toastMessage = initialData ? "Seller updated!" : "Seller created!";
   const action = initialData ? "Save changes" : "Create";
-
-  const onSubmit: FormEventHandler<HTMLFormElement> = async (event: any) => {
-    const data = form.getValues();
-    event.preventDefault();
+  
+  const onSubmit: SubmitHandler<SellerFormValues> = async (data) => {
     try {
       const payload = {
         ...data,
       };
       setLoading(true);
       if (initialData) {
-        console.log("INITIAL DATA = ", payload);
         await axios.patch(
           `/api/${params.storeId}/sellers/${params.sellerId}`,
           payload
@@ -252,7 +249,8 @@ export const SellerForm: React.FC<SellerFormProps> = ({
       </div> */}
       <Separator className="mb-8" />
       <Form {...form}>
-        <form onSubmit={onSubmit} className="space-y-8">
+        {/* <form onSubmit={onSubmit} className="space-y-8"> */}
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <Card>
             <CardContent className="p-6">
               <h2 className="text-xl font-semibold mb-4 underline">
@@ -465,7 +463,7 @@ export const SellerForm: React.FC<SellerFormProps> = ({
                       </FormItem>
                     )}
                   />
-                  <FormField
+                  {/* <FormField
                     control={form.control}
                     name="consignmentRate"
                     render={({ field }) => (
@@ -492,7 +490,7 @@ export const SellerForm: React.FC<SellerFormProps> = ({
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  /> */}
                   <FormField
                     control={form.control}
                     name="shippingAddress"
@@ -659,7 +657,7 @@ export const SellerForm: React.FC<SellerFormProps> = ({
               </CardContent>
             )}
           </Card>
-          <Button disabled={loading} className="w-full " type="submit">
+          <Button disabled={loading} className="w-full" type="submit">
             {action}
           </Button>
         </form>

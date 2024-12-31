@@ -15,7 +15,6 @@ export default async function StoresLayout({
   if (!userId) {
     redirect("/sign-in");
   }
-  console.log("IN StoreLayout");
   
 
   let store = await prismadb.store.findFirst({
