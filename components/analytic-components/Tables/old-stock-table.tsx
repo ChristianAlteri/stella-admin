@@ -12,6 +12,7 @@ import { RiErrorWarningLine } from "react-icons/ri";
 import { Input } from "@/components/ui/input";
 import toast from "react-hot-toast";
 import { TbFaceId, TbFaceIdError } from "react-icons/tb";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 // Custom Toast Error
 const toastError = (message: string) => {
@@ -188,13 +189,13 @@ const OldStock: React.FC<OldStockProps> = ({ countryCode }) => {
   console.log("sorted", sortedProducts);
 
   return (
-    <>
-      <div className="flex-grow flex flex-col">
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-md font-bold flex items-center gap-2">
+    <Card className="col-span-3 h-[280px] flex flex-col w-full">
+      <div className="col-span-3 h-[280px] flex flex-col w-full">
+        <div className="flex items-center justify-between p-4">
+          <div className="text-md font-bold  items-center gap-2 flex flex-row ">
             Stock Older Than {activeTab === "6-weeks" ? "6 Weeks" : "8 Weeks"}:
             <RiErrorWarningLine className="text-orange-300 h-5 w-5" />
-          </span>
+          </div>
           <Button
             variant="outline"
             size="sm"
@@ -203,6 +204,8 @@ const OldStock: React.FC<OldStockProps> = ({ countryCode }) => {
             {isOldestFirst ? "Show Latest First" : "Show Oldest First"}
           </Button>
         </div>
+        <CardContent >
+
         <Tabs
           defaultValue="6-weeks"
           onValueChange={(val) => setActiveTab(val as "6-weeks" | "8-weeks")}
@@ -436,8 +439,9 @@ const OldStock: React.FC<OldStockProps> = ({ countryCode }) => {
             </ScrollArea>
           </TabsContent>
         </Tabs>
+        </CardContent>
       </div>
-    </>
+    </Card>
   );
 };
 

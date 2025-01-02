@@ -2,6 +2,7 @@ import React from "react";
 import { Separator } from "@/components/ui/separator";
 import { Heading } from "@/components/ui/heading";
 import prismadb from "@/lib/prismadb";
+import OldStockTable from "@/components/analytic-components/Tables/old-stock-table";
 import {
   convertDecimalsToNumbers,
   convertSpecificDecimals,
@@ -53,7 +54,11 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
   ] = await Promise.all([
     prismadb.product.findMany({
       where: { storeId: params.storeId },
-      include: { seller: { include: { payouts: true } }, designer: true, category: true },
+      include: {
+        seller: { include: { payouts: true } },
+        designer: true,
+        category: true,
+      },
       orderBy: { createdAt: "desc" },
     }),
     prismadb.store.findUnique({ where: { id: params.storeId } }),
@@ -61,7 +66,16 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
       where: { storeId: params.storeId },
       include: {
         payouts: { orderBy: { createdAt: "desc" } },
-        products: { include: { images: true, designer: true, seller: true, category: true, size: true, color: true } },
+        products: {
+          include: {
+            images: true,
+            designer: true,
+            seller: true,
+            category: true,
+            size: true,
+            color: true,
+          },
+        },
         orderedItems: { include: { order: true } },
       },
       orderBy: { createdAt: "desc" },
@@ -87,7 +101,7 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
     getTopSellingGenderCount(params.storeId),
     getTopSellingConditionCount(params.storeId),
   ]);
-  
+
   // const products = await prismadb.product.findMany({
   //   where: {
   //     storeId: params.storeId,
@@ -156,77 +170,22 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
   const { storePayoutSum, sellerPayoutSum } = getPayoutSums(
     payouts,
     params.storeId
-  );  
+  );
   // Cleaning up the data
   const plainOrders = convertDecimalsToNumbers(orders);
-  const plainPayouts = convertDecimalsToNumbers(payouts);
-  const plainProducts = convertDecimalsToNumbers(products);
-  const calculateAveragePrice = (products: { ourPrice: number }[]): number =>
-    products.length
-  ? +(
-    products.reduce((acc, { ourPrice }) => acc + ourPrice, 0) /
-    products.length
-  ).toFixed(2)
-  : 0;
-  
+
   const lastMonthOrders = filterLastMonthOrders(plainOrders);
   const currentMonthOrders = filterThisMonthOrders(plainOrders);
   const lastMonthRevenue = totalRevenue(lastMonthOrders);
   const currentMonthRevenue = totalRevenue(currentMonthOrders);
-  
-  const grossRevenue = plainOrders.reduce((acc: any, order: { totalAmount: any; }) => acc + order.totalAmount, 0);
+
+  const grossRevenue = plainOrders.reduce(
+    (acc: any, order: { totalAmount: any }) => acc + order.totalAmount,
+    0
+  );
   const netRevenue = storePayoutSum;
   const payoutRevenue = sellerPayoutSum;
   const totalFees = grossRevenue - (storePayoutSum + sellerPayoutSum);
-
-  const todaysOrders = plainOrders.filter((order: any) => {
-    const orderDate = new Date(order.createdAt);
-    const today = new Date();
-    return (
-      orderDate.getDate() === today.getDate() &&
-      orderDate.getMonth() === today.getMonth() &&
-      orderDate.getFullYear() === today.getFullYear()
-    );
-  });
-  const todaysPayouts = plainPayouts.filter((payout: any) => {
-    const payoutDate = new Date(payout.createdAt);
-    const today = new Date();
-    return (
-      payoutDate.getDate() === today.getDate() &&
-      payoutDate.getMonth() === today.getMonth() &&
-      payoutDate.getFullYear() === today.getFullYear()
-    );
-  });
-
-  // const soldStock = products.filter(
-  //   (product: any) => product.isArchived === true
-  // ).length;
-  // const liveStock = products.filter(
-  //   (product: any) => product.isArchived === false
-  // ).length;
-
-  // const liveStockData = plainProducts.filter(
-  //   (product: any) => product.isArchived === false
-  // );
-  // const averagePrice = calculateAveragePrice(liveStockData);
-  const { soldStock, liveStock, liveStockData } = products.reduce(
-      (acc: { soldStock: number; liveStock: number; liveStockData: typeof products }, product) => {
-        if (product.isArchived) {
-          acc.soldStock++;
-        } else {
-          acc.liveStock++;
-          acc.liveStockData.push(product);
-        }
-        return acc;
-      },
-      { soldStock: 0, liveStock: 0, liveStockData: [] as typeof products }
-    );
-    const averagePrice = calculateAveragePrice(
-      liveStockData.map(product => ({
-        ...product,
-        ourPrice: product.ourPrice.toNumber(),
-      }))
-    );
 
   // const topSellingColors = await getTopSellingColorCount(params.storeId);
   // const topSellingSize = await getTopSellingSizeCount(params.storeId);
@@ -237,48 +196,40 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
   // const topSellingGender = await getTopSellingGenderCount(params.storeId);
   // const topSellingCondition = await getTopSellingConditionCount(params.storeId);
   return (
-    <div className="flex-col bg-secondary md:w-full w-1/2">
-      <div className="flex-1 space-y-4 p-3">
+    <div className="flex-col bg-secondary md:w-full w-1/2 p-4 space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <RevenueSplits
+          countryCode={store?.countryCode || "GB"}
+          grossRevenue={grossRevenue}
+          netRevenue={netRevenue}
+          payoutRevenue={payoutRevenue}
+          totalFees={totalFees}
+          lastMonthRevenue={lastMonthRevenue}
+          currentMonthRevenue={currentMonthRevenue}
+        />
 
-        <div className="grid gap-4 grid-cols-2">
-          <RevenueSplits
-            countryCode={store?.countryCode || "GB"}
-            grossRevenue={grossRevenue}
-            netRevenue={netRevenue}
-            payoutRevenue={payoutRevenue}
-            totalFees={totalFees}
-            lastMonthRevenue={lastMonthRevenue}
-            currentMonthRevenue={currentMonthRevenue}
-          />
-          <StockCard
-            countryCode={store?.countryCode || "GB"}
-            liveStock={liveStock}
-            soldStock={soldStock}
-            averagePrice={averagePrice}
-            products={plainProducts}
-            todaysOrders={todaysOrders}
-            todaysPayouts={todaysPayouts}
-          />
+        <StockCard countryCode={store?.countryCode || "GB"} />
 
-          {/* <Card className="overflow-y-auto">
+        {/* <Card className="overflow-y-auto">
             <CardHeader className="flex flex-row items-center justify-between pb-4">
-              <CardTitle className="text-2xl font-semibold text-gray-700">
+            <CardTitle className="text-2xl font-semibold text-gray-700">
                 
               </CardTitle>
             </CardHeader>
           </Card> */}
-        </div>
+      </div>
 
-        <div className="flex flex-row w-full gap-4 justify-between">
-          {/* <StoreRevenueVsOrderAreaChart countryCode={store?.countryCode || "GB"} orders={plainOrders} /> */}
-          <div className="flex flex-row w-full h-full gap-4 justify-between">
-            <TopSellersCard countryCode={store?.countryCode || "GB"} />
-            {/* <TopDesignersCard countryCode={store?.countryCode || "GB"} /> */}
-            {/* <TopCategoriesCard countryCode={store?.countryCode || "GB"} /> */}
-          </div>
+      <div className="flex flex-row w-full gap-4 justify-between">
+        {/* <StoreRevenueVsOrderAreaChart countryCode={store?.countryCode || "GB"} orders={plainOrders} /> */}
+        <div className="flex flex-row w-full h-full gap-4 justify-between">
+          <TopSellersCard countryCode={store?.countryCode || "GB"} />
+          <OldStockTable countryCode={store?.countryCode || "GB"} />
+          {/* <TopDesignersCard countryCode={store?.countryCode || "GB"} /> */}
+          {/* <TopCategoriesCard countryCode={store?.countryCode || "GB"} /> */}
         </div>
+      </div>
 
-        {/* <div className="flex flex-row w-full gap-4 justify-between">
+      {/* <div className="flex flex-row w-full gap-4 justify-between">
           <PayoutsAndOrdersCard
             countryCode={store?.countryCode || "GB"}
             latestPayouts={latestPayouts}
@@ -286,8 +237,9 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
           />
         </div> */}
 
-        <div className="flex flex-row w-full gap-4 justify-between">
-          {/* <TopColorBarChart
+      <div className="flex flex-row w-full gap-4 justify-between">
+        
+        {/* <TopColorBarChart
             topSellingData={topSellingColors}
             attribute="Color"
           />
@@ -310,20 +262,19 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
             topSellingData={topSellingGender}
             attribute="Gender"
           /> */}
-        </div>
+      </div>
 
-        <Separator />
-        <div className="mt-6"></div>
-        {/* <Heading title="Web site stuff" description="if site connected" />
+      <Separator />
+      <div className="mt-6"></div>
+      {/* <Heading title="Web site stuff" description="if site connected" />
         <div className="flex flex-row w-full gap-4 justify-between">
           <StoreClicksAndLikesChart products={plainProducts} />
         </div> */}
-        <div className="flex flex-row gap-4">
-          <div className="flex flex-row w-full gap-4 justify-between">
-            {/* <TopUsersCard users={users} sortBy={"totalPurchases"} /> */}
-            {/* <TopUsersCard users={users} sortBy={"totalItemsPurchased"} /> */}
-            {/* <TopUsersCard users={users} sortBy={"totalTransactionCount"} /> */}
-          </div>
+      <div className="flex flex-row gap-4">
+        <div className="flex flex-row w-full gap-4 justify-between">
+          {/* <TopUsersCard users={users} sortBy={"totalPurchases"} /> */}
+          {/* <TopUsersCard users={users} sortBy={"totalItemsPurchased"} /> */}
+          {/* <TopUsersCard users={users} sortBy={"totalTransactionCount"} /> */}
         </div>
       </div>
     </div>

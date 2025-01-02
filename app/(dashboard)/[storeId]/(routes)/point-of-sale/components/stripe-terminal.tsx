@@ -24,7 +24,7 @@ import { toast } from "react-hot-toast";
 import { TbFaceIdError, TbFaceId } from "react-icons/tb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus } from "lucide-react";
-
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -126,6 +126,8 @@ export default function StripeTerminalComponent({
   const [selectedStaffId, setSelectedStaffId] = useState<string>("");
   const [users, setUsers] = useState<Staff[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>("");
+  const [isCash, setIsCash] = useState<boolean>(false);
+
   useEffect(() => {
     if (readers.length > 0) {
       setSelectedReader(readers[0].id);
@@ -349,7 +351,8 @@ export default function StripeTerminalComponent({
         },
         {}
       );
-      const productsWithSellerIdStringify = JSON.stringify(productsWithSellerId);
+      const productsWithSellerIdStringify =
+        JSON.stringify(productsWithSellerId);
 
       const { data, status } = await axios.post(
         `/api/${storeId}/stripe/create_payment_intent`,
@@ -363,6 +366,7 @@ export default function StripeTerminalComponent({
           productPrices: selectedProducts.map((product) => product.ourPrice),
           productsWithSellerIdStringify, // Object with sellerId as key and productIds, productNames, productPrices as values
           urlFrom: urlFrom,
+          isCash: isCash,
           soldByStaffId: selectedStaffId || `${storeId}`,
           userId: `${selectedUserId}` || "",
           userEmail:
@@ -942,13 +946,23 @@ export default function StripeTerminalComponent({
                         </Select>
 
                         <Separator />
-                        <Input
-                          type="text"
-                          placeholder="Enter amount"
-                          value={amount}
-                          onChange={handleInputChange}
-                          className="text-2xl font-bold text-center"
-                        />
+                        <div className="flex flex-row gap-2 items-center">
+                          <Input
+                            type="text"
+                            placeholder="Enter amount"
+                            value={amount}
+                            onChange={handleInputChange}
+                            className="text-2xl font-bold text-center"
+                          />
+                          <div className="flex items-center space-x-2  text-muted-foreground">
+                            <span>Cash</span>
+                            <Switch
+                              checked={isCash}
+                              onCheckedChange={(checked) => setIsCash(checked)}
+                              className="" 
+                            />
+                          </div>
+                        </div>
                       </>
                     ) : (
                       <div className="text-center">

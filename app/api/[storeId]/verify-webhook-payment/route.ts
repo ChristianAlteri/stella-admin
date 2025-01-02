@@ -14,6 +14,7 @@ interface Metadata {
   userEmail: string;
   [key: string]: string; // includes product IDs, Names and Prices
   productsWithSellerId: any;
+  isCash: string;
 }
 
 const logKey = "VERIFY_WEBHOOK_PAYMENT";
@@ -87,6 +88,7 @@ export async function POST(request: Request) {
         data: {
           store: { connect: { id: metadata.storeId } },
           isPaid: true,
+          isCash: metadata.isCash === "true",
           hasBeenDispatched: true,
           totalAmount: new Prisma.Decimal(totalSales),
           soldByStaff: {

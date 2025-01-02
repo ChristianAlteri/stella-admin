@@ -136,6 +136,7 @@ model Order {
   store             Store       @relation("StoreToOrder", fields: [storeId], references: [id])
   orderItems        OrderItem[] // Relation to OrderItem model
   isPaid            Boolean     @default(false)
+  isCash            Boolean     @default(false)
   hasBeenDispatched Boolean     @default(false)
   inStoreSale       Boolean     @default(true)
   totalAmount       Decimal
