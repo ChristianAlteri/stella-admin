@@ -28,6 +28,7 @@ export type SellerColumn = {
   stripe_connect_unique_id: string;
   consignmentRate: number | undefined;
   isArchived: boolean;
+  isConnectedToStripe: boolean;
 };
 
 export const columns: ColumnDef<SellerColumn>[] = [

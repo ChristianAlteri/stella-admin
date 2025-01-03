@@ -85,17 +85,18 @@ model Seller {
   store      Store    @relation("StoreToSeller", fields: [storeId], references: [id])
   sellerType String?  @default("re-seller")
 
-  instagramHandle String     @default("")
-  firstName       String?    @default("")
-  lastName        String?    @default("")
-  email           String?    @default("")
-  phoneNumber     String?    @default("")
-  shippingAddress String?    @default("")
-  country         String?    @default("")
-  soldCount       Int?       @default(0)
-  billboardId     String? // Foreign Key to Billboard
-  billboard       Billboard? @relation(fields: [billboardId], references: [id])
-  isArchived      Boolean    @default(false)
+  instagramHandle     String     @default("")
+  firstName           String?    @default("")
+  lastName            String?    @default("")
+  email               String?    @default("")
+  phoneNumber         String?    @default("")
+  shippingAddress     String?    @default("")
+  country             String?    @default("")
+  soldCount           Int?       @default(0)
+  billboardId         String? // Foreign Key to Billboard
+  billboard           Billboard? @relation(fields: [billboardId], references: [id])
+  isArchived          Boolean    @default(false)
+  isConnectedToStripe Boolean    @default(true)
 
   stripe_connect_unique_id String?  @default("")
   payouts                  Payout[]

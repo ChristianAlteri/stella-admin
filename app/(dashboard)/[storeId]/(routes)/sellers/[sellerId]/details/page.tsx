@@ -111,6 +111,7 @@ const SellerDetailsPage = async ({
       seller?.stripe_connect_unique_id ?? "No Stripe ID",
     consignmentRate: seller?.consignmentRate ?? undefined,
     isArchived: seller?.isArchived ?? false,
+    isConnectedToStripe: seller?.isConnectedToStripe ?? true,
   };
 
   const archivedProducts = seller?.products.filter(

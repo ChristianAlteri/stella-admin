@@ -29,7 +29,8 @@ export const SellerClient: React.FC<SellerClientProps> = ({ data }) => {
     )
   );
   const archivedSellers = filteredData.filter((seller) => seller.isArchived);
-  const liveSellers = filteredData.filter((seller) => !seller.isArchived);
+  const liveSellers = filteredData.filter((seller) => !seller.isArchived && seller.isConnectedToStripe);
+  const disconnectedSellers = filteredData.filter((seller) => seller.isConnectedToStripe === false);
 
   return (
     <Card className="w-full">
@@ -67,6 +68,7 @@ export const SellerClient: React.FC<SellerClientProps> = ({ data }) => {
           <TabsList>
             <TabsTrigger value="live">Live Sellers</TabsTrigger>
             <TabsTrigger value="archived">Archived Sellers</TabsTrigger>
+            <TabsTrigger value="disconnected">Disconnected Sellers</TabsTrigger>
           </TabsList>
           <TabsContent value="live">
             <div className="flex mt-4">
@@ -85,6 +87,15 @@ export const SellerClient: React.FC<SellerClientProps> = ({ data }) => {
               />
             </div>
             <DataTable columns={columns} data={archivedSellers} />
+          </TabsContent>
+          <TabsContent value="disconnected">
+            <div className="flex mt-4">
+              <Heading
+                title={`Disconnected from Stripe (${disconnectedSellers.length})`}
+                description="See disconnected sellers"
+              />
+            </div>
+            <DataTable columns={columns} data={disconnectedSellers} />
           </TabsContent>
         </Tabs>
       </CardContent>

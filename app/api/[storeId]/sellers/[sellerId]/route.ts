@@ -124,7 +124,8 @@ export async function PATCH(
       sellerType,
       storeName,
       description,
-      consignmentRate
+      consignmentRate,
+      isConnectedToStripe
     } = body;
 
     // console.log("BODY", body);
@@ -172,6 +173,7 @@ export async function PATCH(
         storeName,
         description,
         consignmentRate,
+        isConnectedToStripe,
       },
     });
     console.log("SELLER", seller);
