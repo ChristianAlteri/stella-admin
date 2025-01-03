@@ -31,9 +31,9 @@ export const SellerClient: React.FC<SellerClientProps> = ({ data }) => {
         value.toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
-  const liveSellers = filteredData.filter((seller) => !seller.isArchived && seller.isConnectedToStripe && seller.stripe_connect_unique_id );
+  const liveSellers = filteredData.filter((seller) => !seller.isArchived && seller.isConnectedToStripe && seller.stripe_connect_unique_id);
   const archivedSellers = filteredData.filter((seller) => seller.isArchived);
-  const disconnectedSellers = filteredData.filter((seller) => seller.isConnectedToStripe === false);
+  const disconnectedSellers = filteredData.filter((seller) => !seller.isConnectedToStripe);
 
   // Handler to check all Stripe connections
   const handleCheckAllStripeStatus = async () => {
