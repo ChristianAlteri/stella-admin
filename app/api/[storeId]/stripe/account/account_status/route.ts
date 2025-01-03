@@ -97,19 +97,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
-// import { stripe } from "@/lib/stripe";
-// import { NextRequest, NextResponse } from "next/server";
-
-// export async function POST(req: NextRequest) {
-//   const { stripe_connect_unique_id } = await req.json();
-
-//   try {
-//     const account = await stripe.accounts.retrieve(stripe_connect_unique_id);
-//     console.log("[API_STRIPE_ACCOUNT_GET]", account);
-//     return NextResponse.json(account);
-//   } catch (error) {
-//     console.error("Error retrieving sellers stripe account", error);
-//     return NextResponse.json({ error: error }, { status: 500 });
-//   }
-// }

@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/input";
 import { PlusCircle, Search, Users } from "lucide-react";
 import { columns, SellerColumn } from "./columns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 interface SellerClientProps {
   data: SellerColumn[];
@@ -20,6 +22,7 @@ export const SellerClient: React.FC<SellerClientProps> = ({ data }) => {
   const params = useParams();
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
+  const [isCheckingAll, setIsCheckingAll] = useState(false);
 
   const filteredData = data.filter((seller) =>
     Object.values(seller).some(
@@ -31,6 +34,45 @@ export const SellerClient: React.FC<SellerClientProps> = ({ data }) => {
   const archivedSellers = filteredData.filter((seller) => seller.isArchived);
   const liveSellers = filteredData.filter((seller) => !seller.isArchived && seller.isConnectedToStripe);
   const disconnectedSellers = filteredData.filter((seller) => seller.isConnectedToStripe === false);
+
+  // Handler to check all Stripe connections
+  const handleCheckAllStripeStatus = async () => {
+    setIsCheckingAll(true);
+    for (const seller of filteredData) {
+      if (seller.stripe_connect_unique_id) {
+        try {
+          // Check Stripe status
+          const checkResponse = await axios.post(
+            `/api/${params.storeId}/stripe/account/account_status`,
+            {
+              stripe_connect_unique_id: seller.stripe_connect_unique_id,
+            }
+          );
+
+          const { connected, disabled_reason } = checkResponse.data;
+
+          // Update the seller's Stripe status
+          await axios.patch(
+            `/api/${params.storeId}/sellers/${seller.sellerId}`,
+            {
+              isConnectedToStripe: connected,
+            }
+          );
+
+        } catch (error: any) {
+          console.error(
+            `Error checking/updating Stripe status for seller ID ${seller.sellerId}:`,
+            error
+          );
+        }
+      }
+    }
+    setIsCheckingAll(false);
+    router.refresh();
+    toast.success(
+      `Stripe status checked.`
+    );
+  };
 
   return (
     <Card className="w-full">
@@ -61,6 +103,16 @@ export const SellerClient: React.FC<SellerClientProps> = ({ data }) => {
                 className="pl-8 w-full"
               />
             </div>
+
+            <Button
+              onClick={handleCheckAllStripeStatus}
+              size="sm"
+              variant="default"
+              disabled={isCheckingAll}
+              className="hover:underline hover:cursor-pointer"
+            >
+              {isCheckingAll ? "Checking..." : "Check Stripe Status"}
+            </Button>
           </div>
         </div>
         <Separator className="my-6 mb-4" />

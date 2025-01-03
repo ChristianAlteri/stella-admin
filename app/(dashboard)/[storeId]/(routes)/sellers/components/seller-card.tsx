@@ -222,8 +222,9 @@ export default function SellerCard({ row }: { row: SellerColumn }) {
       </CardContent>
       {error && <div className="p-2 text-red-500 text-sm">{error}</div>}
       {disabledReason && (
-        <div className="p-2 text-yellow-500 text-sm">
-          Reason: {disabledReason}
+        <div className="p-2 text-sm">
+          Disconnected reason:
+          <div className="text-yellow-500 text-sm">{disabledReason}</div>
         </div>
       )}
     </Card>
