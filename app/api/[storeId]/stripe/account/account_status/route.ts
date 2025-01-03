@@ -25,6 +25,10 @@ export async function POST(req: NextRequest) {
     const isChargesEnabled = account.charges_enabled;
     const isPayoutsEnabled = account.payouts_enabled;
     const areDetailsSubmitted = account.details_submitted;
+    const hasConnectedAccount = account.requirements?.pending_verification?.includes(
+        "currently_due"
+    );
+    const disabled_reason = account.requirements?.disabled_reason
 
     // Check all required capabilities are active
     const capabilities = account.capabilities || {};
@@ -75,7 +79,7 @@ export async function POST(req: NextRequest) {
       areRequirementsFulfilled;
 
     console.log("isConnected", { connected: isConnected });
-    return NextResponse.json({ connected: isConnected, account: account });
+    return NextResponse.json({ connected: isConnected, account: account, disabled_reason: disabled_reason });
   } catch (error: any) {
     console.error("Error retrieving seller's Stripe account:", error);
 

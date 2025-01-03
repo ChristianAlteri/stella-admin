@@ -42,10 +42,12 @@ export default function SellerCard({ row }: { row: SellerColumn }) {
     row.stripe_connect_unique_id ? "Connected" : "Not Connected"
   );
   const [error, setError] = useState<string | null>(null);
+  const [disabledReason, setDisabledReason] = useState<string | null>(null);
 
   const handleStripeConnectedCheck = async (stripe_connect_unique_id: string) => {
     setIsChecking(true);
     setError(null);
+    setDisabledReason(null); // Reset disabled reason on new check
 
     try {
       const response = await axios.post(
@@ -54,7 +56,15 @@ export default function SellerCard({ row }: { row: SellerColumn }) {
           stripe_connect_unique_id,
         }
       );
-      // TODO: Database update here
+      const { connected, disabled_reason } = response.data;
+
+      // Update the Stripe status based on the response
+      setStripeStatus(connected ? "Connected" : "Not Connected");
+
+      // If the account is disabled, set the disabled reason
+      if (!connected && disabled_reason) {
+        setDisabledReason(disabled_reason);
+      }
 
       console.log("Stripe account status:", response.data);
     } catch (err: any) {
@@ -112,6 +122,11 @@ export default function SellerCard({ row }: { row: SellerColumn }) {
           {error && (
             <div className="col-span-5 mt-2 text-red-500 text-sm">
               {error}
+            </div>
+          )}
+          {disabledReason && (
+            <div className="col-span-5 mt-2 text-yellow-500 text-sm">
+              Reason: {disabledReason}
             </div>
           )}
         </div>
@@ -183,6 +198,11 @@ export default function SellerCard({ row }: { row: SellerColumn }) {
                 <Badge variant="destructive">Not Connected to Stripe</Badge>
               )}
             </div>
+            {disabledReason && (
+              <div className="text-yellow-500 text-sm mt-1">
+                Reason: {disabledReason}
+              </div>
+            )}
             {error && (
               <div className="text-red-500 text-sm mt-1">{error}</div>
             )}
